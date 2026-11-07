@@ -1,12 +1,16 @@
+import { useState } from 'react'
 import type { AnimeSearchResult, RatedAnime } from '../types'
 
 type RatingsPanelProps = {
   ratings: RatedAnime[]
+  onRate: (anime: AnimeSearchResult, rating: number) => void
   onRemove: (malId: number) => void
   onOpen: (anime: AnimeSearchResult) => void
 }
 
-export function RatingsPanel({ ratings, onRemove, onOpen }: RatingsPanelProps) {
+export function RatingsPanel({ ratings, onRate, onRemove, onOpen }: RatingsPanelProps) {
+  const [editingMalId, setEditingMalId] = useState<number | null>(null)
+
   return (
     <section className="border-t border-white/10 py-10" aria-labelledby="ratings-heading">
       <div className="flex items-end justify-between gap-4">
@@ -43,7 +47,24 @@ export function RatingsPanel({ ratings, onRemove, onOpen }: RatingsPanelProps) {
                 </div>
                 <div className="mt-auto flex items-end justify-between gap-3 pt-4">
                   <button className="text-sm text-violet hover:text-white" type="button" onClick={(event) => { event.stopPropagation(); onOpen(anime) }}>View details</button>
-                  <button className="text-sm text-slate-400 transition hover:text-rose-300" type="button" onClick={(event) => { event.stopPropagation(); onRemove(anime.mal_id) }}>Remove</button>
+                  <div className="flex items-center gap-2" onClick={(event) => event.stopPropagation()}>
+                    {editingMalId === anime.mal_id ? (
+                      <select
+                        className="rounded-lg border border-violet/40 bg-ink px-2.5 py-1.5 text-sm text-white outline-none focus:border-violet"
+                        aria-label={`Edit score for ${anime.title}`}
+                        value={anime.rating}
+                        onChange={(event) => {
+                          onRate(anime, Number(event.target.value))
+                          setEditingMalId(null)
+                        }}
+                      >
+                        {Array.from({ length: 10 }, (_, index) => index + 1).map((rating) => <option value={rating} key={rating}>{rating}/10</option>)}
+                      </select>
+                    ) : (
+                      <button className="rounded-lg bg-white/10 px-3 py-1.5 text-sm text-slate-200 transition hover:bg-white/15 hover:text-white" type="button" onClick={() => setEditingMalId(anime.mal_id)}>Edit score</button>
+                    )}
+                    <button className="rounded-lg bg-black/40 px-3 py-1.5 text-sm text-slate-300 transition hover:bg-rose-950/70 hover:text-rose-200" type="button" onClick={() => onRemove(anime.mal_id)}>Remove</button>
+                  </div>
                 </div>
               </div>
             </li>
