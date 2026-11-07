@@ -1,0 +1,43 @@
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+frontend/.env.local
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+*.tsbuildinfo
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Data and ML artifacts
+data/
+artifacts/
+models/
+ml/outputs/
+ml/checkpoints/
+*.pt
+*.pth
+*.ckpt
+
+# Coverage/logs
+.coverage
+htmlcov/
+coverage/
+*.log
