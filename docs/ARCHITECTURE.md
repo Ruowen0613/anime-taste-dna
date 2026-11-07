@@ -22,6 +22,8 @@ The deployable system has one static frontend and one stateless API. Data prepar
 - `scripts/`: repeatable developer and data utility entry points.
 - `docs/`: decisions, data/evaluation documentation, and deployment notes.
 
+Frontend product behavior is grouped under `frontend/src/features/<feature>/`, with each feature owning its components, hooks, API adapter, and types. Backend behavior follows the same boundary under `backend/app/features/<feature>/`, with feature-owned routers, schemas, and services. Application entry files only configure infrastructure and compose these features.
+
 ## Frontend/backend communication
 
 The frontend reads `VITE_API_BASE_URL` and sends JSON over HTTPS. Contracts are versioned under `/api/v1`; Pydantic response/request models are the source of truth and matching TypeScript types are maintained at the client boundary. Browser ratings use a schema-versioned local-storage key. CORS allows only configured frontend origins outside local development.

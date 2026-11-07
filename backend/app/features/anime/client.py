@@ -2,7 +2,7 @@ from typing import Any
 
 import httpx
 
-from app.schemas import AnimeSearchResult
+from app.features.anime.schemas import AnimeSearchResult
 
 ANILIST_API_URL = "https://graphql.anilist.co"
 SEARCH_QUERY = """

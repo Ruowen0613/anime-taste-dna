@@ -1,8 +1,8 @@
 from fastapi.testclient import TestClient
 
-from app.anilist import AniListError, get_anilist_client
+from app.features.anime.client import AniListError, get_anilist_client
+from app.features.anime.schemas import AnimeSearchResult
 from app.main import app
-from app.schemas import AnimeSearchResult
 
 
 class FakeAniListClient:

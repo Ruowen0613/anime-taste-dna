@@ -15,6 +15,10 @@ Build a deployed, portfolio-quality MVP by **October 31, 2026**. The product mus
 ## Architecture conventions
 
 - Keep `frontend/`, `backend/`, and `ml/` independently runnable. Training code must never run in an API request.
+- Organize product behavior by feature. Frontend feature code belongs under `frontend/src/features/<feature>/`; backend routes, schemas, and services belong under `backend/app/features/<feature>/`.
+- Keep entry and composition files thin. `frontend/src/main.tsx`, `frontend/src/App.tsx`, and `backend/app/main.py` may initialize infrastructure and compose features, but must not contain feature state, business logic, API handlers, or substantial feature markup.
+- A feature folder should own its API adapter, types/schemas, state hooks or services, UI components/routes, and focused tests where applicable. Shared code may move to a shared module only after it has multiple real consumers.
+- Before adding behavior, identify its owning feature and extend that folder instead of growing an entry file. Refactor an entry file immediately if a change would make it responsible for feature behavior.
 - Define and document API schemas before wiring UI features. Use typed Pydantic models and matching TypeScript types.
 - Put offline data preparation, training, and evaluation in `ml/`; load only versioned inference artifacts in `backend/`.
 - Treat MyAnimeList ID as the canonical dataset item ID and store AniList ID mappings explicitly. Never join titles heuristically at request time.

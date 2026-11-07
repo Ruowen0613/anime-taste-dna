@@ -1,0 +1,1 @@
+"""Anime metadata search feature."""
