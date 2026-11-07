@@ -23,6 +23,7 @@ __pycache__/
 .ruff_cache/
 .mypy_cache/
 .venv/
+.venv-old/
 venv/
 *.egg-info/
 

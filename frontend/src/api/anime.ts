@@ -32,6 +32,7 @@ export async function searchAnime(query: string, signal?: AbortSignal): Promise<
     return payload.items
   } catch (error) {
     if (error instanceof DOMException && error.name === 'AbortError') {
+      if (signal?.aborted) throw error
       throw new Error('Search timed out. Check that the API is running on port 8000.')
     }
     if (error instanceof TypeError) {

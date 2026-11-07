@@ -1,4 +1,4 @@
-import { type FormEvent, useEffect, useState } from 'react'
+import { type FormEvent, useEffect, useRef, useState } from 'react'
 import { searchAnime, type AnimeSearchResult } from './api/anime'
 import { getHealth } from './api/health'
 import { useRatings } from './ratings'
@@ -11,6 +11,7 @@ function App() {
   const [results, setResults] = useState<AnimeSearchResult[]>([])
   const [searching, setSearching] = useState(false)
   const [searchError, setSearchError] = useState('')
+  const requestId = useRef(0)
   const { ratings, setRating, removeRating } = useRatings()
 
   useEffect(() => {
@@ -24,18 +25,56 @@ function App() {
     return () => controller.abort()
   }, [])
 
+  useEffect(() => {
+    const normalizedQuery = query.trim()
+    if (normalizedQuery.length < 3) {
+      requestId.current += 1
+      setResults([])
+      setSearching(false)
+      setSearchError('')
+      return
+    }
+
+    const controller = new AbortController()
+    const timer = window.setTimeout(async () => {
+      const currentRequest = ++requestId.current
+      setSearching(true)
+      setSearchError('')
+      try {
+        const items = await searchAnime(normalizedQuery, controller.signal)
+        if (currentRequest === requestId.current) setResults(items)
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        if (currentRequest === requestId.current) {
+          setSearchError(error instanceof Error ? error.message : 'Search failed. Please try again.')
+        }
+      } finally {
+        if (currentRequest === requestId.current) setSearching(false)
+      }
+    }, 350)
+
+    return () => {
+      window.clearTimeout(timer)
+      controller.abort()
+    }
+  }, [query])
+
   async function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const normalizedQuery = query.trim()
     if (!normalizedQuery) return
+    const currentRequest = ++requestId.current
     setSearching(true)
     setSearchError('')
     try {
-      setResults(await searchAnime(normalizedQuery))
+      const items = await searchAnime(normalizedQuery)
+      if (currentRequest === requestId.current) setResults(items)
     } catch (error) {
-      setSearchError(error instanceof Error ? error.message : 'Search failed. Please try again.')
+      if (currentRequest === requestId.current) {
+        setSearchError(error instanceof Error ? error.message : 'Search failed. Please try again.')
+      }
     } finally {
-      setSearching(false)
+      if (currentRequest === requestId.current) setSearching(false)
     }
   }
 
@@ -71,7 +110,7 @@ function App() {
               className="min-w-0 flex-1 rounded-full border border-white/15 bg-white/5 px-5 py-3 outline-none transition placeholder:text-slate-500 focus:border-violet"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search Fullmetal Alchemist, Naruto…"
+              placeholder="Type at least 3 characters…"
               maxLength={100}
             />
             <button className="rounded-full bg-white px-6 py-3 font-semibold text-ink disabled:opacity-50" disabled={searching || !query.trim()} type="submit">
