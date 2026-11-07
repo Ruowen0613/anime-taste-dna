@@ -2,7 +2,7 @@
 
 A personalized anime recommendation app that uses offline-trained collaborative filtering, cold-start user fold-in, and interpretable metadata-derived taste profiles.
 
-This repository currently contains the project foundation: a React landing page, a FastAPI health endpoint, architecture/product documentation, and organized ML placeholders. Recommendation training and the full product flow are intentionally not implemented yet.
+This repository currently contains the first usable Discover slice: AniList-backed search, explicit MAL/AniList identities, browser-persisted 1–10 ratings, a FastAPI health/search API, and the project foundation. Recommendation training and recommendation results are not implemented yet.
 
 ## Repository layout
 
@@ -49,7 +49,7 @@ python -m pip install -e '.[dev]'
 uvicorn app.main:app --reload --port 8000
 ```
 
-Then visit <http://localhost:8000/health> or <http://localhost:8000/docs>.
+Then visit <http://localhost:8000/health> or <http://localhost:8000/docs>. The frontend uses `GET /api/v1/anime/search`; AniList results without a MyAnimeList ID remain visible but cannot be rated because MAL ID is the canonical model item identity.
 
 Run checks from `backend/`:
 
@@ -57,6 +57,11 @@ Run checks from `backend/`:
 ruff check .
 pytest
 ```
+
+## Current status
+
+- Implemented: AniList title search, normalized search cards, 1–10 rating add/edit/remove, and versioned local-storage persistence.
+- Not implemented: dataset preparation, popularity baseline, matrix factorization, fold-in inference, offline evaluation, recommendations, and Taste DNA.
 
 ## ML status
 

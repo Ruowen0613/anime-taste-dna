@@ -77,6 +77,8 @@ AniList GraphQL provides search, covers, titles, descriptions, genres, tags, for
 
 `POST /api/v1/recommendations` will accept `{ ratings: [{ mal_id, rating }], limit: 10 }`. Final schemas should be committed and tested before frontend integration.
 
+The implemented search response is `{ items: AnimeSearchResult[] }`, where each item includes `anilist_id`, nullable `mal_id`, title, cover URL, year, format, and genres. A null `mal_id` is never replaced by a title match; the frontend shows that result but disables rating it.
+
 ## Deployment
 
 - **Vercel:** builds `frontend/`; injects public `VITE_API_BASE_URL` pointing to Cloud Run.
