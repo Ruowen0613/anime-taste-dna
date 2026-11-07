@@ -71,10 +71,10 @@ See [SPEC.md](SPEC.md) for requirements and [docs/ARCHITECTURE.md](docs/ARCHITEC
 
 ## Dataset
 
-The first MVP uses the CC0 CooperUnion Anime Recommendations Database snapshot with anonymous explicit ratings keyed by MyAnimeList ID. Download and verify it with:
+The first MVP uses the 2023 MyAnimeList User Ratings + Anime Dataset snapshot with explicit ratings and timestamps keyed by MyAnimeList ID. Download and verify it with:
 
 ```bash
-./scripts/download_cooperunion_dataset.sh
+./scripts/download_myanimelist_2023_dataset.sh
 ```
 
 Raw data stays outside Git under `data/raw/`. See [docs/DATASET.md](docs/DATASET.md) for the exact version, checksum, schema, processing rules, and limitations.

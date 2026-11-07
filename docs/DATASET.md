@@ -2,53 +2,59 @@
 
 ## Selected MVP snapshot
 
-- Name: Anime Recommendations Database
-- Kaggle reference: `CooperUnion/anime-recommendations-database`
-- Source page: <https://www.kaggle.com/datasets/CooperUnion/anime-recommendations-database>
-- Version: 1
-- Kaggle last-updated timestamp: 2016-12-21
-- License: CC0: Public Domain
-- Archive SHA-256: `49595ab309d1d773ae66464379dc23d813466199816ae6b24e38bc73b8f2cd12`
+- Name: MyAnimeList User Ratings + Anime Dataset
+- Kaggle reference: `andrewgatchalian/myanimelist-user-ratings`
+- Source page: <https://www.kaggle.com/datasets/andrewgatchalian/myanimelist-user-ratings>
+- Version: 3
+- Snapshot/update date: 2023-12-08
+- License reported by Kaggle: MIT
+- Archive SHA-256: `1a86c041de4505dc651c7c6c3bde6d07ba9a695cf3367725a095cb8eef57fbfd`
 
-This snapshot was chosen for the first reproducible MVP because it is compact, uses MyAnimeList IDs directly, and contains anonymous explicit user ratings. Raw files are downloaded into `data/raw/`, which is Git-ignored.
+This snapshot was selected because it uses MyAnimeList IDs, contains explicit user scores and timestamps, includes completed and dropped titles, and has a substantially newer catalog than the superseded 2016 development snapshot.
 
 Run:
 
 ```bash
-./scripts/download_cooperunion_dataset.sh
+./scripts/download_myanimelist_2023_dataset.sh
 ```
+
+The compressed archive is about 340 MB. The script verifies its checksum and extracts only the two required files, totaling about 4.04 GB, into Git-ignored `data/raw/`.
 
 ## Raw files
 
-### `anime.csv`
+### `anime_titles.csv`
 
-12,294 data rows with columns:
-
-```text
-anime_id,name,genre,type,episodes,rating,members
-```
-
-`anime_id` is the canonical MyAnimeList ID. The aggregate `rating` and `members` columns are metadata only; model fitting and popularity statistics must use training interactions rather than these full-snapshot aggregates.
-
-### `rating.csv`
-
-7,813,737 data rows with columns:
+59,655 data rows before validation with columns:
 
 ```text
-user_id,anime_id,rating
+anime_id,title,mean,genres,studios,synopsis,media_type,num_episodes
 ```
 
-- `user_id` is an anonymous generated identifier.
+`anime_id` is the canonical MyAnimeList ID. Aggregate `mean` is metadata only and must not be used to fit or evaluate the training-only popularity baseline.
+
+### `anime_user_ratings.csv`
+
+44,379,880 data rows before validation with columns:
+
+```text
+user_id,anime_id,title,user_status,user_score,user_eps_watched,user_rewatch,updated_at
+```
+
+- `user_id` contains a public MyAnimeList username in the raw source. Preprocessing must map it immediately to a deterministic internal integer and must never export, log, or commit the original value.
 - `anime_id` is a MyAnimeList ID.
-- Explicit scores are integers from 1 through 10.
-- `-1` means watched without an assigned score. These rows must not be treated as a rating of 1. The initial explicit-feedback baseline and matrix-factorization model will exclude them while reporting their count separately.
+- `user_score` contains non-zero explicit scores.
+- `user_status` is limited by the publisher to completed and dropped interactions.
+- `updated_at` enables deterministic time-aware held-out evaluation.
+
+The unused `username_list_full.csv` is intentionally not extracted. The separate one-hot genre file is also omitted because `anime_titles.csv` already contains genre metadata.
 
 ## Known limitations
 
-- The catalog and interactions are old, so recently released anime cannot receive matrix-factorization item embeddings in the first artifact.
-- The snapshot has no trustworthy event timestamps, so the MVP cannot make a chronological train/test split. The split must be deterministic and user-aware, and this limitation must be reported with evaluation results.
-- Users and interactions reflect MyAnimeList participation and are not representative of every anime viewer.
+- The snapshot is current only through November/December 2023, so newer anime will still require a later versioned offline retraining run.
+- Users were sampled from recently-online MyAnimeList accounts, which creates activity and platform-selection bias.
+- Raw user identifiers are public usernames rather than anonymous IDs. They must be irreversibly removed during preprocessing.
+- Completed and dropped interactions do not represent all exposure, plan-to-watch, or currently-watching behavior.
 - Popular titles receive substantially more interactions, introducing exposure and popularity bias.
-- Title metadata is not used for runtime identity joins. MAL IDs remain canonical and AniList mappings must be explicit.
+- Title strings are never used for runtime joins. MAL IDs remain canonical and AniList mappings must be explicit.
 
-The dataset snapshot, filters, seeds, row counts, and fingerprints must be recorded in every exported model artifact.
+The dataset reference, version, checksum, filters, seeds, row counts, time-split protocol, and fingerprints must be recorded in every exported model artifact.

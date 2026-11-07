@@ -4,4 +4,4 @@ Repeatable data-download, artifact-export, and developer automation scripts will
 
 ## Data
 
-- `download_cooperunion_dataset.sh`: downloads and verifies the CC0 ratings snapshot used by the first MVP model.
+- `download_myanimelist_2023_dataset.sh`: downloads, verifies, and selectively extracts the 2023 ratings snapshot used by the first MVP model.
