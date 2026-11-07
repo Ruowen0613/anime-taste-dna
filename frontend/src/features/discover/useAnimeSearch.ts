@@ -1,5 +1,5 @@
 import { type FormEvent, useEffect, useRef, useState } from 'react'
-import { searchAnime } from './api'
+import { searchAnime } from './animeSearchApi'
 import type { AnimeSearchResult } from './types'
 
 export function useAnimeSearch() {
