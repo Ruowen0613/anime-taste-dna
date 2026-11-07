@@ -8,9 +8,9 @@ from app.features.anime.schemas import AnimeDetails, AnimeReview, AnimeSearchRes
 
 ANILIST_API_URL = "https://graphql.anilist.co"
 SEARCH_QUERY = """
-query SearchAnime($search: String!, $perPage: Int!) {
+query SearchAnime($search: String!, $perPage: Int!, $sort: [MediaSort!]!) {
   Page(page: 1, perPage: $perPage) {
-    media(type: ANIME, search: $search, sort: SEARCH_MATCH) {
+    media(type: ANIME, search: $search, sort: $sort) {
       id
       idMal
       title { romaji english native }
@@ -18,6 +18,8 @@ query SearchAnime($search: String!, $perPage: Int!) {
       seasonYear
       format
       genres
+      averageScore
+      popularity
     }
   }
 }
@@ -62,13 +64,16 @@ class AniListClient:
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
         self._client = client
 
-    async def search(self, query: str, limit: int) -> list[AnimeSearchResult]:
+    async def search(self, query: str, limit: int, sort: str) -> list[AnimeSearchResult]:
         owns_client = self._client is None
         client = self._client or httpx.AsyncClient(timeout=8.0)
         try:
             response = await client.post(
                 ANILIST_API_URL,
-                json={"query": SEARCH_QUERY, "variables": {"search": query, "perPage": limit}},
+                json={
+                    "query": SEARCH_QUERY,
+                    "variables": {"search": query, "perPage": limit, "sort": [sort]},
+                },
             )
             response.raise_for_status()
             payload: Any = response.json()
@@ -98,7 +103,6 @@ class AniListClient:
             return AnimeDetails(
                 **base.model_dump(),
                 description=self._clean_text(item.get("description")),
-                average_score=item.get("averageScore"),
                 episodes=item.get("episodes"),
                 duration_minutes=item.get("duration"),
                 status=item.get("status"),
@@ -144,6 +148,8 @@ class AniListClient:
             year=item.get("seasonYear"),
             format=item.get("format"),
             genres=item.get("genres") or [],
+            average_score=item.get("averageScore"),
+            popularity=item.get("popularity") or 0,
         )
 
     @staticmethod

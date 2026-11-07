@@ -6,9 +6,10 @@ from app.main import app
 
 
 class FakeAniListClient:
-    async def search(self, query: str, limit: int) -> list[AnimeSearchResult]:
+    async def search(self, query: str, limit: int, sort: str) -> list[AnimeSearchResult]:
         assert query == "Fullmetal"
         assert limit == 5
+        assert sort == "POPULARITY_DESC"
         return [
             AnimeSearchResult(
                 mal_id=5114,
@@ -39,8 +40,13 @@ def test_search_rejects_blank_query() -> None:
     assert response.status_code == 422
 
 
+def test_search_rejects_unknown_sort() -> None:
+    response = TestClient(app).get("/api/v1/anime/search?q=Naruto&sort=trending")
+    assert response.status_code == 422
+
+
 class FailingAniListClient:
-    async def search(self, query: str, limit: int) -> list[AnimeSearchResult]:
+    async def search(self, query: str, limit: int, sort: str) -> list[AnimeSearchResult]:
         raise AniListError("AniList search is temporarily unavailable")
 
 

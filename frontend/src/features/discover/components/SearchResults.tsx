@@ -1,18 +1,34 @@
-import type { AnimeSearchResult, RatedAnime } from '../types'
+import type { AnimeSearchResult, AnimeSearchSort, RatedAnime } from '../types'
+
+const compactNumber = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 })
 
 type SearchResultsProps = {
   results: AnimeSearchResult[]
   ratings: RatedAnime[]
   onRate: (anime: AnimeSearchResult, rating: number) => void
   onOpen: (anime: AnimeSearchResult) => void
+  sortBy: AnimeSearchSort
+  onSortChange: (sort: AnimeSearchSort) => void
+  searching: boolean
 }
 
-export function SearchResults({ results, ratings, onRate, onOpen }: SearchResultsProps) {
+export function SearchResults({ results, ratings, onRate, onOpen, sortBy, onSortChange, searching }: SearchResultsProps) {
   if (results.length === 0) return null
 
   return (
     <section aria-labelledby="results-heading" className="pb-16">
-      <h2 id="results-heading" className="mb-5 text-2xl font-semibold">Search results</h2>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <h2 id="results-heading" className="text-2xl font-semibold">Search results</h2>
+        <label className="flex items-center gap-2 text-sm text-slate-400">
+          Sort
+          <select className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-violet" value={sortBy} disabled={searching} onChange={(event) => onSortChange(event.target.value as AnimeSearchSort)}>
+            <option value="popularity">Most popular</option>
+            <option value="score">Highest rated</option>
+            <option value="relevance">Best match</option>
+            <option value="newest">Newest release</option>
+          </select>
+        </label>
+      </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {results.map((anime) => {
           const currentRating = anime.mal_id === null ? undefined : ratings.find((item) => item.mal_id === anime.mal_id)?.rating
@@ -23,6 +39,10 @@ export function SearchResults({ results, ratings, onRate, onOpen }: SearchResult
                 <h3 className="font-semibold">{anime.title}</h3>
                 <p className="mt-1 text-sm text-slate-400">{[anime.year, anime.format].filter(Boolean).join(' · ') || 'Details unavailable'}</p>
                 <p className="mt-2 line-clamp-2 text-xs text-slate-400">{anime.genres.join(' · ')}</p>
+                <div className="mt-2 flex gap-3 text-xs text-slate-400">
+                  {anime.average_score != null && <span className="text-sakura">★ {anime.average_score}/100</span>}
+                  <span>{compactNumber.format(anime.popularity)} users</span>
+                </div>
                 {anime.mal_id === null ? (
                   <p className="mt-4 text-xs text-amber-300">No MyAnimeList mapping — rating unavailable</p>
                 ) : (

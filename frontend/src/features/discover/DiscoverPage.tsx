@@ -13,7 +13,7 @@ export function DiscoverPage() {
   return (
     <>
       <SearchForm query={search.query} searching={search.searching} error={search.error} onQueryChange={search.setQuery} onSubmit={search.submit} />
-      <SearchResults results={search.results} ratings={ratings.ratings} onRate={ratings.setRating} onOpen={animeDetails.open} />
+      <SearchResults results={search.results} ratings={ratings.ratings} onRate={ratings.setRating} onOpen={animeDetails.open} sortBy={search.sortBy} onSortChange={search.setSortBy} searching={search.searching} />
       <RatingsPanel ratings={ratings.ratings} onRate={ratings.setRating} onRemove={ratings.removeRating} onOpen={animeDetails.open} />
       <AnimeDetailsModal anime={animeDetails.selected} details={animeDetails.details} loading={animeDetails.loading} error={animeDetails.error} onClose={animeDetails.close} />
     </>

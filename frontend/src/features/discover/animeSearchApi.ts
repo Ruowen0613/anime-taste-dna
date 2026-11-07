@@ -1,10 +1,10 @@
 import { API_BASE_URL } from '../../api/health'
-import type { AnimeSearchResult } from './types'
+import type { AnimeSearchResult, AnimeSearchSort } from './types'
 
 type AnimeSearchResponse = { items: AnimeSearchResult[] }
 
-export async function searchAnime(query: string, signal?: AbortSignal): Promise<AnimeSearchResult[]> {
-  const params = new URLSearchParams({ q: query, limit: '10' })
+export async function searchAnime(query: string, sort: AnimeSearchSort, signal?: AbortSignal): Promise<AnimeSearchResult[]> {
+  const params = new URLSearchParams({ q: query, limit: '10', sort })
   const controller = new AbortController()
   const timeout = window.setTimeout(() => controller.abort(), 10_000)
   const abortRequest = () => controller.abort()

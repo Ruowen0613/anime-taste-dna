@@ -9,6 +9,8 @@ class AnimeSearchResult(BaseModel):
     year: int | None = None
     format: str | None = None
     genres: list[str]
+    average_score: int | None = None
+    popularity: int = 0
 
 
 class AnimeSearchResponse(BaseModel):
@@ -26,7 +28,6 @@ class AnimeReview(BaseModel):
 
 class AnimeDetails(AnimeSearchResult):
     description: str | None = None
-    average_score: int | None = None
     episodes: int | None = None
     duration_minutes: int | None = None
     status: str | None = None

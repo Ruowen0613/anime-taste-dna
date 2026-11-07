@@ -80,7 +80,7 @@ AniList GraphQL provides search, covers, titles, descriptions, genres, tags, for
 
 `POST /api/v1/recommendations` will accept `{ ratings: [{ mal_id, rating }], limit: 10 }`. Final schemas should be committed and tested before frontend integration.
 
-The implemented search response is `{ items: AnimeSearchResult[] }`, where each item includes `anilist_id`, nullable `mal_id`, title, cover URL, year, format, and genres. A null `mal_id` is never replaced by a title match; the frontend shows that result but disables rating it.
+The implemented search response is `{ items: AnimeSearchResult[] }`, where each item includes `anilist_id`, nullable `mal_id`, title, cover URL, year, format, genres, AniList average score, and popularity count. Its `sort` query parameter accepts `popularity` (default), `score`, `relevance`, or `newest`; ordering is performed by AniList before limiting results. A null `mal_id` is never replaced by a title match; the frontend shows that result but disables rating it.
 
 ## Deployment
 

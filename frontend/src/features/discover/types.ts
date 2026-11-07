@@ -6,7 +6,11 @@ export type AnimeSearchResult = {
   year: number | null
   format: string | null
   genres: string[]
+  average_score: number | null
+  popularity: number
 }
+
+export type AnimeSearchSort = 'popularity' | 'score' | 'relevance' | 'newest'
 
 export type RatedAnime = AnimeSearchResult & { mal_id: number; rating: number }
 

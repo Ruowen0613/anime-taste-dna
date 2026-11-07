@@ -1,20 +1,21 @@
-import { type FormEvent, useEffect, useRef, useState } from 'react'
+import { type FormEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { searchAnime } from './animeSearchApi'
-import type { AnimeSearchResult } from './types'
+import type { AnimeSearchResult, AnimeSearchSort } from './types'
 
 export function useAnimeSearch() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<AnimeSearchResult[]>([])
   const [searching, setSearching] = useState(false)
   const [error, setError] = useState('')
+  const [sortBy, setSortBy] = useState<AnimeSearchSort>('popularity')
   const requestId = useRef(0)
 
-  async function runSearch(normalizedQuery: string, signal?: AbortSignal) {
+  const runSearch = useCallback(async (normalizedQuery: string, signal?: AbortSignal) => {
     const currentRequest = ++requestId.current
     setSearching(true)
     setError('')
     try {
-      const items = await searchAnime(normalizedQuery, signal)
+      const items = await searchAnime(normalizedQuery, sortBy, signal)
       if (currentRequest === requestId.current) setResults(items)
     } catch (caught) {
       if (caught instanceof DOMException && caught.name === 'AbortError') return
@@ -24,7 +25,7 @@ export function useAnimeSearch() {
     } finally {
       if (currentRequest === requestId.current) setSearching(false)
     }
-  }
+  }, [sortBy])
 
   useEffect(() => {
     const normalizedQuery = query.trim()
@@ -41,7 +42,7 @@ export function useAnimeSearch() {
       window.clearTimeout(timer)
       controller.abort()
     }
-  }, [query])
+  }, [query, runSearch])
 
   function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -49,5 +50,5 @@ export function useAnimeSearch() {
     if (normalizedQuery) void runSearch(normalizedQuery)
   }
 
-  return { query, setQuery, results, searching, error, submit }
+  return { query, setQuery, results, searching, error, sortBy, setSortBy, submit }
 }

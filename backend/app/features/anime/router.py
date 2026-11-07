@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
@@ -7,18 +7,27 @@ from app.features.anime.schemas import AnimeDetails, AnimeSearchResponse
 
 router = APIRouter(prefix="/api/v1/anime", tags=["anime"])
 
+SearchSort = Literal["popularity", "score", "relevance", "newest"]
+ANILIST_SORTS: dict[SearchSort, str] = {
+    "popularity": "POPULARITY_DESC",
+    "score": "SCORE_DESC",
+    "relevance": "SEARCH_MATCH",
+    "newest": "START_DATE_DESC",
+}
+
 
 @router.get("/search", response_model=AnimeSearchResponse)
 async def search_anime(
     q: Annotated[str, Query(min_length=1, max_length=100)],
     client: Annotated[AniListClient, Depends(get_anilist_client)],
     limit: Annotated[int, Query(ge=1, le=20)] = 10,
+    sort: SearchSort = "popularity",
 ) -> AnimeSearchResponse:
     query = q.strip()
     if not query:
         raise HTTPException(status_code=422, detail="Search query cannot be blank")
     try:
-        items = await client.search(query, limit)
+        items = await client.search(query, limit, ANILIST_SORTS[sort])
     except AniListError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
     return AnimeSearchResponse(items=items)
