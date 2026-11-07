@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.features.anime.client import AniListClient, AniListError, get_anilist_client
-from app.features.anime.schemas import AnimeSearchResponse
+from app.features.anime.schemas import AnimeDetails, AnimeSearchResponse
 
 router = APIRouter(prefix="/api/v1/anime", tags=["anime"])
 
@@ -22,3 +22,17 @@ async def search_anime(
     except AniListError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
     return AnimeSearchResponse(items=items)
+
+
+@router.get("/{anilist_id}", response_model=AnimeDetails)
+async def get_anime_details(
+    anilist_id: int,
+    client: Annotated[AniListClient, Depends(get_anilist_client)],
+) -> AnimeDetails:
+    try:
+        details = await client.get_details(anilist_id)
+    except AniListError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    if details is None:
+        raise HTTPException(status_code=404, detail="Anime not found")
+    return details

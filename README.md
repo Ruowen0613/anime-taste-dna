@@ -60,7 +60,7 @@ pytest
 
 ## Current status
 
-- Implemented: AniList title search, normalized search cards, 1–10 rating add/edit/remove, and versioned local-storage persistence.
+- Implemented: AniList title search, normalized search cards, 1–10 rating add/edit/remove, versioned local-storage persistence, and lazy-loaded anime detail modals with AniList community scores and public review summaries.
 - Not implemented: dataset preparation, popularity baseline, matrix factorization, fold-in inference, offline evaluation, recommendations, and Taste DNA.
 
 ## ML status

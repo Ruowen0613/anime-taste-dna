@@ -73,6 +73,7 @@ AniList GraphQL provides search, covers, titles, descriptions, genres, tags, for
 |---|---|---|
 | GET | `/health` | Lightweight process health check |
 | GET | `/api/v1/anime/search?q=...&limit=...` | Proxied/cached AniList search with IDs normalized |
+| GET | `/api/v1/anime/{anilist_id}` | Lazy-loaded description, community score, metadata, and public review summaries |
 | POST | `/api/v1/recommendations` | Validate ratings and return ranked unseen anime, explanations, and model version |
 | POST | `/api/v1/taste-dna` | Return metadata-derived dimension scores and supporting titles |
 | GET | `/api/v1/model/info` | Expose safe model version and training/evaluation metadata |
