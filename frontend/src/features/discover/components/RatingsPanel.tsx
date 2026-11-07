@@ -1,5 +1,7 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import type { AnimeSearchResult, RatedAnime } from '../types'
+
+type SortOption = 'score-desc' | 'score-asc' | 'title' | 'year-desc'
 
 type RatingsPanelProps = {
   ratings: RatedAnime[]
@@ -10,6 +12,13 @@ type RatingsPanelProps = {
 
 export function RatingsPanel({ ratings, onRate, onRemove, onOpen }: RatingsPanelProps) {
   const [editingMalId, setEditingMalId] = useState<number | null>(null)
+  const [sortBy, setSortBy] = useState<SortOption>('score-desc')
+  const sortedRatings = useMemo(() => [...ratings].sort((left, right) => {
+    if (sortBy === 'score-desc') return right.rating - left.rating || left.title.localeCompare(right.title)
+    if (sortBy === 'score-asc') return left.rating - right.rating || left.title.localeCompare(right.title)
+    if (sortBy === 'year-desc') return (right.year ?? 0) - (left.year ?? 0) || left.title.localeCompare(right.title)
+    return left.title.localeCompare(right.title)
+  }), [ratings, sortBy])
 
   return (
     <section className="border-t border-white/10 py-10" aria-labelledby="ratings-heading">
@@ -18,15 +27,28 @@ export function RatingsPanel({ ratings, onRate, onRemove, onOpen }: RatingsPanel
           <h2 id="ratings-heading" className="text-2xl font-semibold">Your ratings</h2>
           <p className="mt-1 text-sm text-slate-400">{ratings.length}/10 minimum ratings</p>
         </div>
-        <div className="h-2 w-32 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
-          <div className="h-full bg-gradient-to-r from-sakura to-violet" style={{ width: `${Math.min(ratings.length * 10, 100)}%` }} />
+        <div className="flex flex-col items-end gap-3">
+          {ratings.length > 1 && (
+            <label className="flex items-center gap-2 text-sm text-slate-400">
+              Sort
+              <select className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none focus:border-violet" value={sortBy} onChange={(event) => setSortBy(event.target.value as SortOption)}>
+                <option value="score-desc">Highest score</option>
+                <option value="score-asc">Lowest score</option>
+                <option value="title">Title A–Z</option>
+                <option value="year-desc">Newest release</option>
+              </select>
+            </label>
+          )}
+          <div className="h-2 w-32 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
+            <div className="h-full bg-gradient-to-r from-sakura to-violet" style={{ width: `${Math.min(ratings.length * 10, 100)}%` }} />
+          </div>
         </div>
       </div>
       {ratings.length === 0 ? (
         <p className="mt-8 rounded-2xl border border-dashed border-white/15 p-8 text-center text-slate-400">Search above and rate your first anime.</p>
       ) : (
         <ul className="mt-8 grid gap-4 md:grid-cols-2">
-          {ratings.map((anime) => (
+          {sortedRatings.map((anime) => (
             <li className="group flex min-h-44 cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-white/5 transition hover:border-white/20 hover:bg-white/[0.07]" key={anime.mal_id} onClick={() => onOpen(anime)}>
               {anime.cover_image_url ? (
                 <img className="w-28 shrink-0 object-cover sm:w-32" src={anime.cover_image_url} alt={`${anime.title} cover`} />
