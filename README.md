@@ -68,3 +68,13 @@ pytest
 The ML package is structural only. Future commands will preprocess a versioned Kaggle ratings snapshot, train popularity and PyTorch matrix-factorization models offline, evaluate cold-start performance, and export a compact inference bundle. Raw data and model files are Git-ignored.
 
 See [SPEC.md](SPEC.md) for requirements and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the planned system design.
+
+## Dataset
+
+The first MVP uses the CC0 CooperUnion Anime Recommendations Database snapshot with anonymous explicit ratings keyed by MyAnimeList ID. Download and verify it with:
+
+```bash
+./scripts/download_cooperunion_dataset.sh
+```
+
+Raw data stays outside Git under `data/raw/`. See [docs/DATASET.md](docs/DATASET.md) for the exact version, checksum, schema, processing rules, and limitations.
