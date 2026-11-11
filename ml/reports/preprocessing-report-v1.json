@@ -1,0 +1,45 @@
+{
+  "dataset": {
+    "reference": "andrewgatchalian/myanimelist-user-ratings",
+    "version": 3,
+    "snapshot_date": "2023-12-08",
+    "archive_sha256": "1a86c041de4505dc651c7c6c3bde6d07ba9a695cf3367725a095cb8eef57fbfd"
+  },
+  "filters": {
+    "allowed_statuses": [
+      "completed",
+      "dropped"
+    ],
+    "minimum_timestamp": "2004-01-01T00:00:00+00:00",
+    "minimum_user_interactions": 25,
+    "minimum_item_interactions": 20,
+    "interaction_core_iterations": 1
+  },
+  "input": {
+    "raw_rows": 44379880,
+    "excluded_missing_user": 0,
+    "excluded_invalid_item": 0,
+    "excluded_invalid_rating": 0,
+    "excluded_invalid_or_early_timestamp": 166,
+    "excluded_status": 1438761,
+    "excluded_missing_metadata": 1765739,
+    "base_rows": 41535508,
+    "metadata": {
+      "raw_rows": 22590,
+      "invalid_mal_id_rows": 0,
+      "duplicate_mal_id_rows_removed": 27,
+      "unique_mal_ids": 22563
+    }
+  },
+  "output": {
+    "ratings": 41529539,
+    "users": 18095,
+    "items": 14260,
+    "ratings_sha256": "52027b21dd01a4a3db37f7d28b92ecc59587d5297ded23fb81b69ab7a433ad3c",
+    "items_sha256": "d2c3f846e2ef608d8d81f504d50ca10e7133e7242db251e4cb6391fb4d5b89da"
+  },
+  "privacy": {
+    "raw_user_ids_exported": false,
+    "user_index_mapping_persisted": false
+  }
+}

@@ -22,3 +22,13 @@ anime-taste-audit --config configs/preprocess.toml
 The audit validates schemas, ratings, timestamps, MAL ID coverage, status counts, exact duplicate user-item pairs, and interaction-count distributions. Raw usernames are mapped to internal integers in memory and never written to the report.
 
 The sanitized, reproducible result is committed at `reports/dataset-audit-v3.json`. Large working files and processed datasets remain under Git-ignored `data/`.
+
+## Preprocessing
+
+Build the anonymous, filtered Parquet dataset after auditing:
+
+```bash
+anime-taste-preprocess --config configs/preprocess.toml
+```
+
+This keeps completed and dropped explicit ratings from 2004 onward, resolves exact metadata duplicates by MAL ID, iteratively enforces configured user/item interaction minimums, assigns contiguous internal indices, and writes `ratings.parquet`, `items.parquet`, and a fingerprinted report under `data/processed/v1/`.

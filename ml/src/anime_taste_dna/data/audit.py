@@ -195,9 +195,9 @@ def audit_dataset(config: AuditConfig) -> dict[str, Any]:
                 internal_users[position] = user_index
             user_interactions.update(internal_users.tolist())
 
-            pair_keys = (internal_users.astype(np.uint64) << np.uint64(32)) | valid_anime_ids.to_numpy(
-                dtype=np.uint64
-            )
+            pair_keys = (
+                internal_users.astype(np.uint64) << np.uint64(32)
+            ) | valid_anime_ids.to_numpy(dtype=np.uint64)
             pair_keys.tofile(pair_file)
 
     duplicate_pairs = _count_duplicate_pairs(pair_keys_path, valid_rows)
@@ -239,7 +239,9 @@ def audit_dataset(config: AuditConfig) -> dict[str, Any]:
             "valid_mal_ids": len(valid_title_ids[valid_title_ids > 0]),
             "unique_mal_ids": len(metadata_item_ids),
             "duplicate_mal_id_rows": int(valid_title_ids.duplicated().sum()),
-            "invalid_mal_id_rows": int(numeric_title_ids.isna().sum() + (numeric_title_ids <= 0).sum()),
+            "invalid_mal_id_rows": int(
+                numeric_title_ids.isna().sum() + (numeric_title_ids <= 0).sum()
+            ),
         },
         "privacy": {
             "raw_user_ids_exported": False,

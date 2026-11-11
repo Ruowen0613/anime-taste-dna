@@ -10,6 +10,7 @@ requires-python = ">=3.11"
 dependencies = [
   "numpy>=2.0,<3.0",
   "pandas>=2.2,<3.0",
+  "pyarrow>=18,<21",
 ]
 
 [project.optional-dependencies]
@@ -20,6 +21,7 @@ dev = [
 
 [project.scripts]
 anime-taste-audit = "anime_taste_dna.data.audit:main"
+anime-taste-preprocess = "anime_taste_dna.data.preprocess:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

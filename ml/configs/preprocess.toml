@@ -9,6 +9,14 @@ ratings_csv = "../data/raw/myanimelist-2023-v3/anime_data/anime_user_ratings.csv
 titles_csv = "../data/raw/myanimelist-2023-v3/anime_data/anime_titles.csv"
 report_json = "reports/dataset-audit-v3.json"
 working_directory = "../data/processed/.audit-work"
+processed_directory = "../data/processed/v1"
+preprocess_working_directory = "../data/processed/.preprocess-work"
 
 [audit]
 chunk_size = 500000
+
+[preprocess]
+allowed_statuses = ["completed", "dropped"]
+minimum_timestamp = "2004-01-01T00:00:00Z"
+minimum_user_interactions = 25
+minimum_item_interactions = 20

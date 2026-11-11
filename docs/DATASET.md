@@ -62,6 +62,32 @@ Key observed facts:
 - Actual statuses include completed, dropped, watching, and on-hold.
 - The median user has 2,593 interactions, demonstrating strong active-user selection bias.
 
+## Executed preprocessing
+
+The reproducible preprocessing command is:
+
+```bash
+cd ml
+anime-taste-preprocess --config configs/preprocess.toml
+```
+
+The versioned, sanitized result is stored at
+`ml/reports/preprocessing-report-v1.json`. Large Parquet outputs remain Git-ignored under
+`data/processed/v1/`.
+
+The current processed dataset:
+
+- keeps only `completed` and `dropped` ratings dated 2004-01-01 or later;
+- drops interactions whose MAL ID is absent from the supplied title metadata;
+- removes 27 duplicate metadata rows by exact MAL ID, keeping the first source row;
+- iteratively requires at least 25 retained ratings per user and 20 per item;
+- contains 41,529,539 ratings from 18,095 anonymous users across 14,260 anime;
+- uses contiguous `user_index` and `item_index` values and exports no raw username or mapping.
+
+The generated files are `ratings.parquet`, `items.parquet`, and
+`preprocessing_report.json`. Their hashes are recorded in the versioned report. The 116 MB
+processed directory can be regenerated from the verified raw snapshot rather than committed.
+
 ## Known limitations
 
 - The snapshot is current only through November/December 2023, so newer anime will still require a later versioned offline retraining run.
