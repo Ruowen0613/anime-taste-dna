@@ -32,3 +32,13 @@ anime-taste-preprocess --config configs/preprocess.toml
 ```
 
 This keeps completed and dropped explicit ratings from 2004 onward, resolves exact metadata duplicates by MAL ID, iteratively enforces configured user/item interaction minimums, assigns contiguous internal indices, and writes `ratings.parquet`, `items.parquet`, and a fingerprinted report under `data/processed/v1/`.
+
+## Dataset split
+
+Create the shared leakage-safe train, validation, and test files:
+
+```bash
+anime-taste-split --config configs/preprocess.toml
+```
+
+The split is chronological within each anonymous user. The latest 10% is test data, the preceding 10% is validation data, and the earlier history is training data. Counts are rounded down with at least one validation and test interaction, while retaining at least 20 training interactions. Equal timestamps are ordered by item index so repeated runs are deterministic without a random seed.

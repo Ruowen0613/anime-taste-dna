@@ -1,0 +1,43 @@
+{
+  "source": {
+    "ratings_sha256": "52027b21dd01a4a3db37f7d28b92ecc59587d5297ded23fb81b69ab7a433ad3c",
+    "ratings": 41529539,
+    "users": 18095,
+    "items": 14260
+  },
+  "protocol": {
+    "name": "per-user chronological holdout",
+    "order": [
+      "updated_at",
+      "item_index"
+    ],
+    "validation_fraction": 0.1,
+    "test_fraction": 0.1,
+    "rounding": "floor with configured minimums",
+    "minimum_validation_interactions": 1,
+    "minimum_test_interactions": 1,
+    "minimum_train_interactions": 20,
+    "random_seed": null,
+    "deterministic": true
+  },
+  "output": {
+    "users": 18095,
+    "files": {
+      "train": {
+        "rows": 33240025,
+        "users": 18095,
+        "sha256": "b3cb29aca0f8d03ba864709e9677ad56e946c7057e736b666cb010de75dfec32"
+      },
+      "validation": {
+        "rows": 4144757,
+        "users": 18095,
+        "sha256": "b38a6b6599b8397f575521b06eaf7ff8d11cc3948f764a17268da26b6de25ade"
+      },
+      "test": {
+        "rows": 4144757,
+        "users": 18095,
+        "sha256": "ed350de50410f2665a56d44b358ef22024766c47b868dedb15a6af1f5622fcb4"
+      }
+    }
+  }
+}

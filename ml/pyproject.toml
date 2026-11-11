@@ -22,6 +22,7 @@ dev = [
 [project.scripts]
 anime-taste-audit = "anime_taste_dna.data.audit:main"
 anime-taste-preprocess = "anime_taste_dna.data.preprocess:main"
+anime-taste-split = "anime_taste_dna.data.split:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

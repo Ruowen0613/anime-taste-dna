@@ -11,6 +11,8 @@ report_json = "reports/dataset-audit-v3.json"
 working_directory = "../data/processed/.audit-work"
 processed_directory = "../data/processed/v1"
 preprocess_working_directory = "../data/processed/.preprocess-work"
+split_directory = "../data/processed/v1/splits"
+split_working_directory = "../data/processed/.split-work"
 
 [audit]
 chunk_size = 500000
@@ -20,3 +22,11 @@ allowed_statuses = ["completed", "dropped"]
 minimum_timestamp = "2004-01-01T00:00:00Z"
 minimum_user_interactions = 25
 minimum_item_interactions = 20
+
+[split]
+validation_fraction = 0.10
+test_fraction = 0.10
+minimum_validation_interactions = 1
+minimum_test_interactions = 1
+minimum_train_interactions = 20
+user_buckets = 64

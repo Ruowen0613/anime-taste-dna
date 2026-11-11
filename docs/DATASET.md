@@ -88,6 +88,27 @@ The generated files are `ratings.parquet`, `items.parquet`, and
 `preprocessing_report.json`. Their hashes are recorded in the versioned report. The 116 MB
 processed directory can be regenerated from the verified raw snapshot rather than committed.
 
+## Executed split
+
+The processed ratings use a deterministic per-user chronological holdout shared by every model.
+Within each user, interactions are ordered by `updated_at` and then `item_index`; equal timestamps
+therefore have a stable, non-random order. The latest 10% is assigned to test, the preceding 10%
+to validation, and the remaining earlier history to train. Validation and test counts are rounded
+down with a minimum of one each, and the split refuses to leave fewer than 20 training ratings.
+
+The executed split contains:
+
+- 33,240,025 train interactions;
+- 4,144,757 validation interactions;
+- 4,144,757 test interactions;
+- all 18,095 users in every split, with observed minima of 21 train, 2 validation, and 2 test
+  interactions per user.
+
+The full row count is conserved, and full-data validation confirmed that every user's latest train
+timestamp is no later than their earliest validation timestamp, and likewise from validation to
+test. The sanitized protocol, counts, and output fingerprints are committed at
+`ml/reports/split-report-v1.json`; the 464 MB Parquet files remain Git-ignored.
+
 ## Known limitations
 
 - The snapshot is current only through November/December 2023, so newer anime will still require a later versioned offline retraining run.
