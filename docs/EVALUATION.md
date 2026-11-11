@@ -45,3 +45,11 @@ one with highest mean validation Recall@10. This selected regularization 1,000.
 
 Machine-readable executed reports are stored in `ml/reports/`. No metric in this document is an
 estimate or an unexecuted target.
+
+## Online artifact
+
+The exported `matrix-factorization-v1` NPZ is approximately 2.16 MB and contains item factors,
+item biases, the global mean, selected fold-in regularization, supported-item mask, MAL IDs, and
+basic titles. It deliberately excludes historical user factors and identifiers. A local FastAPI
+contract run mapped 10 ratings, returned 10 unseen items, and completed in approximately 31 ms.
+This local timing is evidence for bounded inference behavior, not a production latency guarantee.

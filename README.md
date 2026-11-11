@@ -49,7 +49,7 @@ python -m pip install -e '.[dev]'
 uvicorn app.main:app --reload --port 8000
 ```
 
-Then visit <http://localhost:8000/health> or <http://localhost:8000/docs>. The frontend uses `GET /api/v1/anime/search`; AniList results without a MyAnimeList ID remain visible but cannot be rated because MAL ID is the canonical model item identity.
+Then visit <http://localhost:8000/health> or <http://localhost:8000/docs>. The frontend uses `GET /api/v1/anime/search`; AniList results without a MyAnimeList ID remain visible but cannot be rated because MAL ID is the canonical model item identity. After running the ML export, `POST /api/v1/recommendations` loads the default artifact from `data/artifacts/matrix-factorization-v1/matrix_factorization.npz`. Set `MODEL_ARTIFACT_PATH` to override it.
 
 Run checks from `backend/`:
 
@@ -61,12 +61,13 @@ pytest
 ## Current status
 
 - Implemented: AniList title search, normalized search cards, 1–10 rating add/edit/remove, versioned local-storage persistence, and lazy-loaded anime detail modals with AniList community scores and public review summaries.
-- Implemented in ML: reproducible dataset download plus chunked schema, privacy, timestamp, mapping-coverage, duplicate, and interaction-distribution audit.
-- Not implemented: filtered dataset preparation, deterministic split, popularity baseline, matrix factorization, fold-in inference, offline evaluation, recommendations, and Taste DNA.
+- Implemented in ML: reproducible download/audit, anonymous preprocessing, chronological splits, evaluated popularity baseline, PyTorch matrix factorization, regularized cold-start fold-in, and a versioned inference artifact.
+- Implemented in the API: typed recommendation contract, artifact validation/loading, MAL ID mapping, bounded fold-in/ranking, rated-item filtering, and explicit unmapped-ID reporting.
+- Not implemented: recommendation frontend, AniList enrichment for recommended cards, production artifact packaging, and Taste DNA.
 
 ## ML status
 
-The ML package is structural only. Future commands will preprocess a versioned Kaggle ratings snapshot, train popularity and PyTorch matrix-factorization models offline, evaluate cold-start performance, and export a compact inference bundle. Raw data and model files are Git-ignored.
+The executed matrix-factorization model beats the shared popularity baseline by roughly 43% on Recall@10 and 38% on NDCG@10 under the documented test protocol. Raw data and generated model files are Git-ignored; sanitized reports are committed under `ml/reports/`. See [docs/EVALUATION.md](docs/EVALUATION.md) for exact metrics and limitations.
 
 See [SPEC.md](SPEC.md) for requirements and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the planned system design.
 

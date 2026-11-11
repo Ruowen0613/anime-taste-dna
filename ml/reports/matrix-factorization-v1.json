@@ -95,7 +95,8 @@
   },
   "artifact": {
     "path": "matrix_factorization.npz",
-    "sha256": "fa6b3b187b33e3c6e812f6b790cb148692bd61bea120a773cecd1d690ad1fe13",
+    "version": "matrix-factorization-v1",
+    "sha256": "2b39615504a4fe3fe4aadd1f5ec22e428c7a0135530a3bce92820f1becf07638",
     "historical_user_parameters_exported": false
   }
 }

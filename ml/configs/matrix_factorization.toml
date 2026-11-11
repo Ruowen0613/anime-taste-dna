@@ -3,6 +3,9 @@ processed_directory = "../data/processed/v1"
 split_directory = "../data/processed/v1/splits"
 output_directory = "../data/artifacts/matrix-factorization-v1"
 
+[artifact]
+version = "matrix-factorization-v1"
+
 [training]
 embedding_dimension = 32
 epochs = 8

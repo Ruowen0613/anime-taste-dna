@@ -24,6 +24,7 @@ class MatrixFactorizationConfig:
     processed_directory: Path
     split_directory: Path
     output_directory: Path
+    artifact_version: str
     embedding_dimension: int
     epochs: int
     batch_size: int
@@ -52,6 +53,7 @@ class MatrixFactorizationConfig:
             processed_directory=resolve(raw["paths"]["processed_directory"]),
             split_directory=resolve(raw["paths"]["split_directory"]),
             output_directory=resolve(raw["paths"]["output_directory"]),
+            artifact_version=raw["artifact"]["version"],
             embedding_dimension=int(raw["training"]["embedding_dimension"]),
             epochs=int(raw["training"]["epochs"]),
             batch_size=int(raw["training"]["batch_size"]),
@@ -460,7 +462,10 @@ def train_and_evaluate(config: MatrixFactorizationConfig) -> dict[str, Any]:
         global_mean=np.asarray([float(model.global_mean.cpu())], dtype=np.float32),
         item_index=items_frame["item_index"].to_numpy(dtype=np.int32),
         mal_id=items_frame["mal_id"].to_numpy(dtype=np.int64),
+        title=items_frame["title"].fillna("").to_numpy(dtype=np.str_),
         supported=supported_items,
+        fold_in_regularization=np.asarray([selected_regularization], dtype=np.float32),
+        model_version=np.asarray([config.artifact_version], dtype=np.str_),
     )
     report = {
         "model": {
@@ -503,6 +508,7 @@ def train_and_evaluate(config: MatrixFactorizationConfig) -> dict[str, Any]:
         },
         "artifact": {
             "path": artifact_path.name,
+            "version": config.artifact_version,
             "sha256": _sha256(artifact_path),
         },
     }

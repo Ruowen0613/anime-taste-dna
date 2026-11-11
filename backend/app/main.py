@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.features.anime.router import router as anime_router
+from app.features.recommendations.router import router as recommendations_router
 from app.features.system.router import router as system_router
 
 settings = get_settings()
@@ -21,3 +22,4 @@ app.add_middleware(
 )
 app.include_router(system_router)
 app.include_router(anime_router)
+app.include_router(recommendations_router)

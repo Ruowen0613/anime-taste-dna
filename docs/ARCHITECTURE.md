@@ -78,7 +78,15 @@ AniList GraphQL provides search, covers, titles, descriptions, genres, tags, for
 | POST | `/api/v1/taste-dna` | Return metadata-derived dimension scores and supporting titles |
 | GET | `/api/v1/model/info` | Expose safe model version and training/evaluation metadata |
 
-`POST /api/v1/recommendations` will accept `{ ratings: [{ mal_id, rating }], limit: 10 }`. Final schemas should be committed and tested before frontend integration.
+The implemented `POST /api/v1/recommendations` accepts
+`{ ratings: [{ mal_id, rating }], limit: 10 }`. It requires 10–20 unique positive MAL IDs with
+integer ratings from 1–10 and a limit from 1–20. At least five ratings must map to supported model
+items. The response is
+`{ model_version, mapped_ratings, unmapped_mal_ids, items: [{ mal_id, title, rank, predicted_rating }] }`.
+The service loads fold-in regularization, item factors/biases, titles, supported-item mask, and MAL
+mapping from the versioned artifact; it never loads historical user parameters. Unmapped ratings
+are reported explicitly and never title-matched. AniList cover/details enrichment remains a
+separate explicit MAL-to-AniList mapping step.
 
 The implemented search response is `{ items: AnimeSearchResult[] }`, where each item includes `anilist_id`, nullable `mal_id`, title, cover URL, year, format, genres, AniList average score, and popularity count. Its `sort` query parameter accepts `popularity` (default), `score`, `relevance`, or `newest`; ordering is performed by AniList before limiting results. A null `mal_id` is never replaced by a title match; the frontend shows that result but disables rating it.
 
