@@ -23,6 +23,7 @@ dev = [
 anime-taste-audit = "anime_taste_dna.data.audit:main"
 anime-taste-preprocess = "anime_taste_dna.data.preprocess:main"
 anime-taste-split = "anime_taste_dna.data.split:main"
+anime-taste-popularity = "anime_taste_dna.models.popularity:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

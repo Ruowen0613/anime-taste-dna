@@ -30,7 +30,7 @@ venv/
 # Data and ML artifacts
 /data/
 artifacts/
-models/
+/models/
 ml/outputs/
 ml/checkpoints/
 *.pt

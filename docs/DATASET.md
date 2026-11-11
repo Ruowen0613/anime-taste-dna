@@ -109,6 +109,28 @@ timestamp is no later than their earliest validation timestamp, and likewise fro
 test. The sanitized protocol, counts, and output fingerprints are committed at
 `ml/reports/split-report-v1.json`; the 464 MB Parquet files remain Git-ignored.
 
+## Executed popularity baseline
+
+The baseline uses only train ratings. Each train-supported item receives the Bayesian score
+
+```text
+(train rating sum + shrinkage × global train mean) / (train count + shrinkage)
+```
+
+Validation NDCG@10 selects shrinkage, with validation Recall@10 and then the lower shrinkage value
+as deterministic tie-breakers. The search grid spans 5 through 10,000,000 and has an interior
+optimum at 1,000,000. Held-out ratings of 8 or higher are relevant; ranking candidates are all
+train-supported items after excluding the user's history before the target split.
+
+On test, the selected baseline has Recall@10 `0.03076363` and NDCG@10 `0.37968674` across 18,086
+eligible users. Results are identical at 5, 10, and 20 observed-rating conditions because this
+global baseline does not personalize its ranking; the conditions will affect the matrix
+factorization fold-in model. The executed configuration, validation result, test result, input
+fingerprints, and artifact fingerprint are stored in `ml/reports/popularity-baseline-v1.json`.
+
+The snapshot's strong active-user and catalog bias is visible in the resulting global ranking, so
+this model is an evaluated comparison baseline rather than the intended final recommender.
+
 ## Known limitations
 
 - The snapshot is current only through November/December 2023, so newer anime will still require a later versioned offline retraining run.

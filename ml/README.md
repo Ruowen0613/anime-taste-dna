@@ -42,3 +42,13 @@ anime-taste-split --config configs/preprocess.toml
 ```
 
 The split is chronological within each anonymous user. The latest 10% is test data, the preceding 10% is validation data, and the earlier history is training data. Counts are rounded down with at least one validation and test interaction, while retaining at least 20 training interactions. Equal timestamps are ordered by item index so repeated runs are deterministic without a random seed.
+
+## Popularity baseline
+
+Fit the train-only Bayesian popularity baseline, select shrinkage on validation, and evaluate once on test:
+
+```bash
+anime-taste-popularity --config configs/popularity.toml
+```
+
+The candidate universe contains only items supported by train data. Evaluation treats held-out ratings of 8 or higher as relevant and excludes all user history preceding the target split. The generated inference table and full report remain under Git-ignored `data/artifacts/popularity-v1/`; a sanitized report is committed after an executed run.
