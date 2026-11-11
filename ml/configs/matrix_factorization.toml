@@ -1,0 +1,24 @@
+[paths]
+processed_directory = "../data/processed/v1"
+split_directory = "../data/processed/v1/splits"
+output_directory = "../data/artifacts/matrix-factorization-v1"
+
+[training]
+embedding_dimension = 32
+epochs = 8
+batch_size = 131072
+learning_rate = 0.02
+weight_decay = 0.00001
+early_stopping_patience = 2
+seed = 42
+device = "auto"
+
+[fold_in]
+regularization_candidates = [0.1, 1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0]
+selection_ndcg_tolerance = 0.001
+user_batch_size = 128
+
+[evaluation]
+observed_ratings = [5, 10, 20]
+relevance_threshold = 8
+ranking_k = 10

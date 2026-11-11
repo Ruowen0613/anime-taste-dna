@@ -52,3 +52,13 @@ anime-taste-popularity --config configs/popularity.toml
 ```
 
 The candidate universe contains only items supported by train data. Evaluation treats held-out ratings of 8 or higher as relevant and excludes all user history preceding the target split. The generated inference table and full report remain under Git-ignored `data/artifacts/popularity-v1/`; a sanitized report is committed after an executed run.
+
+## Matrix factorization
+
+Train the personalized PyTorch model and evaluate cold-start fold-in:
+
+```bash
+anime-taste-mf --config configs/matrix_factorization.toml
+```
+
+The model learns user/item factors and biases from train only, selects its checkpoint by validation RMSE, freezes item parameters, and solves a regularized user vector from the most recent 5, 10, or 20 pre-test ratings. Test ranking covers the full item universe after filtering prior user history. The inference artifact exports item parameters and MAL ID mappings without historical user factors.

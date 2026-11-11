@@ -11,6 +11,7 @@ dependencies = [
   "numpy>=2.0,<3.0",
   "pandas>=2.2,<3.0",
   "pyarrow>=18,<21",
+  "torch>=2.5,<3.0",
 ]
 
 [project.optional-dependencies]
@@ -24,6 +25,7 @@ anime-taste-audit = "anime_taste_dna.data.audit:main"
 anime-taste-preprocess = "anime_taste_dna.data.preprocess:main"
 anime-taste-split = "anime_taste_dna.data.split:main"
 anime-taste-popularity = "anime_taste_dna.models.popularity:main"
+anime-taste-mf = "anime_taste_dna.models.matrix_factorization:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

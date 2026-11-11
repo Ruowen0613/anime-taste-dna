@@ -1,0 +1,101 @@
+{
+  "model": {
+    "name": "explicit matrix factorization",
+    "loss": "mean squared error with AdamW regularization",
+    "fit_data": "train only",
+    "embedding_dimension": 32,
+    "global_train_mean": 6.89992332,
+    "supported_items": 14075,
+    "best_epoch": 1,
+    "training_history": [
+      {
+        "epoch": 1,
+        "train_rmse": 1.43249484,
+        "validation_rmse": 1.67768377
+      },
+      {
+        "epoch": 2,
+        "train_rmse": 1.26603986,
+        "validation_rmse": 1.69956532
+      },
+      {
+        "epoch": 3,
+        "train_rmse": 1.24938736,
+        "validation_rmse": 1.71387652
+      }
+    ]
+  },
+  "fold_in": {
+    "method": "regularized least squares with frozen item factors and bias",
+    "regularization_candidates": [
+      0.1,
+      1.0,
+      10.0,
+      100.0,
+      1000.0,
+      10000.0,
+      100000.0,
+      1000000.0
+    ],
+    "selection_metric": "highest validation Recall@10 among trials within 0.001 of best validation NDCG@10",
+    "selected_regularization": 1000.0,
+    "selected_validation": {
+      "eligible_users": 18078,
+      "mean_recall_at_10": 0.02915362,
+      "mean_ndcg_at_10": 0.27862588
+    },
+    "observations": "most recent interactions before the test split"
+  },
+  "evaluation": {
+    "relevance_threshold": 8,
+    "ranking_k": 10,
+    "candidate_set": "all train-supported items excluding train and validation user history",
+    "test_by_observed_ratings": {
+      "5": {
+        "eligible_users": 18086,
+        "recall_at_10": 0.04385212,
+        "ndcg_at_10": 0.52429491
+      },
+      "10": {
+        "eligible_users": 18086,
+        "recall_at_10": 0.04394219,
+        "ndcg_at_10": 0.52467443
+      },
+      "20": {
+        "eligible_users": 18086,
+        "recall_at_10": 0.04412245,
+        "ndcg_at_10": 0.52577783
+      }
+    },
+    "relative_to_popularity_percent": {
+      "5": {
+        "recall_at_10": 42.55,
+        "ndcg_at_10": 38.09
+      },
+      "10": {
+        "recall_at_10": 42.84,
+        "ndcg_at_10": 38.19
+      },
+      "20": {
+        "recall_at_10": 43.42,
+        "ndcg_at_10": 38.48
+      }
+    }
+  },
+  "reproducibility": {
+    "seed": 42,
+    "device": "cpu",
+    "torch_version": "2.15.0"
+  },
+  "source": {
+    "split_report_sha256": "6f64abeeb4760481007b5b9ae7be9afd5ad390c18bedb5e8b991386f1cda56d9",
+    "train_sha256": "b3cb29aca0f8d03ba864709e9677ad56e946c7057e736b666cb010de75dfec32",
+    "validation_sha256": "b38a6b6599b8397f575521b06eaf7ff8d11cc3948f764a17268da26b6de25ade",
+    "test_sha256": "ed350de50410f2665a56d44b358ef22024766c47b868dedb15a6af1f5622fcb4"
+  },
+  "artifact": {
+    "path": "matrix_factorization.npz",
+    "sha256": "fa6b3b187b33e3c6e812f6b790cb148692bd61bea120a773cecd1d690ad1fe13",
+    "historical_user_parameters_exported": false
+  }
+}
