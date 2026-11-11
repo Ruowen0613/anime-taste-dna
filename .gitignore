@@ -28,7 +28,7 @@ venv/
 *.egg-info/
 
 # Data and ML artifacts
-data/
+/data/
 artifacts/
 models/
 ml/outputs/

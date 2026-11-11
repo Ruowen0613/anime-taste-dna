@@ -24,7 +24,7 @@ The compressed archive is about 340 MB. The script verifies its checksum and ext
 
 ### `anime_titles.csv`
 
-59,655 data rows before validation with columns:
+The file contains 22,590 CSV records before validation. Its synopsis fields contain embedded newlines, so line-counting tools report a misleading larger number. Columns:
 
 ```text
 anime_id,title,mean,genres,studios,synopsis,media_type,num_episodes
@@ -43,10 +43,24 @@ user_id,anime_id,title,user_status,user_score,user_eps_watched,user_rewatch,upda
 - `user_id` contains a public MyAnimeList username in the raw source. Preprocessing must map it immediately to a deterministic internal integer and must never export, log, or commit the original value.
 - `anime_id` is a MyAnimeList ID.
 - `user_score` contains non-zero explicit scores.
-- `user_status` is limited by the publisher to completed and dropped interactions.
+- The published description emphasizes completed and dropped interactions, but the actual audit also finds watching and on-hold rows. Status-specific filtering must use observed data rather than the description alone.
 - `updated_at` enables deterministic time-aware held-out evaluation.
 
 The unused `username_list_full.csv` is intentionally not extracted. The separate one-hot genre file is also omitted because `anime_titles.csv` already contains genre metadata.
+
+## Executed audit
+
+The versioned report is stored at `ml/reports/dataset-audit-v3.json`. It was produced by chunk-scanning the full ratings CSV; no raw usernames or username mappings are present in the report.
+
+Key observed facts:
+
+- 44,379,880 of 44,379,880 rating rows pass score, MAL ID, user-presence, and timestamp parsing checks.
+- There are 18,145 users and 16,139 rated MAL IDs.
+- No duplicate user–item rows were found.
+- 166 timestamps predate MyAnimeList's 2004 launch and must be treated as invalid/sentinel values for chronological splitting.
+- 1,765,739 interactions across 1,247 MAL IDs have no row in the supplied title metadata and require explicit resolution or filtering.
+- Actual statuses include completed, dropped, watching, and on-hold.
+- The median user has 2,593 interactions, demonstrating strong active-user selection bias.
 
 ## Known limitations
 

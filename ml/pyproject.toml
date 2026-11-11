@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "anime-taste-dna-ml"
+version = "0.1.0"
+description = "Offline training and evaluation for Anime Taste DNA"
+requires-python = ">=3.11"
+dependencies = [
+  "numpy>=2.0,<3.0",
+  "pandas>=2.2,<3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.3,<9.0",
+  "ruff>=0.8,<1.0",
+]
+
+[project.scripts]
+anime-taste-audit = "anime_taste_dna.data.audit:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["tests"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

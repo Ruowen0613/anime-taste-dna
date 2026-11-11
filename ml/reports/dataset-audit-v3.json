@@ -1,0 +1,72 @@
+{
+  "dataset": {
+    "reference": "andrewgatchalian/myanimelist-user-ratings",
+    "version": 3,
+    "snapshot_date": "2023-12-08",
+    "archive_sha256": "1a86c041de4505dc651c7c6c3bde6d07ba9a695cf3367725a095cb8eef57fbfd"
+  },
+  "ratings": {
+    "raw_rows": 44379880,
+    "valid_rows": 44379880,
+    "invalid_score_rows": 0,
+    "invalid_anime_id_rows": 0,
+    "missing_user_rows": 0,
+    "invalid_timestamp_rows": 0,
+    "timestamp_before_2004_rows": 166,
+    "duplicate_user_item_rows": 0,
+    "metadata_missing_rows": 1765739,
+    "metadata_missing_unique_items": 1247,
+    "unique_users": 18145,
+    "unique_items": 16139,
+    "score_mean": 6.9824,
+    "score_counts": {
+      "1": 508411,
+      "2": 588249,
+      "3": 945819,
+      "4": 1836964,
+      "5": 3978057,
+      "6": 7049774,
+      "7": 11612021,
+      "8": 9655430,
+      "9": 4758624,
+      "10": 3446531
+    },
+    "status_counts": {
+      "completed": 41519317,
+      "dropped": 1421802,
+      "on_hold": 474661,
+      "watching": 964100
+    },
+    "timestamp_min": "1970-01-01T00:00:00+00:00",
+    "timestamp_max": "2023-11-06T08:09:12+00:00",
+    "interactions_per_user": {
+      "min": 1,
+      "p25": 1808.0,
+      "median": 2593.0,
+      "p75": 3182.0,
+      "p90": 3588.0,
+      "p99": 4173.0,
+      "max": 4803
+    },
+    "interactions_per_item": {
+      "min": 1,
+      "p25": 117.0,
+      "median": 524.0,
+      "p75": 2905.5,
+      "p90": 10584.0,
+      "p99": 17228.86,
+      "max": 18004
+    }
+  },
+  "titles": {
+    "raw_rows": 22590,
+    "valid_mal_ids": 22590,
+    "unique_mal_ids": 22563,
+    "duplicate_mal_id_rows": 27,
+    "invalid_mal_id_rows": 0
+  },
+  "privacy": {
+    "raw_user_ids_exported": false,
+    "user_index_mapping_persisted": false
+  }
+}

@@ -1,0 +1,14 @@
+[dataset]
+reference = "andrewgatchalian/myanimelist-user-ratings"
+version = 3
+snapshot_date = "2023-12-08"
+archive_sha256 = "1a86c041de4505dc651c7c6c3bde6d07ba9a695cf3367725a095cb8eef57fbfd"
+
+[paths]
+ratings_csv = "../data/raw/myanimelist-2023-v3/anime_data/anime_user_ratings.csv"
+titles_csv = "../data/raw/myanimelist-2023-v3/anime_data/anime_titles.csv"
+report_json = "reports/dataset-audit-v3.json"
+working_directory = "../data/processed/.audit-work"
+
+[audit]
+chunk_size = 500000
