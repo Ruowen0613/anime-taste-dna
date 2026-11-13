@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field, model_validator
 
 
@@ -25,10 +27,17 @@ class RecommendationItem(BaseModel):
     title: str
     rank: int
     predicted_rating: float
+    anilist_id: int | None = None
+    cover_image_url: str | None = None
+    year: int | None = None
+    format: str | None = None
+    genres: list[str] = Field(default_factory=list)
+    average_score: int | None = None
 
 
 class RecommendationResponse(BaseModel):
     model_version: str
     mapped_ratings: int
     unmapped_mal_ids: list[int]
+    metadata_status: Literal["complete", "partial", "unavailable"] = "unavailable"
     items: list[RecommendationItem]

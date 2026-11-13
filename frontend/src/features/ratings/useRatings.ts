@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { AnimeSearchResult, RatedAnime } from './types'
+import type { AnimeSearchResult, RatedAnime } from '../discover/types'
 
 const STORAGE_KEY = 'anime-taste-dna:ratings:v1'
 

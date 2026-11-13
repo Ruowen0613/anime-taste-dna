@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
+import type { AnimeDetails, AnimeSearchResult } from '../discover/types'
 import { getAnimeDetails } from './animeDetailsApi'
-import type { AnimeDetails, AnimeSearchResult } from './types'
 
 export function useAnimeDetails() {
   const [selected, setSelected] = useState<AnimeSearchResult | null>(null)
@@ -20,7 +20,6 @@ export function useAnimeDetails() {
       setLoading(false)
       return
     }
-
     const nextController = new AbortController()
     controller.current = nextController
     setDetails(null)

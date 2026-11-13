@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../../api/health'
-import type { AnimeDetails } from './types'
+import type { AnimeDetails } from '../discover/types'
 
 export async function getAnimeDetails(anilistId: number, signal?: AbortSignal): Promise<AnimeDetails> {
   const controller = new AbortController()

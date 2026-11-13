@@ -58,7 +58,7 @@ At process startup, FastAPI loads and validates one artifact bundle. For a recom
 2. resolves known item indices and reports/handles unmapped inputs;
 3. initializes and optimizes a regularized user vector (and optional bias) while item parameters stay frozen;
 4. scores candidate items, masks rated/unavailable titles, and selects Top K;
-5. attaches cached metadata and evidence-based explanations;
+5. batch-enriches ranked MAL IDs with runtime AniList metadata while preserving the model ranking;
 6. uses the popularity artifact as an explicit fallback when too few inputs map.
 
 Inference is bounded and CPU-friendly. The artifact is immutable per deployment, making replicas stateless and results traceable to a model version.
@@ -82,11 +82,12 @@ The implemented `POST /api/v1/recommendations` accepts
 `{ ratings: [{ mal_id, rating }], limit: 10 }`. It requires 10–20 unique positive MAL IDs with
 integer ratings from 1–10 and a limit from 1–20. At least five ratings must map to supported model
 items. The response is
-`{ model_version, mapped_ratings, unmapped_mal_ids, items: [{ mal_id, title, rank, predicted_rating }] }`.
+`{ model_version, mapped_ratings, unmapped_mal_ids, metadata_status, items: [{ mal_id, anilist_id, title, rank, predicted_rating, cover_image_url, year, format, genres, average_score }] }`.
 The service loads fold-in regularization, item factors/biases, titles, supported-item mask, and MAL
 mapping from the versioned artifact; it never loads historical user parameters. Unmapped ratings
-are reported explicitly and never title-matched. AniList cover/details enrichment remains a
-separate explicit MAL-to-AniList mapping step.
+are reported explicitly and never title-matched. The API sends ranked MAL IDs to AniList in one
+`idMal_in` query and joins only on the returned `idMal`. `metadata_status` is `complete`, `partial`,
+or `unavailable`; an AniList outage never discards the model results.
 
 The implemented search response is `{ items: AnimeSearchResult[] }`, where each item includes `anilist_id`, nullable `mal_id`, title, cover URL, year, format, genres, AniList average score, and popularity count. Its `sort` query parameter accepts `popularity` (default), `score`, `relevance`, or `newest`; ordering is performed by AniList before limiting results. A null `mal_id` is never replaced by a title match; the frontend shows that result but disables rating it.
 

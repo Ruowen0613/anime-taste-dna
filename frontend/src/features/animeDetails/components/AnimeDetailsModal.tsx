@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import type { AnimeDetails, AnimeSearchResult } from '../types'
+import type { AnimeDetails, AnimeSearchResult } from '../../discover/types'
 
 type AnimeDetailsModalProps = {
   anime: AnimeSearchResult | null
@@ -53,7 +53,6 @@ export function AnimeDetailsModal({ anime, details, loading, error, onClose }: A
               </div>
             )}
           </div>
-
           {loading && <p className="py-12 text-center text-slate-400">Loading details…</p>}
           {error && <p className="mt-8 rounded-xl bg-rose-400/10 p-4 text-rose-200" role="alert">{error}</p>}
           {details && (
@@ -63,30 +62,13 @@ export function AnimeDetailsModal({ anime, details, loading, error, onClose }: A
                 {details.status && <span className="rounded-full bg-white/10 px-3 py-1 text-sm text-slate-200">{formatLabel(details.status)}</span>}
                 {details.source && <span className="rounded-full bg-white/10 px-3 py-1 text-sm text-slate-200">From {formatLabel(details.source)}</span>}
               </div>
+              <div><h3 className="text-lg font-semibold">About</h3><p className="mt-3 whitespace-pre-line leading-7 text-slate-300">{details.description || 'No description is available from AniList.'}</p></div>
               <div>
-                <h3 className="text-lg font-semibold">About</h3>
-                <p className="mt-3 whitespace-pre-line leading-7 text-slate-300">{details.description || 'No description is available from AniList.'}</p>
-              </div>
-              <div>
-                <div className="flex items-center justify-between gap-4">
-                  <h3 className="text-lg font-semibold">Community reviews</h3>
-                  <a className="text-sm text-violet hover:text-white" href={details.anilist_url} target="_blank" rel="noreferrer">View on AniList ↗</a>
-                </div>
-                {details.reviews.length === 0 ? (
-                  <p className="mt-3 text-slate-400">No public reviews are available for this title.</p>
-                ) : (
-                  <div className="mt-4 grid gap-3 md:grid-cols-2">
-                    {details.reviews.map((review) => (
-                      <article className="rounded-2xl border border-white/10 bg-white/5 p-4" key={review.id}>
-                        <div className="flex items-center gap-3 text-sm text-slate-400">
-                          {review.user_avatar_url && <img className="h-8 w-8 rounded-full object-cover" src={review.user_avatar_url} alt="" />}
-                          <span>{review.user_name}</span>
-                          <span className="ml-auto">{review.helpful_count}/{review.rating_count} helpful</span>
-                        </div>
-                        <p className="mt-3 line-clamp-4 text-sm leading-6 text-slate-300">{review.summary}</p>
-                      </article>
-                    ))}
-                  </div>
+                <div className="flex items-center justify-between gap-4"><h3 className="text-lg font-semibold">Community reviews</h3><a className="text-sm text-violet hover:text-white" href={details.anilist_url} target="_blank" rel="noreferrer">View on AniList ↗</a></div>
+                {details.reviews.length === 0 ? <p className="mt-3 text-slate-400">No public reviews are available for this title.</p> : (
+                  <div className="mt-4 grid gap-3 md:grid-cols-2">{details.reviews.map((review) => (
+                    <article className="rounded-2xl border border-white/10 bg-white/5 p-4" key={review.id}><div className="flex items-center gap-3 text-sm text-slate-400">{review.user_avatar_url && <img className="h-8 w-8 rounded-full object-cover" src={review.user_avatar_url} alt="" />}<span>{review.user_name}</span><span className="ml-auto">{review.helpful_count}/{review.rating_count} helpful</span></div><p className="mt-3 line-clamp-4 text-sm leading-6 text-slate-300">{review.summary}</p></article>
+                  ))}</div>
                 )}
               </div>
             </div>

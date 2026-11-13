@@ -54,6 +54,23 @@ query AnimeDetails($id: Int!) {
   }
 }
 """
+MAL_IDS_QUERY = """
+query AnimeByMalIds($malIds: [Int], $perPage: Int!) {
+  Page(page: 1, perPage: $perPage) {
+    media(type: ANIME, idMal_in: $malIds) {
+      id
+      idMal
+      title { romaji english native }
+      coverImage { large }
+      seasonYear
+      format
+      genres
+      averageScore
+      popularity
+    }
+  }
+}
+"""
 
 
 class AniListError(RuntimeError):
@@ -113,6 +130,20 @@ class AniListClient:
             )
         except (KeyError, TypeError, AttributeError) as exc:
             raise AniListError("AniList returned an invalid response") from exc
+
+    async def get_by_mal_ids(self, mal_ids: list[int]) -> dict[int, AnimeSearchResult]:
+        if not mal_ids:
+            return {}
+        payload = await self._request(
+            MAL_IDS_QUERY,
+            {"malIds": mal_ids, "perPage": len(mal_ids)},
+        )
+        try:
+            media = payload["data"]["Page"]["media"]
+            parsed = [self._parse_item(item) for item in media]
+            return {item.mal_id: item for item in parsed if item.mal_id is not None}
+        except (KeyError, TypeError, AttributeError) as exc:
+            raise AniListError("AniList returned invalid recommendation metadata") from exc
 
     async def _request(self, query: str, variables: dict[str, Any]) -> dict[str, Any]:
         owns_client = self._client is None

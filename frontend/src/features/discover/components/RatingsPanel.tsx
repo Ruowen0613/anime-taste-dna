@@ -8,9 +8,10 @@ type RatingsPanelProps = {
   onRate: (anime: AnimeSearchResult, rating: number) => void
   onRemove: (malId: number) => void
   onOpen: (anime: AnimeSearchResult) => void
+  onRecommend: () => void
 }
 
-export function RatingsPanel({ ratings, onRate, onRemove, onOpen }: RatingsPanelProps) {
+export function RatingsPanel({ ratings, onRate, onRemove, onOpen, onRecommend }: RatingsPanelProps) {
   const [editingMalId, setEditingMalId] = useState<number | null>(null)
   const [sortBy, setSortBy] = useState<SortOption>('score-desc')
   const sortedRatings = useMemo(() => [...ratings].sort((left, right) => {
@@ -44,6 +45,15 @@ export function RatingsPanel({ ratings, onRate, onRemove, onOpen }: RatingsPanel
           </div>
         </div>
       </div>
+      {ratings.length >= 10 && (
+        <div className="mt-8 flex flex-col items-start justify-between gap-4 rounded-2xl border border-violet/30 bg-gradient-to-r from-violet/15 to-sakura/10 p-5 sm:flex-row sm:items-center">
+          <div>
+            <h3 className="font-semibold">Your taste profile is ready</h3>
+            <p className="mt-1 text-sm text-slate-300">Generate a personalized Top 10 from your {ratings.length} ratings.</p>
+          </div>
+          <button className="rounded-xl bg-white px-5 py-3 font-semibold text-ink transition hover:bg-violet hover:text-white" type="button" onClick={onRecommend}>Get recommendations</button>
+        </div>
+      )}
       {ratings.length === 0 ? (
         <p className="mt-8 rounded-2xl border border-dashed border-white/15 p-8 text-center text-slate-400">Search above and rate your first anime.</p>
       ) : (

@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     app_name: str = "Anime Taste DNA API"
-    allowed_origins: str = "http://localhost:5173"
+    allowed_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
     model_artifact_path: Path = (
         Path(__file__).resolve().parents[2]
         / "data/artifacts/matrix-factorization-v1/matrix_factorization.npz"

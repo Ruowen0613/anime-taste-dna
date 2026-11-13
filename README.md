@@ -2,14 +2,14 @@
 
 A personalized anime recommendation app that uses offline-trained collaborative filtering, cold-start user fold-in, and interpretable metadata-derived taste profiles.
 
-This repository currently contains the first usable Discover slice: AniList-backed search, explicit MAL/AniList identities, browser-persisted 1–10 ratings, a FastAPI health/search API, and the project foundation. Recommendation training and recommendation results are not implemented yet.
+This repository contains an end-to-end recommendation slice: AniList-backed discovery, browser-persisted ratings, offline-trained matrix factorization, cold-start fold-in inference, and an enriched Top 10 recommendations view.
 
 ## Repository layout
 
 ```text
 frontend/             React + TypeScript + Vite + Tailwind
 backend/              FastAPI service and tests
-ml/                   Future preprocessing, training, evaluation, artifacts
+ml/                   Preprocessing, training, evaluation, and artifact export
 docs/                 Architecture documentation
 scripts/              Future repeatable utility scripts
 .github/workflows/    Basic continuous integration
@@ -62,8 +62,9 @@ pytest
 
 - Implemented: AniList title search, normalized search cards, 1–10 rating add/edit/remove, versioned local-storage persistence, and lazy-loaded anime detail modals with AniList community scores and public review summaries.
 - Implemented in ML: reproducible download/audit, anonymous preprocessing, chronological splits, evaluated popularity baseline, PyTorch matrix factorization, regularized cold-start fold-in, and a versioned inference artifact.
-- Implemented in the API: typed recommendation contract, artifact validation/loading, MAL ID mapping, bounded fold-in/ranking, rated-item filtering, and explicit unmapped-ID reporting.
-- Not implemented: recommendation frontend, AniList enrichment for recommended cards, production artifact packaging, and Taste DNA.
+- Implemented in the API: typed recommendation contract, artifact validation/loading, MAL ID mapping, bounded fold-in/ranking, rated-item filtering, explicit unmapped-ID reporting, and batched AniList metadata enrichment with graceful degradation.
+- Implemented in the frontend: a model-backed Top 10 view with predicted ratings clearly separated from AniList community scores, responsive cards, retry/regenerate states, and reusable anime detail modals.
+- Not implemented: production artifact packaging/deployment and Taste DNA.
 
 ## ML status
 

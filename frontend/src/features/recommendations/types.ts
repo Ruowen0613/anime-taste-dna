@@ -1,0 +1,20 @@
+export type RecommendationItem = {
+  mal_id: number
+  title: string
+  rank: number
+  predicted_rating: number
+  anilist_id: number | null
+  cover_image_url: string | null
+  year: number | null
+  format: string | null
+  genres: string[]
+  average_score: number | null
+}
+
+export type RecommendationResponse = {
+  model_version: string
+  mapped_ratings: number
+  unmapped_mal_ids: number[]
+  metadata_status: 'complete' | 'partial' | 'unavailable'
+  items: RecommendationItem[]
+}
