@@ -84,8 +84,32 @@ broader coverage (4,742 items, 33.69%) but very poor ranking quality (Recall@10 
 NDCG@10 0.01121872), so simply removing item bias is not a viable fix. The next model experiment
 must be selected on validation data and report both ranking quality and personalization diagnostics.
 
+### Validation-only fold-in diagnosis
+
+A follow-up sweep tested fold-in regularization 0.1, 1, 10, 100, and 1,000 on one common validation
+cohort without accessing test targets. At 10 observed ratings, item-bias-only achieved Recall@10
+0.02908499 and NDCG@10 0.27925718. The exported regularization of 1,000 achieved Recall@10
+0.02919120 and NDCG@10 0.27848268: a Recall gain of only 0.00010621 and an NDCG loss of 0.00077450.
+
+| Fold-in regularization | User-factor norm | Interaction score std | Coverage | Bias overlap | Recall@10 | NDCG@10 |
+|---:|---:|---:|---:|---:|---:|---:|
+| 0.1 | 2.3873 | 1.0130 | 35.51% | 1.66% | 0.00172473 | 0.01568440 |
+| 1 | 1.6174 | 0.6947 | 31.42% | 4.74% | 0.00386249 | 0.03438100 |
+| 10 | 0.5721 | 0.2544 | 12.74% | 33.22% | 0.01749664 | 0.15968201 |
+| 100 | 0.1001 | 0.0457 | 1.08% | 84.02% | 0.02826578 | 0.26922216 |
+| 1,000 | 0.0112 | 0.0051 | 0.31% | 98.33% | 0.02919120 | 0.27848268 |
+
+Lower regularization recovers diversity but makes ranking substantially worse, and more observations
+make the weakly regularized trials worse rather than better. The failure is therefore not fixed by
+choosing a different fold-in value: the learned interaction geometry does not generalize to new-user
+ranking. The training curve supports this diagnosis. Train RMSE fell from 1.4325 to 1.2494 over
+epochs 1–3 while validation RMSE rose from 1.6777 to 1.7139, so epoch 1 is a legitimate early-stop
+result rather than a reporting bug. The next experiment should change training regularization and
+checkpoint selection before introducing a different model objective.
+
 Machine-readable executed reports are stored in `ml/reports/`, including
-`personalization-audit-v1.json`. No metric in this document is an estimate or an unexecuted target.
+`personalization-audit-v1.json` and `fold-in-diagnostic-v1.json`. No metric in this document is an
+estimate or an unexecuted target.
 
 ## Online artifact
 

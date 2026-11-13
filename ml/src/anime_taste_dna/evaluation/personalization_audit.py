@@ -142,7 +142,7 @@ def evaluate_mode(
 ) -> tuple[dict[str, float | int], np.ndarray]:
     recommendations = np.empty((len(users), config.ranking_k), dtype=np.int32)
     discounts = 1.0 / np.log2(np.arange(2, config.ranking_k + 2))
-    recall_sum = ndcg_sum = norm_sum = 0.0
+    recall_sum = ndcg_sum = norm_sum = interaction_std_sum = 0.0
     zero_bias = np.zeros_like(item_bias)
 
     for start in range(0, len(users), config.user_batch_size):
@@ -166,6 +166,7 @@ def evaluate_mode(
             )
         scoring_bias = item_bias if mode in {"full", "item_bias_only"} else zero_bias
         scores = user_factors @ item_factors.T
+        interaction_std_sum += float(scores[:, supported].std(axis=1).sum())
         scores += user_bias[:, None] + scoring_bias[None, :] + global_mean
         scores[:, ~supported] = -np.inf
         for row, user in enumerate(batch):
@@ -198,6 +199,7 @@ def evaluate_mode(
         "recall_at_10": round(recall_sum / len(users), 8),
         "ndcg_at_10": round(ndcg_sum / len(users), 8),
         "mean_user_factor_norm": round(norm_sum / len(users), 8),
+        "mean_interaction_score_std": round(interaction_std_sum / len(users), 8),
         "catalog_coverage_items": len(unique_items),
         "catalog_coverage_fraction": round(len(unique_items) / int(supported.sum()), 8),
         "top_10_items_share_of_slots": round(most_common_slots / total_slots, 8),

@@ -87,3 +87,13 @@ The audit evaluates the fixed artifact on one common test cohort and reports cat
 recommendation concentration, user-factor norms, and Top-10 overlap with item-bias-only and
 interaction-only inference ablations. Its versioned report is
 `reports/personalization-audit-v1.json`.
+
+Diagnose fold-in strength without using test targets:
+
+```bash
+anime-taste-fold-in-diagnostic --config configs/fold_in_diagnostic.toml
+```
+
+This command compares regularization candidates on one common validation cohort and records ranking
+metrics, user-factor norms, interaction-score variance, catalog coverage, and overlap with the
+item-bias-only ranking in `reports/fold-in-diagnostic-v1.json`.
