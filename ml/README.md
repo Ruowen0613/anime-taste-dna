@@ -97,3 +97,14 @@ anime-taste-fold-in-diagnostic --config configs/fold_in_diagnostic.toml
 This command compares regularization candidates on one common validation cohort and records ranking
 metrics, user-factor norms, interaction-score variance, catalog coverage, and overlap with the
 item-bias-only ranking in `reports/fold-in-diagnostic-v1.json`.
+
+Compare explicit-MF optimizer settings without touching test targets or exporting a production
+artifact:
+
+```bash
+anime-taste-mf-training-diagnostic --config configs/mf_training_diagnostic.toml
+```
+
+The experiment retrains each declared variant, selects fold-in regularization by validation
+NDCG@10, and compares its full ranking with its own item-bias-only ranking. Results are written to
+`reports/mf-training-diagnostic-v1.json`.

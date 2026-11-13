@@ -107,9 +107,25 @@ epochs 1–3 while validation RMSE rose from 1.6777 to 1.7139, so epoch 1 is a l
 result rather than a reporting bug. The next experiment should change training regularization and
 checkpoint selection before introducing a different model objective.
 
+### Explicit-MF training variants
+
+Three additional models were trained without test access using learning rate 0.005 and AdamW weight
+decay 0.00001, 0.0001, or 0.001. All three again selected epoch 1 by validation RMSE and produced
+nearly identical results. The lowest-decay variant improved validation RMSE from the original
+model's 1.6777 to 1.5952, but its best validation ranking used fold-in regularization 1,000 and
+achieved only Recall@10 0.02180459 and NDCG@10 0.20279198. Its own item-bias-only ranking achieved
+Recall@10 0.02252185 and NDCG@10 0.20109621.
+
+The interaction term therefore added 0.00169577 NDCG but lost 0.00071726 Recall, retained 91.93%
+Top-10 overlap with bias-only, and covered only 55 supported items. Improving rating RMSE did not
+improve Top-N ranking, while practical AdamW weight-decay changes had no meaningful effect. This is
+evidence of objective mismatch rather than a fold-in hyperparameter mistake. Further tuning of the
+same explicit-MSE setup is not justified before testing a ranking-aware objective.
+
 Machine-readable executed reports are stored in `ml/reports/`, including
 `personalization-audit-v1.json` and `fold-in-diagnostic-v1.json`. No metric in this document is an
-estimate or an unexecuted target.
+estimate or an unexecuted target. The explicit-MF training comparison is stored in
+`mf-training-diagnostic-v1.json`.
 
 ## Online artifact
 
