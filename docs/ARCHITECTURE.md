@@ -79,7 +79,7 @@ AniList GraphQL provides search, covers, titles, descriptions, genres, tags, for
 | GET | `/api/v1/model/info` | Expose safe model version and training/evaluation metadata |
 
 The implemented `POST /api/v1/recommendations` accepts
-`{ ratings: [{ mal_id, rating }], limit: 10 }`. It requires 10–20 unique positive MAL IDs with
+`{ ratings: [{ mal_id, rating }], excluded_mal_ids: [], limit: 10 }`. It requires 10–20 unique positive MAL IDs with
 integer ratings from 1–10 and a limit from 1–20. At least five ratings must map to supported model
 items. The response is
 `{ model_version, mapped_ratings, unmapped_mal_ids, metadata_status, items: [{ mal_id, anilist_id, title, rank, predicted_rating, cover_image_url, year, format, genres, average_score }] }`.
@@ -98,8 +98,9 @@ fills its position. When more than 20 local ratings exist, the latest 20 are use
 the complete local rated-ID set remains excluded from the displayed results.
 “Not interested” archives are also versioned in browser local storage. They filter ranking
 candidates without becoming synthetic low ratings, so dismissing a title does not distort the
-collaborative-filtering user vector. Users can restore all archived titles from the recommendation
-status row.
+collaborative-filtering user vector. Users can restore selected archived titles from the recommendation
+status row through a multi-select manager. Archiving a recommendation returns the viewport to the
+page header while a replacement is generated.
 
 ## Deployment
 

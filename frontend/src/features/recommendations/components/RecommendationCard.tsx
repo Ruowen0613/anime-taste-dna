@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import type { AnimeSearchResult } from '../../discover/types'
-import type { RecommendationItem } from '../types'
+import type { ArchivedRecommendation, RecommendationItem } from '../types'
 
 type RecommendationCardProps = {
   item: RecommendationItem
   onOpen: (anime: AnimeSearchResult) => void
   onRate: (anime: AnimeSearchResult, rating: number) => void
-  onArchive: (malId: number) => void
+  onArchive: (item: ArchivedRecommendation) => void
 }
 
 export function RecommendationCard({ item, onOpen, onRate, onArchive }: RecommendationCardProps) {
@@ -67,7 +67,7 @@ export function RecommendationCard({ item, onOpen, onRate, onArchive }: Recommen
           ) : (
             <button className="text-sm text-sakura transition hover:text-white disabled:text-slate-600" type="button" disabled={!canOpen} onClick={() => setRatingOpen(true)}>{canOpen ? 'Already watched? Rate it' : 'Rating unavailable'}</button>
           )}
-          <button className="rounded-lg bg-black/30 px-2.5 py-1 text-sm text-slate-400 transition hover:bg-black/50 hover:text-white" type="button" onClick={() => onArchive(item.mal_id)}>Not interested</button>
+          <button className="rounded-lg bg-black/30 px-2.5 py-1 text-sm text-slate-400 transition hover:bg-black/50 hover:text-white" type="button" onClick={() => onArchive({ mal_id: item.mal_id, title: item.title })}>Not interested</button>
         </div>
       </div>
     </li>
