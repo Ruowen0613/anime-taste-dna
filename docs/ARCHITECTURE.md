@@ -63,6 +63,19 @@ At process startup, FastAPI loads and validates one artifact bundle. For a recom
 
 Inference is bounded and CPU-friendly. The artifact is immutable per deployment, making replicas stateless and results traceable to a model version.
 
+### Experimental pairwise taste refinement
+
+`POST /api/v1/preference-quiz/options` samples model-supported items, enriches a candidate pool through
+one AniList MAL-ID query, and greedily selects four options that add distinct genres. The browser
+stores each `most_mal_id > least_mal_id` choice separately from watched ratings. During fold-in, each
+pair contributes a weighted item-factor difference row with no user-bias term; item embeddings and
+all global model parameters remain frozen. Least-interest choices are excluded from ranking.
+
+This is an experimental inference protocol, not a retrained model. The UI reports how many Top 10
+items actually changed and does not claim improved quality. Before promotion from experimental
+status, rating-only fold-in must be compared with 5- and 10-round quiz refinement under the same
+Recall@10/NDCG@10 evaluation protocol.
+
 ## Anime metadata integration
 
 AniList GraphQL provides search, covers, titles, descriptions, genres, tags, format, and season/year. Search results should request `idMal` and use the MAL ID as the bridge to the ratings dataset. Persist an offline mapping table with `mal_id`, `anilist_id`, mapping status, and metadata timestamp. Runtime metadata may be cached in memory with bounded TTL; rate limits and partial outages must produce clear degraded behavior.
@@ -75,14 +88,15 @@ AniList GraphQL provides search, covers, titles, descriptions, genres, tags, for
 | GET | `/api/v1/anime/search?q=...&limit=...` | Proxied/cached AniList search with IDs normalized |
 | GET | `/api/v1/anime/{anilist_id}` | Lazy-loaded description, community score, metadata, and public review summaries |
 | POST | `/api/v1/recommendations` | Validate ratings and return ranked unseen anime, explanations, and model version |
+| POST | `/api/v1/preference-quiz/options` | Return four model-supported, metadata-enriched quiz options |
 | POST | `/api/v1/taste-dna` | Return metadata-derived dimension scores and supporting titles |
 | GET | `/api/v1/model/info` | Expose safe model version and training/evaluation metadata |
 
 The implemented `POST /api/v1/recommendations` accepts
-`{ ratings: [{ mal_id, rating }], excluded_mal_ids: [], limit: 10 }`. It requires 10–20 unique positive MAL IDs with
+`{ ratings: [{ mal_id, rating }], preferences: [{ most_mal_id, least_mal_id }], excluded_mal_ids: [], limit: 10 }`. It requires 10–20 unique positive MAL IDs with
 integer ratings from 1–10 and a limit from 1–20. At least five ratings must map to supported model
 items. The response is
-`{ model_version, mapped_ratings, unmapped_mal_ids, metadata_status, items: [{ mal_id, anilist_id, title, rank, predicted_rating, cover_image_url, year, format, genres, average_score }] }`.
+`{ model_version, mapped_ratings, mapped_preferences, unmapped_mal_ids, metadata_status, items: [{ mal_id, anilist_id, title, rank, predicted_rating, cover_image_url, year, format, genres, average_score }] }`.
 The service loads fold-in regularization, item factors/biases, titles, supported-item mask, and MAL
 mapping from the versioned artifact; it never loads historical user parameters. Unmapped ratings
 are reported explicitly and never title-matched. The API sends ranked MAL IDs to AniList in one

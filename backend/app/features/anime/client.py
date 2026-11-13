@@ -14,6 +14,7 @@ query SearchAnime($search: String!, $perPage: Int!, $sort: [MediaSort!]!) {
       id
       idMal
       title { romaji english native }
+      description(asHtml: false)
       coverImage { large }
       seasonYear
       format
@@ -61,6 +62,7 @@ query AnimeByMalIds($malIds: [Int], $perPage: Int!) {
       id
       idMal
       title { romaji english native }
+      description(asHtml: false)
       coverImage { large }
       seasonYear
       format
@@ -181,6 +183,7 @@ class AniListClient:
             genres=item.get("genres") or [],
             average_score=item.get("averageScore"),
             popularity=item.get("popularity") or 0,
+            summary=AniListClient._clean_text(item.get("description")),
         )
 
     @staticmethod

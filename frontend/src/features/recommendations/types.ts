@@ -16,6 +16,7 @@ export type ArchivedRecommendation = Pick<RecommendationItem, 'mal_id' | 'title'
 export type RecommendationResponse = {
   model_version: string
   mapped_ratings: number
+  mapped_preferences: number
   unmapped_mal_ids: number[]
   metadata_status: 'complete' | 'partial' | 'unavailable'
   items: RecommendationItem[]

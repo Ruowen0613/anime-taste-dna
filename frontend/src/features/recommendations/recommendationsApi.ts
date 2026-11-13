@@ -1,13 +1,14 @@
 import { API_BASE_URL } from '../../api/health'
 import type { RatedAnime } from '../discover/types'
+import type { PairwisePreference } from '../preferenceQuiz/types'
 import type { RecommendationResponse } from './types'
 
-export async function getRecommendations(ratings: RatedAnime[], archivedMalIds: number[], signal?: AbortSignal): Promise<RecommendationResponse> {
+export async function getRecommendations(ratings: RatedAnime[], archivedMalIds: number[], preferences: PairwisePreference[], signal?: AbortSignal): Promise<RecommendationResponse> {
   const controller = new AbortController()
   const timeout = window.setTimeout(() => controller.abort(), 15_000)
   const abortRequest = () => controller.abort()
   signal?.addEventListener('abort', abortRequest, { once: true })
-  const excludedMalIds = [...new Set([...ratings.map(({ mal_id }) => mal_id), ...archivedMalIds])]
+  const excludedMalIds = [...new Set([...ratings.map(({ mal_id }) => mal_id), ...archivedMalIds, ...preferences.map(({ least_mal_id }) => least_mal_id)])]
 
   try {
     const response = await fetch(`${API_BASE_URL}/api/v1/recommendations`, {
@@ -15,6 +16,7 @@ export async function getRecommendations(ratings: RatedAnime[], archivedMalIds: 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ratings: ratings.slice(-20).map(({ mal_id, rating }) => ({ mal_id, rating })),
+        preferences: preferences.slice(-20),
         excluded_mal_ids: excludedMalIds,
         limit: 10,
       }),

@@ -46,7 +46,20 @@ class RecommendationService:
 
         observed_items = np.asarray([item for item, _ in mapped], dtype=np.int32)
         observed_ratings = np.asarray([rating for _, rating in mapped], dtype=np.float32)
-        user_factor, user_bias = self._fold_in(observed_items, observed_ratings)
+        mapped_preferences = [
+            (
+                self._item_by_mal_id[preference.most_mal_id],
+                self._item_by_mal_id[preference.least_mal_id],
+            )
+            for preference in request.preferences
+            if preference.most_mal_id in self._item_by_mal_id
+            and preference.least_mal_id in self._item_by_mal_id
+            and self.artifact.supported[self._item_by_mal_id[preference.most_mal_id]]
+            and self.artifact.supported[self._item_by_mal_id[preference.least_mal_id]]
+        ]
+        user_factor, user_bias = self._fold_in(
+            observed_items, observed_ratings, mapped_preferences
+        )
         scores = self.artifact.item_factors @ user_factor
         scores += self.artifact.item_bias + self.artifact.global_mean + user_bias
         scores[~self.artifact.supported] = -np.inf
@@ -81,12 +94,16 @@ class RecommendationService:
         return RecommendationResponse(
             model_version=self.artifact.model_version,
             mapped_ratings=len(mapped),
+            mapped_preferences=len(mapped_preferences),
             unmapped_mal_ids=unmapped_mal_ids,
             items=items,
         )
 
     def _fold_in(
-        self, observed_items: np.ndarray, observed_ratings: np.ndarray
+        self,
+        observed_items: np.ndarray,
+        observed_ratings: np.ndarray,
+        preferences: list[tuple[int, int]],
     ) -> tuple[np.ndarray, float]:
         factors = self.artifact.item_factors[observed_items]
         design = np.concatenate(
@@ -97,6 +114,25 @@ class RecommendationService:
             - self.artifact.global_mean
             - self.artifact.item_bias[observed_items]
         )
+        if preferences:
+            most_items = np.asarray([most for most, _ in preferences], dtype=np.int32)
+            least_items = np.asarray([least for _, least in preferences], dtype=np.int32)
+            preference_weight = np.sqrt(0.75)
+            preference_design = np.concatenate(
+                (
+                    self.artifact.item_factors[most_items]
+                    - self.artifact.item_factors[least_items],
+                    np.zeros((len(preferences), 1), dtype=np.float32),
+                ),
+                axis=1,
+            )
+            preference_targets = (
+                1.0
+                - self.artifact.item_bias[most_items]
+                + self.artifact.item_bias[least_items]
+            )
+            design = np.concatenate((design, preference_design * preference_weight), axis=0)
+            targets = np.concatenate((targets, preference_targets * preference_weight))
         penalty = np.eye(design.shape[1], dtype=np.float32)
         penalty *= self.artifact.fold_in_regularization
         parameters = np.linalg.solve(design.T @ design + penalty, design.T @ targets)

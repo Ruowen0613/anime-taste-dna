@@ -10,8 +10,20 @@ class UserRating(BaseModel):
     rating: int = Field(ge=1, le=10)
 
 
+class PairwisePreference(BaseModel):
+    most_mal_id: int = Field(gt=0)
+    least_mal_id: int = Field(gt=0)
+
+    @model_validator(mode="after")
+    def choices_must_differ(self) -> PairwisePreference:
+        if self.most_mal_id == self.least_mal_id:
+            raise ValueError("most_mal_id and least_mal_id must differ")
+        return self
+
+
 class RecommendationRequest(BaseModel):
     ratings: list[UserRating] = Field(min_length=10, max_length=20)
+    preferences: list[PairwisePreference] = Field(default_factory=list, max_length=20)
     excluded_mal_ids: list[int] = Field(default_factory=list, max_length=500)
     limit: int = Field(default=10, ge=1, le=20)
 
@@ -43,6 +55,7 @@ class RecommendationItem(BaseModel):
 class RecommendationResponse(BaseModel):
     model_version: str
     mapped_ratings: int
+    mapped_preferences: int = 0
     unmapped_mal_ids: list[int]
     metadata_status: Literal["complete", "partial", "unavailable"] = "unavailable"
     items: list[RecommendationItem]

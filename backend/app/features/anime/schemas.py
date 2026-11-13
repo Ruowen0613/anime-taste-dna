@@ -11,6 +11,7 @@ class AnimeSearchResult(BaseModel):
     genres: list[str]
     average_score: int | None = None
     popularity: int = 0
+    summary: str | None = None
 
 
 class AnimeSearchResponse(BaseModel):

@@ -103,6 +103,27 @@ def test_recommendations_exclude_archived_mal_ids_without_using_them_for_fold_in
     assert [item.mal_id for item in result.items] == [4]
 
 
+def test_pairwise_preference_refines_user_vector_without_becoming_a_rating() -> None:
+    ratings = [
+        {"mal_id": mal_id, "rating": 10 if mal_id == 1 else 1}
+        for mal_id in [1, 2, 100, 101, 102, 103, 104, 105, 106, 107]
+    ]
+    baseline = _service().recommend(RecommendationRequest(ratings=ratings, limit=2))
+    refined = _service().recommend(
+        RecommendationRequest(
+            ratings=ratings,
+            preferences=[{"most_mal_id": 4, "least_mal_id": 3}],
+            limit=2,
+        )
+    )
+
+    baseline_scores = {item.mal_id: item.predicted_rating for item in baseline.items}
+    refined_scores = {item.mal_id: item.predicted_rating for item in refined.items}
+    assert refined.mapped_ratings == baseline.mapped_ratings == 2
+    assert refined.mapped_preferences == 1
+    assert refined_scores[4] - refined_scores[3] > baseline_scores[4] - baseline_scores[3]
+
+
 def test_recommendations_require_enough_model_mappings() -> None:
     service = _service()
     app.dependency_overrides[get_available_recommendation_service] = lambda: service
