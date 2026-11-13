@@ -2,11 +2,12 @@ import { API_BASE_URL } from '../../api/health'
 import type { RatedAnime } from '../discover/types'
 import type { RecommendationResponse } from './types'
 
-export async function getRecommendations(ratings: RatedAnime[], signal?: AbortSignal): Promise<RecommendationResponse> {
+export async function getRecommendations(ratings: RatedAnime[], archivedMalIds: number[], signal?: AbortSignal): Promise<RecommendationResponse> {
   const controller = new AbortController()
   const timeout = window.setTimeout(() => controller.abort(), 15_000)
   const abortRequest = () => controller.abort()
   signal?.addEventListener('abort', abortRequest, { once: true })
+  const excludedMalIds = [...new Set([...ratings.map(({ mal_id }) => mal_id), ...archivedMalIds])]
 
   try {
     const response = await fetch(`${API_BASE_URL}/api/v1/recommendations`, {
@@ -14,7 +15,8 @@ export async function getRecommendations(ratings: RatedAnime[], signal?: AbortSi
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ratings: ratings.slice(-20).map(({ mal_id, rating }) => ({ mal_id, rating })),
-        limit: 20,
+        excluded_mal_ids: excludedMalIds,
+        limit: 10,
       }),
       signal: controller.signal,
     })
@@ -23,11 +25,11 @@ export async function getRecommendations(ratings: RatedAnime[], signal?: AbortSi
       throw new Error(payload?.detail ?? 'Could not generate recommendations.')
     }
     const result = await response.json() as RecommendationResponse
-    const ratedMalIds = new Set(ratings.map(({ mal_id }) => mal_id))
+    const excludedMalIdSet = new Set(excludedMalIds)
     return {
       ...result,
       items: result.items
-        .filter(({ mal_id }) => !ratedMalIds.has(mal_id))
+        .filter(({ mal_id }) => !excludedMalIdSet.has(mal_id))
         .slice(0, 10)
         .map((item, index) => ({ ...item, rank: index + 1 })),
     }

@@ -6,9 +6,10 @@ type RecommendationCardProps = {
   item: RecommendationItem
   onOpen: (anime: AnimeSearchResult) => void
   onRate: (anime: AnimeSearchResult, rating: number) => void
+  onArchive: (malId: number) => void
 }
 
-export function RecommendationCard({ item, onOpen, onRate }: RecommendationCardProps) {
+export function RecommendationCard({ item, onOpen, onRate, onArchive }: RecommendationCardProps) {
   const [ratingOpen, setRatingOpen] = useState(false)
   const canOpen = item.anilist_id !== null
   const anime = item.anilist_id !== null ? {
@@ -66,6 +67,7 @@ export function RecommendationCard({ item, onOpen, onRate }: RecommendationCardP
           ) : (
             <button className="text-sm text-sakura transition hover:text-white disabled:text-slate-600" type="button" disabled={!canOpen} onClick={() => setRatingOpen(true)}>{canOpen ? 'Already watched? Rate it' : 'Rating unavailable'}</button>
           )}
+          <button className="rounded-lg bg-black/30 px-2.5 py-1 text-sm text-slate-400 transition hover:bg-black/50 hover:text-white" type="button" onClick={() => onArchive(item.mal_id)}>Not interested</button>
         </div>
       </div>
     </li>

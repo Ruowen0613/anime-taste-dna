@@ -3,7 +3,7 @@ import type { RatedAnime } from '../discover/types'
 import { getRecommendations } from './recommendationsApi'
 import type { RecommendationResponse } from './types'
 
-export function useRecommendations(ratings: RatedAnime[]) {
+export function useRecommendations(ratings: RatedAnime[], archivedMalIds: number[]) {
   const [result, setResult] = useState<RecommendationResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -16,7 +16,7 @@ export function useRecommendations(ratings: RatedAnime[]) {
     setLoading(true)
     setError('')
     try {
-      const response = await getRecommendations(ratings, nextController.signal)
+      const response = await getRecommendations(ratings, archivedMalIds, nextController.signal)
       setResult(response)
     } catch (caught) {
       if (caught instanceof DOMException && caught.name === 'AbortError') return
@@ -24,7 +24,7 @@ export function useRecommendations(ratings: RatedAnime[]) {
     } finally {
       if (controller.current === nextController) setLoading(false)
     }
-  }, [ratings])
+  }, [ratings, archivedMalIds])
 
   useEffect(() => {
     void generate()

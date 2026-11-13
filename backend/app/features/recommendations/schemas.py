@@ -12,6 +12,7 @@ class UserRating(BaseModel):
 
 class RecommendationRequest(BaseModel):
     ratings: list[UserRating] = Field(min_length=10, max_length=20)
+    excluded_mal_ids: list[int] = Field(default_factory=list, max_length=500)
     limit: int = Field(default=10, ge=1, le=20)
 
     @model_validator(mode="after")
@@ -19,6 +20,10 @@ class RecommendationRequest(BaseModel):
         mal_ids = [rating.mal_id for rating in self.ratings]
         if len(mal_ids) != len(set(mal_ids)):
             raise ValueError("ratings must contain unique mal_id values")
+        if any(mal_id <= 0 for mal_id in self.excluded_mal_ids):
+            raise ValueError("excluded_mal_ids must contain positive values")
+        if len(self.excluded_mal_ids) != len(set(self.excluded_mal_ids)):
+            raise ValueError("excluded_mal_ids must contain unique values")
         return self
 
 

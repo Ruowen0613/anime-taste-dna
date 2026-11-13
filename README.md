@@ -63,7 +63,7 @@ pytest
 - Implemented: AniList title search, normalized search cards, 1–10 rating add/edit/remove, versioned local-storage persistence, and lazy-loaded anime detail modals with AniList community scores and public review summaries.
 - Implemented in ML: reproducible download/audit, anonymous preprocessing, chronological splits, evaluated popularity baseline, PyTorch matrix factorization, regularized cold-start fold-in, and a versioned inference artifact.
 - Implemented in the API: typed recommendation contract, artifact validation/loading, MAL ID mapping, bounded fold-in/ranking, rated-item filtering, explicit unmapped-ID reporting, and batched AniList metadata enrichment with graceful degradation.
-- Implemented in the frontend: a model-backed Top 10 view with predicted ratings clearly separated from AniList community scores, responsive cards, retry/regenerate states, reusable anime detail modals, and in-place scoring of already-watched recommendations with automatic replacement.
+- Implemented in the frontend: a model-backed Top 10 view with predicted ratings clearly separated from AniList community scores, responsive cards, retry/regenerate states, reusable anime detail modals, in-place scoring of already-watched recommendations, and restorable browser-local “not interested” archives with automatic replacement.
 - Not implemented: production artifact packaging/deployment and Taste DNA.
 
 ## ML status

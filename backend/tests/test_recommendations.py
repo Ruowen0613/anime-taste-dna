@@ -5,6 +5,7 @@ from app.features.anime.client import AniListError, get_anilist_client
 from app.features.anime.schemas import AnimeSearchResult
 from app.features.recommendations.artifact import RecommendationArtifact
 from app.features.recommendations.router import get_available_recommendation_service
+from app.features.recommendations.schemas import RecommendationRequest
 from app.features.recommendations.service import RecommendationService
 from app.main import app
 
@@ -86,6 +87,20 @@ def test_recommendations_reject_duplicate_mal_ids() -> None:
         app.dependency_overrides.clear()
 
     assert response.status_code == 422
+
+
+def test_recommendations_exclude_archived_mal_ids_without_using_them_for_fold_in() -> None:
+    ratings = [
+        {"mal_id": mal_id, "rating": 10 if mal_id == 1 else 1}
+        for mal_id in [1, 2, 100, 101, 102, 103, 104, 105, 106, 107]
+    ]
+
+    result = _service().recommend(
+        RecommendationRequest(ratings=ratings, excluded_mal_ids=[3], limit=2)
+    )
+
+    assert result.mapped_ratings == 2
+    assert [item.mal_id for item in result.items] == [4]
 
 
 def test_recommendations_require_enough_model_mappings() -> None:

@@ -91,11 +91,15 @@ or `unavailable`; an AniList outage never discards the model results.
 
 The implemented search response is `{ items: AnimeSearchResult[] }`, where each item includes `anilist_id`, nullable `mal_id`, title, cover URL, year, format, genres, AniList average score, and popularity count. Its `sort` query parameter accepts `popularity` (default), `score`, `relevance`, or `newest`; ordering is performed by AniList before limiting results. A null `mal_id` is never replaced by a title match; the frontend shows that result but disables rating it.
 
-The recommendations client requests up to 20 ranked candidates, removes every locally rated MAL ID,
-and displays the first 10. Scoring an already-watched recommendation persists it through the shared
+The recommendations client submits every locally rated or archived MAL ID as an explicit ranking
+exclusion and displays the returned Top 10. Scoring an already-watched recommendation persists it through the shared
 ratings feature and triggers a fresh request, so the title disappears and the next unseen candidate
 fills its position. When more than 20 local ratings exist, the latest 20 are used for fold-in while
 the complete local rated-ID set remains excluded from the displayed results.
+“Not interested” archives are also versioned in browser local storage. They filter ranking
+candidates without becoming synthetic low ratings, so dismissing a title does not distort the
+collaborative-filtering user vector. Users can restore all archived titles from the recommendation
+status row.
 
 ## Deployment
 

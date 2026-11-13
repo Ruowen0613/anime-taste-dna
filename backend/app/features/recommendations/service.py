@@ -51,6 +51,12 @@ class RecommendationService:
         scores += self.artifact.item_bias + self.artifact.global_mean + user_bias
         scores[~self.artifact.supported] = -np.inf
         scores[observed_items] = -np.inf
+        excluded_items = [
+            self._item_by_mal_id[mal_id]
+            for mal_id in request.excluded_mal_ids
+            if mal_id in self._item_by_mal_id
+        ]
+        scores[excluded_items] = -np.inf
         candidates = np.flatnonzero(np.isfinite(scores))
         result_limit = min(request.limit, len(candidates))
         if result_limit:
