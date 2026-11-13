@@ -67,6 +67,7 @@ pytest
 - Implemented experimentally: a four-title, genre-diverse Taste Quiz with short AniList summaries. Most/least-interest choices are stored separately from ratings; least-interest choices are excluded from recommendations.
 - Not implemented: production artifact packaging/deployment and Taste DNA.
 - Evaluated: the current linear pairwise fold-in did not improve validation ranking, so its production weight is 0. Quiz choices are retained for future pairwise-aware model experiments and are never converted into fake ratings.
+- Hidden by default: set `VITE_ENABLE_TASTE_QUIZ=true` only for experimental development; the production-facing navigation does not expose it.
 
 ## ML status
 

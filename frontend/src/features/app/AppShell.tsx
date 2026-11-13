@@ -7,6 +7,7 @@ import { useRatings } from '../ratings/useRatings'
 import { ApiStatus } from '../system/ApiStatus'
 
 type View = 'discover' | 'recommendations'
+const TASTE_QUIZ_ENABLED = import.meta.env.VITE_ENABLE_TASTE_QUIZ === 'true'
 
 export function AppShell() {
   const [view, setView] = useState<View>('discover')
@@ -22,7 +23,7 @@ export function AppShell() {
             Anime Taste <span className="text-sakura">DNA</span>
           </button>
           <div className="flex items-center gap-3">
-            <button className="rounded-full border border-sakura/30 bg-sakura/10 px-4 py-2 text-sm text-sakura transition hover:bg-sakura/20 hover:text-white" type="button" onClick={() => setQuizOpen(true)}>Taste quiz</button>
+            {TASTE_QUIZ_ENABLED && <button className="rounded-full border border-sakura/30 bg-sakura/10 px-4 py-2 text-sm text-sakura transition hover:bg-sakura/20 hover:text-white" type="button" onClick={() => setQuizOpen(true)}>Taste quiz</button>}
             {ratings.ratings.length >= 10 && (
               <button className="rounded-full border border-violet/40 bg-violet/10 px-4 py-2 text-sm text-violet transition hover:bg-violet/20 hover:text-white" type="button" onClick={() => setView(view === 'discover' ? 'recommendations' : 'discover')}>
                 {view === 'discover' ? 'Recommendations' : 'Discover'}
@@ -37,7 +38,7 @@ export function AppShell() {
           <RecommendationsPage ratings={ratings.ratings} preferences={quiz.preferences} onRate={ratings.setRating} onBack={() => setView('discover')} />
         )}
       </div>
-      {quizOpen && (
+      {TASTE_QUIZ_ENABLED && quizOpen && (
         <PreferenceQuizModal
           excludedMalIds={[...ratings.ratings.map(({ mal_id }) => mal_id), ...quiz.seenMalIds]}
           completedRounds={quiz.preferences.length}

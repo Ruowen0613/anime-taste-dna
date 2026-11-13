@@ -1,0 +1,13 @@
+[paths]
+split_directory = "../data/processed/v1/splits"
+artifact_path = "../data/artifacts/matrix-factorization-v1/matrix_factorization.npz"
+output_report = "reports/personalization-audit-v1.json"
+
+[evaluation]
+observed_ratings = [5, 10, 20]
+relevance_threshold = 8
+ranking_k = 10
+user_batch_size = 128
+parquet_batch_size = 131072
+pair_samples = 10000
+seed = 42

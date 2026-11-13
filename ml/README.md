@@ -73,3 +73,17 @@ anime-taste-pairwise-eval --config configs/pairwise_quiz.toml
 
 The command selects pairwise weight on validation only, then compares 0, 5, and 10 Quiz rounds on
 one common test cohort. Its versioned report is `reports/pairwise-quiz-v1.json`.
+
+## Personalization audit
+
+Audit whether the exported model actually changes rankings between users, rather than merely
+reproducing item popularity:
+
+```bash
+anime-taste-personalization-audit --config configs/personalization_audit.toml
+```
+
+The audit evaluates the fixed artifact on one common test cohort and reports catalog coverage,
+recommendation concentration, user-factor norms, and Top-10 overlap with item-bias-only and
+interaction-only inference ablations. Its versioned report is
+`reports/personalization-audit-v1.json`.

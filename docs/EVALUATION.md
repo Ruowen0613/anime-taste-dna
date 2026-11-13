@@ -66,8 +66,26 @@ user vector. Production weight is therefore 0. Quiz choices remain separate feed
 items may be explicitly excluded, but the system does not claim that Quiz improves accuracy. A
 pairwise-aware training objective or hybrid model requires a new validation experiment.
 
-Machine-readable executed reports are stored in `ml/reports/`. No metric in this document is an
-estimate or an unexecuted target.
+## Personalization audit
+
+The ranking metrics above establish that matrix factorization beats the popularity baseline, but
+they do not establish that its recommendations vary meaningfully between users. A separate audit
+therefore measured catalog coverage, recommendation concentration, user-vector magnitude, and
+Top-10 overlap against inference ablations on the same 18,086-user test cohort.
+
+At 10 observed ratings, the full model recommended only 62 of 14,075 supported items across all
+users (0.44% catalog coverage). Its mean Top-10 overlap with an item-bias-only ranking was 98.21%,
+while overlap with the interaction-only ranking was 0.23%. The mean folded-in user-factor norm was
+0.0108. Increasing observations from 10 to 20 changed only 1.95% of Top-10 slots on average.
+
+These results show that the current model's strong Recall@10 and NDCG@10 mostly come from learned
+item bias rather than useful user-specific ordering. The interaction-only ablation produced much
+broader coverage (4,742 items, 33.69%) but very poor ranking quality (Recall@10 0.00123522 and
+NDCG@10 0.01121872), so simply removing item bias is not a viable fix. The next model experiment
+must be selected on validation data and report both ranking quality and personalization diagnostics.
+
+Machine-readable executed reports are stored in `ml/reports/`, including
+`personalization-audit-v1.json`. No metric in this document is an estimate or an unexecuted target.
 
 ## Online artifact
 

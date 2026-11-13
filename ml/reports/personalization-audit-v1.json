@@ -1,0 +1,76 @@
+{
+  "protocol": {
+    "model_version": "matrix-factorization-v1",
+    "common_cohort": "test users eligible for 20 observations and one relevant target",
+    "candidate_set": "all train-supported items excluding train and validation history",
+    "inference_ablation_note": "item-bias and interaction terms are removed at inference; they are not retrained models"
+  },
+  "full_model_by_observed_ratings": {
+    "5": {
+      "eligible_users": 18086,
+      "recall_at_10": 0.04385212,
+      "ndcg_at_10": 0.52429491,
+      "mean_user_factor_norm": 0.00698881,
+      "catalog_coverage_items": 62,
+      "catalog_coverage_fraction": 0.00440497,
+      "top_10_items_share_of_slots": 0.48416455,
+      "sampled_user_pair_jaccard": 0.24964508
+    },
+    "10": {
+      "eligible_users": 18086,
+      "recall_at_10": 0.04394219,
+      "ndcg_at_10": 0.52467443,
+      "mean_user_factor_norm": 0.01077999,
+      "catalog_coverage_items": 62,
+      "catalog_coverage_fraction": 0.00440497,
+      "top_10_items_share_of_slots": 0.48421984,
+      "sampled_user_pair_jaccard": 0.24881585
+    },
+    "20": {
+      "eligible_users": 18086,
+      "recall_at_10": 0.04412245,
+      "ndcg_at_10": 0.52577783,
+      "mean_user_factor_norm": 0.01660756,
+      "catalog_coverage_items": 66,
+      "catalog_coverage_fraction": 0.00468917,
+      "top_10_items_share_of_slots": 0.48182572,
+      "sampled_user_pair_jaccard": 0.24674184
+    }
+  },
+  "ablations_at_10_ratings": {
+    "item_bias_only": {
+      "eligible_users": 18086,
+      "recall_at_10": 0.04371226,
+      "ndcg_at_10": 0.52414105,
+      "mean_user_factor_norm": 0.0,
+      "catalog_coverage_items": 61,
+      "catalog_coverage_fraction": 0.00433393,
+      "top_10_items_share_of_slots": 0.48250581,
+      "sampled_user_pair_jaccard": 0.25021044
+    },
+    "interaction_only_without_item_bias": {
+      "eligible_users": 18086,
+      "recall_at_10": 0.00123522,
+      "ndcg_at_10": 0.01121872,
+      "mean_user_factor_norm": 0.01272687,
+      "catalog_coverage_items": 4742,
+      "catalog_coverage_fraction": 0.33690941,
+      "top_10_items_share_of_slots": 0.07224925,
+      "sampled_user_pair_jaccard": 0.0085747
+    }
+  },
+  "comparisons": {
+    "full_vs_item_bias_top_10_overlap": 0.9821243,
+    "full_vs_interaction_only_top_10_overlap": 0.00227801,
+    "full_5_vs_10_top_10_overlap": 0.98750415,
+    "full_10_vs_20_top_10_overlap": 0.98054296
+  },
+  "source": {
+    "artifact_sha256": "2b39615504a4fe3fe4aadd1f5ec22e428c7a0135530a3bce92820f1becf07638",
+    "split_report_sha256": "6f64abeeb4760481007b5b9ae7be9afd5ad390c18bedb5e8b991386f1cda56d9"
+  },
+  "reproducibility": {
+    "seed": 42,
+    "sampled_user_pairs": 10000
+  }
+}

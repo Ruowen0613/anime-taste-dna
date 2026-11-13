@@ -27,6 +27,7 @@ anime-taste-split = "anime_taste_dna.data.split:main"
 anime-taste-popularity = "anime_taste_dna.models.popularity:main"
 anime-taste-mf = "anime_taste_dna.models.matrix_factorization:main"
 anime-taste-pairwise-eval = "anime_taste_dna.evaluation.pairwise_quiz:main"
+anime-taste-personalization-audit = "anime_taste_dna.evaluation.personalization_audit:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
