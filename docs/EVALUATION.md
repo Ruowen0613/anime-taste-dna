@@ -43,6 +43,29 @@ one with highest mean validation Recall@10. This selected regularization 1,000.
 - Only one matrix-factorization architecture and training configuration has been executed so far.
   Broader hyperparameter experiments must remain validation-only.
 
+## Executed Taste Quiz proxy evaluation
+
+The pairwise experiment evaluates the same fixed `matrix-factorization-v1` item artifact with 10
+observed ratings plus 0, 5, or 10 simulated Quiz rounds. A Quiz pair is constructed only from
+chronologically earlier history, requires a rating gap of at least two points, and never accesses
+the target split. All conditions use the same users who can supply 10 pairs. Historical rating
+differences are only a proxy for pre-watch interest, which remains an important limitation.
+
+Validation compared pairwise weights 0, 0.05, 0.1, 0.25, 0.75, 2, and 5. Weight 0 produced the
+highest validation NDCG@10, so it was selected before test evaluation. Stronger weights increased
+preference satisfaction but consistently reduced ranking quality.
+
+| Quiz rounds | Eligible test users | Recall@10 | NDCG@10 | Mean Top-10 replacements |
+|---:|---:|---:|---:|---:|
+| 0 | 18,081 | 0.04395434 | 0.52481952 | — |
+| 5 | 18,081 | 0.04395434 | 0.52481952 | 0.0 |
+| 10 | 18,081 | 0.04395434 | 0.52481952 | 0.0 |
+
+The evidence does not support using the current linear pairwise constraint to update the online
+user vector. Production weight is therefore 0. Quiz choices remain separate feedback; least-interest
+items may be explicitly excluded, but the system does not claim that Quiz improves accuracy. A
+pairwise-aware training objective or hybrid model requires a new validation experiment.
+
 Machine-readable executed reports are stored in `ml/reports/`. No metric in this document is an
 estimate or an unexecuted target.
 

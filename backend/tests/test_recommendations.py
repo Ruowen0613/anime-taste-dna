@@ -10,7 +10,7 @@ from app.features.recommendations.service import RecommendationService
 from app.main import app
 
 
-def _service() -> RecommendationService:
+def _service(preference_weight: float = 0.0) -> RecommendationService:
     artifact = RecommendationArtifact(
         item_factors=np.asarray([[1.0, 0.0], [0.0, 1.0], [0.8, 0.2], [0.2, 0.8]], dtype=np.float32),
         item_bias=np.zeros(4, dtype=np.float32),
@@ -21,7 +21,11 @@ def _service() -> RecommendationService:
         fold_in_regularization=1.0,
         model_version="fixture-v1",
     )
-    return RecommendationService(artifact=artifact, minimum_mapped_ratings=2)
+    return RecommendationService(
+        artifact=artifact,
+        minimum_mapped_ratings=2,
+        preference_weight=preference_weight,
+    )
 
 
 class FakeRecommendationMetadataClient:
@@ -109,7 +113,7 @@ def test_pairwise_preference_refines_user_vector_without_becoming_a_rating() -> 
         for mal_id in [1, 2, 100, 101, 102, 103, 104, 105, 106, 107]
     ]
     baseline = _service().recommend(RecommendationRequest(ratings=ratings, limit=2))
-    refined = _service().recommend(
+    refined = _service(preference_weight=1.0).recommend(
         RecommendationRequest(
             ratings=ratings,
             preferences=[{"most_mal_id": 4, "least_mal_id": 3}],
@@ -121,6 +125,7 @@ def test_pairwise_preference_refines_user_vector_without_becoming_a_rating() -> 
     refined_scores = {item.mal_id: item.predicted_rating for item in refined.items}
     assert refined.mapped_ratings == baseline.mapped_ratings == 2
     assert refined.mapped_preferences == 1
+    assert refined.pairwise_refinement_active is True
     assert refined_scores[4] - refined_scores[3] > baseline_scores[4] - baseline_scores[3]
 
 

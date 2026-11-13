@@ -1,0 +1,17 @@
+[paths]
+split_directory = "../data/processed/v1/splits"
+artifact_path = "../data/artifacts/matrix-factorization-v1/matrix_factorization.npz"
+output_report = "reports/pairwise-quiz-v1.json"
+
+[evaluation]
+observed_ratings = 10
+quiz_rounds = [0, 5, 10]
+minimum_rating_gap = 2
+relevance_threshold = 8
+ranking_k = 10
+user_batch_size = 128
+parquet_batch_size = 131072
+seed = 42
+
+[validation]
+preference_weight_candidates = [0.0, 0.05, 0.1, 0.25, 0.75, 2.0, 5.0]

@@ -17,6 +17,7 @@ export type RecommendationResponse = {
   model_version: string
   mapped_ratings: number
   mapped_preferences: number
+  pairwise_refinement_active: boolean
   unmapped_mal_ids: number[]
   metadata_status: 'complete' | 'partial' | 'unavailable'
   items: RecommendationItem[]

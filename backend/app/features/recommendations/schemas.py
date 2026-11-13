@@ -56,6 +56,7 @@ class RecommendationResponse(BaseModel):
     model_version: str
     mapped_ratings: int
     mapped_preferences: int = 0
+    pairwise_refinement_active: bool = False
     unmapped_mal_ids: list[int]
     metadata_status: Literal["complete", "partial", "unavailable"] = "unavailable"
     items: list[RecommendationItem]

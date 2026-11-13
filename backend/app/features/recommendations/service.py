@@ -21,9 +21,15 @@ class InsufficientMappedRatingsError(ValueError):
 
 
 class RecommendationService:
-    def __init__(self, artifact: RecommendationArtifact, minimum_mapped_ratings: int) -> None:
+    def __init__(
+        self,
+        artifact: RecommendationArtifact,
+        minimum_mapped_ratings: int,
+        preference_weight: float = 0.0,
+    ) -> None:
         self.artifact = artifact
         self.minimum_mapped_ratings = minimum_mapped_ratings
+        self.preference_weight = preference_weight
         self._item_by_mal_id = {
             int(mal_id): item_index for item_index, mal_id in enumerate(artifact.mal_ids)
         }
@@ -95,6 +101,7 @@ class RecommendationService:
             model_version=self.artifact.model_version,
             mapped_ratings=len(mapped),
             mapped_preferences=len(mapped_preferences),
+            pairwise_refinement_active=self.preference_weight > 0,
             unmapped_mal_ids=unmapped_mal_ids,
             items=items,
         )
@@ -114,10 +121,10 @@ class RecommendationService:
             - self.artifact.global_mean
             - self.artifact.item_bias[observed_items]
         )
-        if preferences:
+        if preferences and self.preference_weight > 0:
             most_items = np.asarray([most for most, _ in preferences], dtype=np.int32)
             least_items = np.asarray([least for _, least in preferences], dtype=np.int32)
-            preference_weight = np.sqrt(0.75)
+            preference_weight = np.sqrt(self.preference_weight)
             preference_design = np.concatenate(
                 (
                     self.artifact.item_factors[most_items]
@@ -141,7 +148,9 @@ class RecommendationService:
 
 @lru_cache
 def get_recommendation_service() -> RecommendationService:
+    settings = get_settings()
     return RecommendationService(
         artifact=get_recommendation_artifact(),
-        minimum_mapped_ratings=get_settings().minimum_mapped_ratings,
+        minimum_mapped_ratings=settings.minimum_mapped_ratings,
+        preference_weight=settings.pairwise_preference_weight,
     )

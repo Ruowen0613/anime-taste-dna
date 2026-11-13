@@ -12,6 +12,7 @@ class Settings(BaseSettings):
         / "data/artifacts/matrix-factorization-v1/matrix_factorization.npz"
     )
     minimum_mapped_ratings: int = 5
+    pairwise_preference_weight: float = 0.0
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

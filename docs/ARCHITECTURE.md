@@ -63,18 +63,19 @@ At process startup, FastAPI loads and validates one artifact bundle. For a recom
 
 Inference is bounded and CPU-friendly. The artifact is immutable per deployment, making replicas stateless and results traceable to a model version.
 
-### Experimental pairwise taste refinement
+### Experimental pairwise taste feedback
 
 `POST /api/v1/preference-quiz/options` samples model-supported items, enriches a candidate pool through
 one AniList MAL-ID query, and greedily selects four options that add distinct genres. The browser
-stores each `most_mal_id > least_mal_id` choice separately from watched ratings. During fold-in, each
-pair contributes a weighted item-factor difference row with no user-bias term; item embeddings and
-all global model parameters remain frozen. Least-interest choices are excluded from ranking.
+stores each `most_mal_id > least_mal_id` choice separately from watched ratings. The evaluated
+experimental fold-in represents each pair as a weighted item-factor difference row with no
+user-bias term; item embeddings and all global model parameters remain frozen. Least-interest
+choices are excluded from ranking.
 
-This is an experimental inference protocol, not a retrained model. The UI reports how many Top 10
-items actually changed and does not claim improved quality. Before promotion from experimental
-status, rating-only fold-in must be compared with 5- and 10-round quiz refinement under the same
-Recall@10/NDCG@10 evaluation protocol.
+Validation selected pairwise weight 0.0: every positive candidate reduced NDCG@10 on the common
+eligible cohort. Production therefore records the choices and applies explicit least-interest
+exclusions but does not alter the user vector. A future pairwise-aware model must beat rating-only
+fold-in under the same Recall@10/NDCG@10 protocol before this signal can affect ranking scores.
 
 ## Anime metadata integration
 

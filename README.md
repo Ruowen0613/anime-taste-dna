@@ -64,9 +64,9 @@ pytest
 - Implemented in ML: reproducible download/audit, anonymous preprocessing, chronological splits, evaluated popularity baseline, PyTorch matrix factorization, regularized cold-start fold-in, and a versioned inference artifact.
 - Implemented in the API: typed recommendation contract, artifact validation/loading, MAL ID mapping, bounded fold-in/ranking, rated-item filtering, explicit unmapped-ID reporting, and batched AniList metadata enrichment with graceful degradation.
 - Implemented in the frontend: a model-backed Top 10 view with predicted ratings clearly separated from AniList community scores, responsive cards, retry/regenerate states, reusable anime detail modals, in-place scoring of already-watched recommendations, and browser-local “not interested” archives with automatic replacement and selective restore.
-- Implemented experimentally: a four-title, genre-diverse Taste Quiz with short AniList summaries. Most/least-interest choices are stored as pairwise preferences and refine only the current browser user's fold-in vector; they are never converted into fake ratings.
+- Implemented experimentally: a four-title, genre-diverse Taste Quiz with short AniList summaries. Most/least-interest choices are stored separately from ratings; least-interest choices are excluded from recommendations.
 - Not implemented: production artifact packaging/deployment and Taste DNA.
-- Not yet evaluated: whether pairwise quiz refinement improves Recall@10 or NDCG@10 over rating-only fold-in.
+- Evaluated: the current linear pairwise fold-in did not improve validation ranking, so its production weight is 0. Quiz choices are retained for future pairwise-aware model experiments and are never converted into fake ratings.
 
 ## ML status
 

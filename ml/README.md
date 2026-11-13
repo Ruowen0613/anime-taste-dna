@@ -62,3 +62,14 @@ anime-taste-mf --config configs/matrix_factorization.toml
 ```
 
 The model learns user/item factors and biases from train only, selects its checkpoint by validation RMSE, freezes item parameters, and solves a regularized user vector from the most recent 5, 10, or 20 pre-test ratings. Test ranking covers the full item universe after filtering prior user history. The inference artifact exports item parameters and MAL ID mappings without historical user factors.
+
+## Pairwise Taste Quiz evaluation
+
+Evaluate the experimental pairwise protocol against the fixed exported model:
+
+```bash
+anime-taste-pairwise-eval --config configs/pairwise_quiz.toml
+```
+
+The command selects pairwise weight on validation only, then compares 0, 5, and 10 Quiz rounds on
+one common test cohort. Its versioned report is `reports/pairwise-quiz-v1.json`.

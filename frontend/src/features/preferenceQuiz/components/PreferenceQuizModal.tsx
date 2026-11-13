@@ -49,7 +49,7 @@ export function PreferenceQuizModal({ excludedMalIds, completedRounds, onSubmit,
       <div className="mx-auto max-w-6xl rounded-3xl border border-white/10 bg-[#111625] p-5 shadow-2xl sm:p-8">
         <div className="flex items-start justify-between gap-6">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-violet">Experimental taste refinement</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.25em] text-violet">Experimental taste feedback</p>
             <h2 id="preference-quiz-title" className="mt-2 text-3xl font-bold sm:text-4xl">Pick your instinct</h2>
             <p className="mt-2 max-w-2xl text-slate-300">Choose one you are most interested in and one you are least interested in. You do not need to have watched them.</p>
             <p className="mt-2 text-sm text-slate-500">{completedRounds} preference round{completedRounds === 1 ? '' : 's'} saved</p>
@@ -81,7 +81,7 @@ export function PreferenceQuizModal({ excludedMalIds, completedRounds, onSubmit,
             </div>
             <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
               <button className="text-sm text-slate-400 underline decoration-white/20 underline-offset-4 hover:text-white" type="button" onClick={() => onSkip(shownMalIds)}>Skip this set</button>
-              <button className="rounded-xl bg-white px-5 py-3 font-semibold text-ink transition hover:bg-violet hover:text-white disabled:opacity-40" type="button" disabled={most === null || least === null} onClick={() => { if (most === null || least === null) return; onSubmit({ most_mal_id: most, least_mal_id: least }, shownMalIds) }}>Refine my taste</button>
+              <button className="rounded-xl bg-white px-5 py-3 font-semibold text-ink transition hover:bg-violet hover:text-white disabled:opacity-40" type="button" disabled={most === null || least === null} onClick={() => { if (most === null || least === null) return; onSubmit({ most_mal_id: most, least_mal_id: least }, shownMalIds) }}>Save my choices</button>
             </div>
           </>
         )}
