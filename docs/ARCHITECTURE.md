@@ -91,6 +91,12 @@ or `unavailable`; an AniList outage never discards the model results.
 
 The implemented search response is `{ items: AnimeSearchResult[] }`, where each item includes `anilist_id`, nullable `mal_id`, title, cover URL, year, format, genres, AniList average score, and popularity count. Its `sort` query parameter accepts `popularity` (default), `score`, `relevance`, or `newest`; ordering is performed by AniList before limiting results. A null `mal_id` is never replaced by a title match; the frontend shows that result but disables rating it.
 
+The recommendations client requests up to 20 ranked candidates, removes every locally rated MAL ID,
+and displays the first 10. Scoring an already-watched recommendation persists it through the shared
+ratings feature and triggers a fresh request, so the title disappears and the next unseen candidate
+fills its position. When more than 20 local ratings exist, the latest 20 are used for fold-in while
+the complete local rated-ID set remains excluded from the displayed results.
+
 ## Deployment
 
 - **Vercel:** builds `frontend/`; injects public `VITE_API_BASE_URL` pointing to Cloud Run.

@@ -29,7 +29,7 @@ export function AppShell() {
         {view === 'discover' ? (
           <DiscoverPage ratings={ratings.ratings} onRate={ratings.setRating} onRemove={ratings.removeRating} onRecommend={() => setView('recommendations')} />
         ) : (
-          <RecommendationsPage ratings={ratings.ratings} onBack={() => setView('discover')} />
+          <RecommendationsPage ratings={ratings.ratings} onRate={ratings.setRating} onBack={() => setView('discover')} />
         )}
       </div>
     </main>

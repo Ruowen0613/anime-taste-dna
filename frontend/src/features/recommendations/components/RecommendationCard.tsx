@@ -1,18 +1,19 @@
+import { useState } from 'react'
 import type { AnimeSearchResult } from '../../discover/types'
 import type { RecommendationItem } from '../types'
 
 type RecommendationCardProps = {
   item: RecommendationItem
   onOpen: (anime: AnimeSearchResult) => void
+  onRate: (anime: AnimeSearchResult, rating: number) => void
 }
 
-export function RecommendationCard({ item, onOpen }: RecommendationCardProps) {
+export function RecommendationCard({ item, onOpen, onRate }: RecommendationCardProps) {
+  const [ratingOpen, setRatingOpen] = useState(false)
   const canOpen = item.anilist_id !== null
-  const open = () => {
-    if (!canOpen) return
-    onOpen({
+  const anime = item.anilist_id !== null ? {
       mal_id: item.mal_id,
-      anilist_id: item.anilist_id!,
+      anilist_id: item.anilist_id,
       title: item.title,
       cover_image_url: item.cover_image_url,
       year: item.year,
@@ -20,7 +21,9 @@ export function RecommendationCard({ item, onOpen }: RecommendationCardProps) {
       genres: item.genres,
       average_score: item.average_score,
       popularity: 0,
-    })
+    } satisfies AnimeSearchResult : null
+  const open = () => {
+    if (anime) onOpen(anime)
   }
 
   return (
@@ -42,7 +45,28 @@ export function RecommendationCard({ item, onOpen }: RecommendationCardProps) {
           {item.genres.slice(0, 3).map((genre) => <span className="rounded-full bg-white/10 px-2.5 py-1" key={genre}>{genre}</span>)}
         </div>
         {item.average_score !== null && <p className="mt-3 text-sm text-slate-400">AniList community score <span className="text-slate-200">{item.average_score}/100</span></p>}
-        <button className="mt-auto self-start pt-5 text-sm text-violet transition hover:text-white disabled:text-slate-600" type="button" disabled={!canOpen} onClick={open}>{canOpen ? 'View details' : 'Details unavailable'}</button>
+        <div className="mt-auto flex flex-wrap items-end gap-x-4 gap-y-2 pt-5">
+          <button className="text-sm text-violet transition hover:text-white disabled:text-slate-600" type="button" disabled={!canOpen} onClick={open}>{canOpen ? 'View details' : 'Details unavailable'}</button>
+          {ratingOpen ? (
+            <label className="flex items-center gap-2 text-sm text-slate-300">
+              Your score
+              <select
+                className="rounded-lg border border-violet/40 bg-ink px-2.5 py-1.5 text-sm text-white outline-none focus:border-violet"
+                aria-label={`Rate ${item.title}`}
+                defaultValue=""
+                onChange={(event) => {
+                  if (!anime) return
+                  onRate(anime, Number(event.target.value))
+                }}
+              >
+                <option value="" disabled>1–10</option>
+                {Array.from({ length: 10 }, (_, index) => index + 1).map((rating) => <option value={rating} key={rating}>{rating}/10</option>)}
+              </select>
+            </label>
+          ) : (
+            <button className="text-sm text-sakura transition hover:text-white disabled:text-slate-600" type="button" disabled={!canOpen} onClick={() => setRatingOpen(true)}>{canOpen ? 'Already watched? Rate it' : 'Rating unavailable'}</button>
+          )}
+        </div>
       </div>
     </li>
   )

@@ -1,15 +1,16 @@
 import { AnimeDetailsModal } from '../animeDetails/components/AnimeDetailsModal'
 import { useAnimeDetails } from '../animeDetails/useAnimeDetails'
-import type { RatedAnime } from '../discover/types'
+import type { AnimeSearchResult, RatedAnime } from '../discover/types'
 import { RecommendationCard } from './components/RecommendationCard'
 import { useRecommendations } from './useRecommendations'
 
 type RecommendationsPageProps = {
   ratings: RatedAnime[]
+  onRate: (anime: AnimeSearchResult, rating: number) => void
   onBack: () => void
 }
 
-export function RecommendationsPage({ ratings, onBack }: RecommendationsPageProps) {
+export function RecommendationsPage({ ratings, onRate, onBack }: RecommendationsPageProps) {
   const recommendations = useRecommendations(ratings)
   const animeDetails = useAnimeDetails()
 
@@ -35,7 +36,7 @@ export function RecommendationsPage({ ratings, onBack }: RecommendationsPageProp
         <>
           <div className="mt-8 flex flex-wrap gap-3 text-sm text-slate-400"><span>{recommendations.result.mapped_ratings}/{Math.min(ratings.length, 20)} ratings mapped</span><span>·</span><span>Model {recommendations.result.model_version}</span>{recommendations.result.metadata_status !== 'complete' && <span className="text-amber-300">· Some AniList metadata is unavailable</span>}</div>
           {recommendations.result.unmapped_mal_ids.length > 0 && <p className="mt-3 text-sm text-slate-500">{recommendations.result.unmapped_mal_ids.length} newer or unsupported title{recommendations.result.unmapped_mal_ids.length === 1 ? '' : 's'} could not influence this result.</p>}
-          {recommendations.result.items.length === 0 ? <p className="mt-12 rounded-2xl border border-dashed border-white/15 p-10 text-center text-slate-400">No unseen recommendations are available.</p> : <ul className="mt-10 grid gap-4 md:grid-cols-2">{recommendations.result.items.map((item) => <RecommendationCard item={item} onOpen={animeDetails.open} key={item.mal_id} />)}</ul>}
+          {recommendations.result.items.length === 0 ? <p className="mt-12 rounded-2xl border border-dashed border-white/15 p-10 text-center text-slate-400">No unseen recommendations are available.</p> : <ul className="mt-10 grid gap-4 md:grid-cols-2">{recommendations.result.items.map((item) => <RecommendationCard item={item} onOpen={animeDetails.open} onRate={onRate} key={item.mal_id} />)}</ul>}
         </>
       )}
       <AnimeDetailsModal anime={animeDetails.selected} details={animeDetails.details} loading={animeDetails.loading} error={animeDetails.error} onClose={animeDetails.close} />
