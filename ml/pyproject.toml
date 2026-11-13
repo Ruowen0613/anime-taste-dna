@@ -30,6 +30,7 @@ anime-taste-pairwise-eval = "anime_taste_dna.evaluation.pairwise_quiz:main"
 anime-taste-personalization-audit = "anime_taste_dna.evaluation.personalization_audit:main"
 anime-taste-fold-in-diagnostic = "anime_taste_dna.evaluation.fold_in_diagnostic:main"
 anime-taste-mf-training-diagnostic = "anime_taste_dna.evaluation.mf_training_diagnostic:main"
+anime-taste-bpr = "anime_taste_dna.models.bpr:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

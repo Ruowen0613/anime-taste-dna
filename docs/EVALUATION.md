@@ -122,10 +122,35 @@ improve Top-N ranking, while practical AdamW weight-decay changes had no meaning
 evidence of objective mismatch rather than a fold-in hyperparameter mistake. Further tuning of the
 same explicit-MSE setup is not justified before testing a ranking-aware objective.
 
+## BPR Model C validation experiment
+
+The first ranking-aware candidate trained 32-dimensional Bayesian Personalized Ranking matrix
+factorization on 12,679,964 train interactions rated 8 or higher. Each positive was paired with a
+uniformly sampled train-supported item absent from that user's train history. A fixed cohort of
+2,048 validation users selected the checkpoint by NDCG@10; epoch 1 won even though pairwise training
+loss continued to fall through epoch 4. Test targets were never loaded.
+
+For cold-start validation, observed ratings were centered and folded into the fixed BPR item factors
+with ridge regression. On the full 18,078-user validation cohort, regularization 100 produced the
+best NDCG@10:
+
+| Model | Recall@10 | NDCG@10 | Catalog coverage |
+|---|---:|---:|---:|
+| Current explicit MF, reg 1,000 | 0.02919120 | 0.27848268 | 0.31% |
+| BPR Model C, reg 100 | 0.01585189 | 0.18092936 | 1.71% |
+
+BPR increased coverage but substantially reduced both ranking metrics, so this candidate is rejected
+without test evaluation or artifact export. The falling BPR loss alongside worsening ranking also
+shows that offline pair classification alone is not a sufficient checkpoint signal. A likely design
+weakness is the mismatch between pairwise historical-user training and rating-regression cold-start
+fold-in; a follow-up must optimize the new-user vector with the same pairwise objective before BPR
+can be judged conclusively.
+
 Machine-readable executed reports are stored in `ml/reports/`, including
 `personalization-audit-v1.json` and `fold-in-diagnostic-v1.json`. No metric in this document is an
 estimate or an unexecuted target. The explicit-MF training comparison is stored in
-`mf-training-diagnostic-v1.json`.
+`mf-training-diagnostic-v1.json`; the rejected BPR candidate is stored in
+`bpr-validation-v1.json`.
 
 ## Online artifact
 

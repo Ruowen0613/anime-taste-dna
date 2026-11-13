@@ -108,3 +108,16 @@ anime-taste-mf-training-diagnostic --config configs/mf_training_diagnostic.toml
 The experiment retrains each declared variant, selects fold-in regularization by validation
 NDCG@10, and compares its full ranking with its own item-bias-only ranking. Results are written to
 `reports/mf-training-diagnostic-v1.json`.
+
+## BPR Model C experiment
+
+Train the first ranking-aware candidate and evaluate it on validation only:
+
+```bash
+anime-taste-bpr --config configs/bpr.toml
+```
+
+The command trains BPR from high-rated train interactions, samples only items absent from each
+user's train history as negatives, selects its checkpoint on a fixed validation cohort, and then
+runs one full validation evaluation. It does not read test targets or export a production artifact.
+The executed report is `reports/bpr-validation-v1.json`.
