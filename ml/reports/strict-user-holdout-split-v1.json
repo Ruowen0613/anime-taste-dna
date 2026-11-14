@@ -1,0 +1,53 @@
+{
+  "source": {
+    "ratings_sha256": "52027b21dd01a4a3db37f7d28b92ecc59587d5297ded23fb81b69ab7a433ad3c",
+    "ratings": 41529539,
+    "users": 18095,
+    "items": 14260
+  },
+  "protocol": {
+    "name": "strict user holdout with chronological held-out targets",
+    "user_group_seed": 42,
+    "validation_user_fraction": 0.1,
+    "test_user_fraction": 0.1,
+    "target_fraction": 0.2,
+    "minimum_target_interactions": 5,
+    "minimum_history_interactions": 20,
+    "global_training_users": "train group only"
+  },
+  "user_groups": {
+    "train": 14477,
+    "validation": 1809,
+    "test": 1809,
+    "pairwise_disjoint": true
+  },
+  "output": {
+    "files": {
+      "train": {
+        "rows": 33165031,
+        "users": 14477,
+        "sha256": "a8de3ed692fdd2ef491b9621362ce1420e8d3e5d634d2e023d1917feef621896"
+      },
+      "validation_history": {
+        "rows": 3348792,
+        "users": 1809,
+        "sha256": "d4ac0f342514e5b16f1c8923b5e98f1432aedb25a6d885fd34b7eaa4c36757cb"
+      },
+      "validation_target": {
+        "rows": 836266,
+        "users": 1809,
+        "sha256": "611c744f83edbb1242b5afbdce2c45c5086c6012c72620a0826764ac7a25c0f4"
+      },
+      "test_history": {
+        "rows": 3344289,
+        "users": 1809,
+        "sha256": "85b0fce64e4080b10e309ff6f8d383759ebc7e64550fadb99c5279d8e0ff8f20"
+      },
+      "test_target": {
+        "rows": 835161,
+        "users": 1809,
+        "sha256": "7d3032ae5a6e3b9216c116670e84bf409e55b31ce70b33c56f7ff48ef6d14f05"
+      }
+    }
+  }
+}

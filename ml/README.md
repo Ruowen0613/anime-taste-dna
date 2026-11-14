@@ -63,6 +63,26 @@ anime-taste-mf --config configs/matrix_factorization.toml
 
 The model learns user/item factors and biases from train only, selects its checkpoint by validation RMSE, freezes item parameters, and solves a regularized user vector from the most recent 5, 10, or 20 pre-test ratings. Test ranking covers the full item universe after filtering prior user history. The inference artifact exports item parameters and MAL ID mappings without historical user factors.
 
+## Strict new-user evaluation
+
+Create pairwise-disjoint global-training, validation-user, and test-user groups without overwriting
+the historical per-user chronological split:
+
+```bash
+anime-taste-user-holdout-split --config configs/user_holdout_split.toml
+```
+
+Then fit and select the validation-only popularity baseline:
+
+```bash
+anime-taste-strict-cold-start --config configs/strict_cold_start.toml
+```
+
+The evaluator ranks the complete train-supported catalog and excludes only the 5, 10, or 20 ratings
+actually exposed to the model. Hidden user history is not used for global training, fold-in, or
+candidate filtering. Versioned reports are `reports/strict-user-holdout-split-v1.json` and
+`reports/strict-cold-start-popularity-v1.json`; test users remain untouched.
+
 ## Pairwise Taste Quiz evaluation
 
 Evaluate the experimental pairwise protocol against the fixed exported model:

@@ -1,5 +1,35 @@
 # Offline recommendation evaluation
 
+## Strict new-user protocol (current model-selection protocol)
+
+An audit found that the original chronological protocol placed every user in train, validation, and
+test. It separated target interactions in time, but it did not measure a user who was absent from
+global item-embedding training. It also excluded each user's full hidden history from candidates
+while exposing only 5, 10, or 20 ratings to fold-in. Those results remain reproducible historical
+evidence, but they are no longer sufficient for selecting the next production model.
+
+The strict protocol assigns users, with seed 42, to 14,477 global-training users, 1,809 validation
+users, and 1,809 untouched test users. The groups are pairwise disjoint. Held-out users retain the
+chronologically latest 20% of interactions as targets, with at least 20 earlier interactions
+available for 5/10/20-rating experiments. Global model parameters may use only training users.
+Candidate ranking covers all train-supported items and excludes only the ratings actually exposed
+to the model; hidden history is neither used for fold-in nor silently removed from candidates.
+
+The first validation-only baseline evaluated 1,808 eligible validation users. A broad Bayesian
+shrinkage search reached a plateau at shrinkage 250,000, but pure train interaction count was still
+stronger. The count baseline is therefore the strict protocol's baseline to beat:
+
+| Observed ratings | Recall@10 | NDCG@10 | Catalog coverage |
+|---:|---:|---:|---:|
+| 5 | 0.02738187 | 0.55981055 | 13 items |
+| 10 | 0.02748630 | 0.56191260 | 13 items |
+| 20 | 0.02777205 | 0.56586980 | 16 items |
+
+High NDCG alongside low Recall is possible because held-out targets contain many relevant items:
+NDCG measures how well the ten returned positions are ordered, while Recall divides hits by all
+relevant target items. The baseline is accurate but extremely concentrated, so model comparisons
+must also report catalog coverage. Test users remain untouched.
+
 ## Protocol
 
 Both models use the same deterministic per-user chronological train, validation, and test split.
