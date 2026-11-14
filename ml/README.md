@@ -83,6 +83,16 @@ actually exposed to the model. Hidden user history is not used for global traini
 candidate filtering. Versioned reports are `reports/strict-user-holdout-split-v1.json` and
 `reports/strict-cold-start-popularity-v1.json`; test users remain untouched.
 
+Retrain explicit MF using only global-training users and select its checkpoint directly by strict
+validation-user ranking:
+
+```bash
+anime-taste-strict-mf --config configs/strict_mf.toml
+```
+
+The executed validation report is `reports/strict-cold-start-mf-v1.json`. This experiment does not
+export an artifact or access held-out test users.
+
 ## Pairwise Taste Quiz evaluation
 
 Evaluate the experimental pairwise protocol against the fixed exported model:

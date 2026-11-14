@@ -1,0 +1,19 @@
+[paths]
+split_directory = "../data/processed/v2-user-holdout"
+output_report = "reports/strict-cold-start-mf-v1.json"
+
+[training]
+embedding_dimension = 32
+epochs = 4
+batch_size = 131072
+learning_rate = 0.02
+weight_decay = 0.00001
+seed = 42
+device = "auto"
+
+[validation]
+regularization_candidates = [10.0, 100.0, 1000.0, 10000.0]
+observed_ratings = [5, 10, 20]
+relevance_threshold = 8
+ranking_k = 10
+user_batch_size = 128

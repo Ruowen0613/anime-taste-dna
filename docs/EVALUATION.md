@@ -30,6 +30,26 @@ NDCG measures how well the ten returned positions are ordered, while Recall divi
 relevant target items. The baseline is accurate but extremely concentrated, so model comparisons
 must also report catalog coverage. Test users remain untouched.
 
+### Strict explicit-MF validation
+
+The 32-dimensional explicit-MSE model was retrained using only the 14,477 global-training users.
+Four epochs were checkpointed directly by strict held-out-user ranking across 5, 10, and 20 exposed
+ratings. Fold-in regularization 10, 100, 1,000, and 10,000 was selected on validation only; test
+users were not loaded. Epoch 1 with regularization 10,000 was best:
+
+| Model | Mean Recall@10 | Mean NDCG@10 | 10-rating coverage |
+|---|---:|---:|---:|
+| Interaction-count popularity | 0.02755 | 0.56253 | 13 items |
+| Strict explicit MF | 0.01610 | 0.34806 | 12 items |
+
+At 10 ratings, full MF achieved NDCG@10 0.34737630 versus 0.34723988 for its item-bias-only
+ablation, a gain of only 0.00013642. The selected user-factor norm was 0.00110736. Lower
+regularization increased coverage but sharply reduced ranking quality, and later epochs worsened
+both ranking metrics despite lower train RMSE. Under the corrected protocol, explicit MF neither
+beats popularity nor provides material personalization. The historical claim that MF beats
+popularity applies only to the original transductive protocol and must not be described as strict
+new-user performance.
+
 ## Protocol
 
 Both models use the same deterministic per-user chronological train, validation, and test split.

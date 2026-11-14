@@ -33,6 +33,7 @@ anime-taste-mf-training-diagnostic = "anime_taste_dna.evaluation.mf_training_dia
 anime-taste-bpr = "anime_taste_dna.models.bpr:main"
 anime-taste-user-holdout-split = "anime_taste_dna.data.user_holdout_split:main"
 anime-taste-strict-cold-start = "anime_taste_dna.evaluation.strict_cold_start:main"
+anime-taste-strict-mf = "anime_taste_dna.models.strict_matrix_factorization:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
