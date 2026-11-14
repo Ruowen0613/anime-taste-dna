@@ -120,4 +120,7 @@ anime-taste-bpr --config configs/bpr.toml
 The command trains BPR from high-rated train interactions, samples only items absent from each
 user's train history as negatives, selects its checkpoint on a fixed validation cohort, and then
 runs one full validation evaluation. It does not read test targets or export a production artifact.
-The executed report is `reports/bpr-validation-v1.json`.
+The first ridge fold-in report is `reports/bpr-validation-v1.json`. The current config uses a
+pairwise logistic fold-in aligned with BPR training and writes
+`reports/bpr-pairwise-fold-in-v1.json`. Both candidates were rejected on validation and never
+accessed test targets.

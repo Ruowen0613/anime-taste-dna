@@ -1,0 +1,121 @@
+{
+  "protocol": {
+    "split": "validation only",
+    "test_access": "none",
+    "positive_definition": "train rating >= 8",
+    "negative_sampling": "uniform train-supported item absent from user train history",
+    "fold_in": "regularized pairwise logistic optimization with fixed item factors and biases"
+  },
+  "model": {
+    "name": "bayesian personalized ranking matrix factorization",
+    "embedding_dimension": 32,
+    "best_epoch": 1,
+    "history": [
+      {
+        "epoch": 1,
+        "mean_bpr_loss": 0.2947489,
+        "checkpoint_validation_trials": [
+          {
+            "regularization": 0.1,
+            "eligible_users": 2048,
+            "recall_at_10": 0.01870989,
+            "ndcg_at_10": 0.18048134,
+            "mean_user_factor_norm": 5.78214601,
+            "catalog_coverage_items": 2854,
+            "catalog_coverage_fraction": 0.20277087
+          },
+          {
+            "regularization": 1.0,
+            "eligible_users": 2048,
+            "recall_at_10": 0.01976964,
+            "ndcg_at_10": 0.19969444,
+            "mean_user_factor_norm": 1.9481989,
+            "catalog_coverage_items": 2079,
+            "catalog_coverage_fraction": 0.1477087
+          },
+          {
+            "regularization": 10.0,
+            "eligible_users": 2048,
+            "recall_at_10": 0.019984,
+            "ndcg_at_10": 0.21357193,
+            "mean_user_factor_norm": 0.44263343,
+            "catalog_coverage_items": 1057,
+            "catalog_coverage_fraction": 0.07509769
+          },
+          {
+            "regularization": 100.0,
+            "eligible_users": 2048,
+            "recall_at_10": 0.01858055,
+            "ndcg_at_10": 0.20924833,
+            "mean_user_factor_norm": 0.07100382,
+            "catalog_coverage_items": 327,
+            "catalog_coverage_fraction": 0.02323268
+          }
+        ],
+        "selected_checkpoint_metrics": {
+          "regularization": 10.0,
+          "eligible_users": 2048,
+          "recall_at_10": 0.019984,
+          "ndcg_at_10": 0.21357193,
+          "mean_user_factor_norm": 0.44263343,
+          "catalog_coverage_items": 1057,
+          "catalog_coverage_fraction": 0.07509769
+        }
+      }
+    ]
+  },
+  "full_validation_trials": [
+    {
+      "regularization": 0.1,
+      "eligible_users": 18078,
+      "recall_at_10": 0.01865731,
+      "ndcg_at_10": 0.18457015,
+      "mean_user_factor_norm": 5.82285391,
+      "catalog_coverage_items": 6097,
+      "catalog_coverage_fraction": 0.4331794
+    },
+    {
+      "regularization": 1.0,
+      "eligible_users": 18078,
+      "recall_at_10": 0.02023679,
+      "ndcg_at_10": 0.20523009,
+      "mean_user_factor_norm": 1.95328296,
+      "catalog_coverage_items": 4647,
+      "catalog_coverage_fraction": 0.33015986
+    },
+    {
+      "regularization": 10.0,
+      "eligible_users": 18078,
+      "recall_at_10": 0.02055292,
+      "ndcg_at_10": 0.21774257,
+      "mean_user_factor_norm": 0.43911335,
+      "catalog_coverage_items": 2172,
+      "catalog_coverage_fraction": 0.15431616
+    },
+    {
+      "regularization": 100.0,
+      "eligible_users": 18078,
+      "recall_at_10": 0.01900047,
+      "ndcg_at_10": 0.21335527,
+      "mean_user_factor_norm": 0.06992481,
+      "catalog_coverage_items": 470,
+      "catalog_coverage_fraction": 0.03339254
+    }
+  ],
+  "selected_validation": {
+    "regularization": 10.0,
+    "eligible_users": 18078,
+    "recall_at_10": 0.02055292,
+    "ndcg_at_10": 0.21774257,
+    "mean_user_factor_norm": 0.43911335,
+    "catalog_coverage_items": 2172,
+    "catalog_coverage_fraction": 0.15431616
+  },
+  "reproducibility": {
+    "seed": 42,
+    "device": "cpu",
+    "positive_interactions": 12679964,
+    "checkpoint_users": 2048,
+    "full_validation_users": 18078
+  }
+}

@@ -1,10 +1,10 @@
 [paths]
 split_directory = "../data/processed/v1/splits"
-output_report = "reports/bpr-validation-v1.json"
+output_report = "reports/bpr-pairwise-fold-in-v1.json"
 
 [training]
 embedding_dimension = 32
-epochs = 4
+epochs = 1
 batch_size = 131072
 learning_rate = 0.01
 weight_decay = 0.0001
@@ -20,3 +20,4 @@ relevance_threshold = 8
 ranking_k = 10
 user_batch_size = 128
 parquet_batch_size = 131072
+pairwise_fold_in_steps = 8

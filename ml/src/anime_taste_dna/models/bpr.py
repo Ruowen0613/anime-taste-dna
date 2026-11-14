@@ -38,6 +38,7 @@ class BprConfig:
     ranking_k: int
     user_batch_size: int
     parquet_batch_size: int
+    pairwise_fold_in_steps: int
 
     @classmethod
     def from_toml(cls, path: Path) -> BprConfig:
@@ -68,6 +69,7 @@ class BprConfig:
             ranking_k=int(raw["validation"]["ranking_k"]),
             user_batch_size=int(raw["validation"]["user_batch_size"]),
             parquet_batch_size=int(raw["validation"]["parquet_batch_size"]),
+            pairwise_fold_in_steps=int(raw["validation"]["pairwise_fold_in_steps"]),
         )
 
 
@@ -129,6 +131,63 @@ def fold_in_preference_users(
     return np.linalg.solve(gram + penalty, rhs[..., None]).squeeze(-1)
 
 
+def sample_fold_in_negatives(
+    observed_items: np.ndarray,
+    supported_items: np.ndarray,
+    generator: np.random.Generator,
+) -> np.ndarray:
+    negatives = generator.choice(supported_items, size=observed_items.shape).astype(np.int32)
+    for _ in range(20):
+        invalid = (negatives[:, :, None] == observed_items[:, None, :]).any(axis=2)
+        if not invalid.any():
+            return negatives
+        negatives[invalid] = generator.choice(supported_items, size=int(invalid.sum()))
+    raise RuntimeError("Unable to sample fold-in negatives after 20 attempts")
+
+
+def fold_in_pairwise_users(
+    item_factors: np.ndarray,
+    item_bias: np.ndarray,
+    observed_items: np.ndarray,
+    observed_ratings: np.ndarray,
+    negative_items: np.ndarray,
+    regularization: float,
+    steps: int,
+) -> np.ndarray:
+    observed_factors = item_factors[observed_items]
+    observed_bias = item_bias[observed_items]
+    pair_differences = observed_factors[:, :, None, :] - observed_factors[:, None, :, :]
+    pair_offsets = observed_bias[:, :, None] - observed_bias[:, None, :]
+    rating_differences = observed_ratings[:, :, None] - observed_ratings[:, None, :]
+    pair_mask = rating_differences >= 2.0
+    batch_size, observations = observed_items.shape
+    pair_differences = pair_differences.reshape(batch_size, observations**2, -1)
+    pair_offsets = pair_offsets.reshape(batch_size, observations**2)
+    pair_mask = pair_mask.reshape(batch_size, observations**2)
+
+    sampled_differences = observed_factors - item_factors[negative_items]
+    sampled_offsets = observed_bias - item_bias[negative_items]
+    sampled_mask = observed_ratings >= 8.0
+    differences = np.concatenate((pair_differences, sampled_differences), axis=1)
+    offsets = np.concatenate((pair_offsets, sampled_offsets), axis=1)
+    mask = np.concatenate((pair_mask, sampled_mask), axis=1).astype(np.float32)
+
+    user_factors = np.zeros((batch_size, item_factors.shape[1]), dtype=np.float32)
+    identity = np.eye(item_factors.shape[1], dtype=np.float32)[None, :, :]
+    for _ in range(steps):
+        margins = np.einsum("bpd,bd->bp", differences, user_factors) + offsets
+        probabilities = 1.0 / (1.0 + np.exp(np.clip(margins, -30.0, 30.0)))
+        weighted_probabilities = probabilities * mask
+        gradient = -np.einsum("bpd,bp->bd", differences, weighted_probabilities)
+        gradient += regularization * user_factors
+        curvature = probabilities * (1.0 - probabilities) * mask
+        hessian = np.einsum("bpi,bp,bpj->bij", differences, curvature, differences)
+        hessian += regularization * identity
+        update = np.linalg.solve(hessian, gradient[..., None]).squeeze(-1)
+        user_factors -= update
+    return user_factors
+
+
 def evaluate_cold_start(
     users: list[AuditUser],
     item_factors: np.ndarray,
@@ -140,6 +199,8 @@ def evaluate_cold_start(
     discounts = 1.0 / np.log2(np.arange(2, config.ranking_k + 2))
     recall_sum = ndcg_sum = norm_sum = 0.0
     recommended: list[np.ndarray] = []
+    generator = np.random.default_rng(config.seed)
+    supported_indices = np.flatnonzero(supported).astype(np.int32)
     for start in range(0, len(users), config.user_batch_size):
         batch = users[start : start + config.user_batch_size]
         observed_items = np.stack(
@@ -148,8 +209,17 @@ def evaluate_cold_start(
         observed_ratings = np.stack(
             [user.history_ratings[-config.observed_ratings :] for user in batch]
         ).astype(np.float32)
-        user_factors = fold_in_preference_users(
-            item_factors, observed_items, observed_ratings, regularization
+        negative_items = sample_fold_in_negatives(
+            observed_items, supported_indices, generator
+        )
+        user_factors = fold_in_pairwise_users(
+            item_factors,
+            item_bias,
+            observed_items,
+            observed_ratings,
+            negative_items,
+            regularization,
+            config.pairwise_fold_in_steps,
         )
         scores = user_factors @ item_factors.T + item_bias[None, :]
         scores[:, ~supported] = -np.inf
@@ -214,7 +284,15 @@ def train_and_validate(config: BprConfig) -> dict[str, Any]:
         config.observed_ratings,
         config.relevance_threshold,
     )
-    checkpoint_users = validation_users[: config.checkpoint_users]
+    checkpoint_generator = np.random.default_rng(config.seed)
+    checkpoint_indices = np.sort(
+        checkpoint_generator.choice(
+            len(validation_users),
+            size=min(config.checkpoint_users, len(validation_users)),
+            replace=False,
+        )
+    )
+    checkpoint_users = [validation_users[index] for index in checkpoint_indices]
 
     device = _select_device(config.device)
     torch.manual_seed(config.seed)
@@ -326,7 +404,9 @@ def train_and_validate(config: BprConfig) -> dict[str, Any]:
             "test_access": "none",
             "positive_definition": f"train rating >= {config.positive_rating_threshold}",
             "negative_sampling": "uniform train-supported item absent from user train history",
-            "fold_in": "ridge regression from centered observed ratings into fixed item factors",
+            "fold_in": (
+                "regularized pairwise logistic optimization with fixed item factors and biases"
+            ),
         },
         "model": {
             "name": "bayesian personalized ranking matrix factorization",

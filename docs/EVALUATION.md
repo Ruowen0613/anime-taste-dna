@@ -146,11 +146,34 @@ weakness is the mismatch between pairwise historical-user training and rating-re
 fold-in; a follow-up must optimize the new-user vector with the same pairwise objective before BPR
 can be judged conclusively.
 
+### Pairwise cold-start follow-up
+
+The follow-up removed that mismatch. It fixed BPR item parameters and optimized each new user vector
+with regularized pairwise logistic loss. Observed rating gaps of at least two points supplied direct
+preference pairs; high-rated observations were also paired with deterministic sampled items absent
+from the user's observed history. Eight batched Newton updates solved the 32-dimensional user vector.
+
+Checkpoint monitoring used a fixed seeded random sample of 2,048 validation users rather than the
+first users in index order. On the full validation cohort, regularization 10 was selected:
+
+| Fold-in | Recall@10 | NDCG@10 | Catalog coverage |
+|---|---:|---:|---:|
+| BPR ridge | 0.01585189 | 0.18092936 | 1.71% |
+| BPR pairwise | 0.02055292 | 0.21774257 | 15.43% |
+| Current explicit MF | 0.02919120 | 0.27848268 | 0.31% |
+
+Matching training and fold-in objectives materially improved both BPR accuracy and diversity, but
+it still failed the predeclared requirement to beat the current MF on Recall@10 and NDCG@10. The BPR
+route is therefore stopped at validation: no test evaluation, artifact export, or production change
+is justified. Future work should test a different model family or candidate/reranking strategy rather
+than continue tuning this BPR implementation.
+
 Machine-readable executed reports are stored in `ml/reports/`, including
 `personalization-audit-v1.json` and `fold-in-diagnostic-v1.json`. No metric in this document is an
 estimate or an unexecuted target. The explicit-MF training comparison is stored in
 `mf-training-diagnostic-v1.json`; the rejected BPR candidate is stored in
-`bpr-validation-v1.json`.
+`bpr-validation-v1.json`, and its pairwise fold-in follow-up is stored in
+`bpr-pairwise-fold-in-v1.json`.
 
 ## Online artifact
 

@@ -3,6 +3,7 @@ import torch
 
 from anime_taste_dna.models.bpr import (
     BprMatrixFactorization,
+    fold_in_pairwise_users,
     fold_in_preference_users,
     sample_unobserved_items,
 )
@@ -40,6 +41,22 @@ def test_fold_in_preference_users_points_toward_higher_rated_item() -> None:
         observed_items=np.asarray([[0, 1]], dtype=np.int32),
         observed_ratings=np.asarray([[10.0, 5.0]], dtype=np.float32),
         regularization=0.1,
+    )
+
+    scores = user @ factors.T
+    assert scores[0, 0] > scores[0, 1]
+
+
+def test_pairwise_fold_in_ranks_high_rating_above_low_rating() -> None:
+    factors = np.asarray([[1.0, 0.0], [0.0, 1.0], [-1.0, 0.0]], dtype=np.float32)
+    user = fold_in_pairwise_users(
+        factors,
+        item_bias=np.zeros(3, dtype=np.float32),
+        observed_items=np.asarray([[0, 1]], dtype=np.int32),
+        observed_ratings=np.asarray([[10.0, 5.0]], dtype=np.float32),
+        negative_items=np.asarray([[2, 2]], dtype=np.int32),
+        regularization=1.0,
+        steps=8,
     )
 
     scores = user @ factors.T
