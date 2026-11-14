@@ -93,6 +93,17 @@ anime-taste-strict-mf --config configs/strict_mf.toml
 The executed validation report is `reports/strict-cold-start-mf-v1.json`. This experiment does not
 export an artifact or access held-out test users.
 
+Train Weighted ALS and select a popularity-aware hybrid ranker on strict validation users:
+
+```bash
+anime-taste-weighted-als --config configs/weighted_als.toml
+```
+
+The broad and refined validation searches are recorded in
+`reports/strict-cold-start-weighted-als-v1.json` and
+`reports/strict-cold-start-weighted-als-hybrid-refinement-v1.json`. These commands do not access
+test users or export a production artifact.
+
 ## Pairwise Taste Quiz evaluation
 
 Evaluate the experimental pairwise protocol against the fixed exported model:

@@ -1,0 +1,20 @@
+[paths]
+split_directory = "../data/processed/v2-user-holdout"
+output_report = "reports/strict-cold-start-weighted-als-hybrid-refinement-v1.json"
+
+[training]
+dimensions = 32
+iterations = 4
+alpha = 10.0
+regularization = 1.0
+positive_rating_threshold = 8
+seed = 42
+
+[validation]
+regularization_candidates = [100.0]
+popularity_blend_candidates = [4.0, 6.0, 8.0, 10.0, 12.0, 16.0, 24.0, 32.0, 64.0]
+observed_ratings = [5, 10, 20]
+relevance_threshold = 8
+ranking_k = 10
+user_batch_size = 128
+parquet_batch_size = 131072

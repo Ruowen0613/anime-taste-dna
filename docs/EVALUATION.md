@@ -50,6 +50,28 @@ beats popularity nor provides material personalization. The historical claim tha
 popularity applies only to the original transductive protocol and must not be described as strict
 new-user performance.
 
+### Weighted ALS and popularity hybrid validation
+
+Weighted implicit ALS used ratings of at least 8 as positive preferences, confidence
+`1 + 10 * (rating - 7)`, 32 dimensions, and the same normal equations for offline alternating
+updates and held-out-user fold-in. Pure ALS improved personalization but remained below the count
+baseline. A validation-only hybrid then standardized each user's ALS scores and added a weighted,
+standardized log interaction-count score.
+
+A broad search selected training iteration 2, fold-in regularization 100, and initially reached the
+blend boundary. A preregistered refinement over blend weights 4–64 produced an interior optimum at
+32; weight 64 was worse. The fixed validation winner was:
+
+| Model | Mean Recall@10 | Mean NDCG@10 | 10-rating coverage |
+|---|---:|---:|---:|
+| Interaction-count popularity | 0.02755 | 0.56253 | 13 items |
+| Weighted ALS + popularity | 0.03043 | 0.60390 | 86 items |
+
+The hybrid also improved with additional observations: NDCG@10 was 0.58966041, 0.60511835, and
+0.61692283 at 5, 10, and 20 ratings. This is the first candidate to beat the strict popularity
+baseline on both ranking metrics while increasing coverage. Its iteration, training parameters,
+fold-in regularization, and blend weight are now frozen before the first and only test-user run.
+
 ## Protocol
 
 Both models use the same deterministic per-user chronological train, validation, and test split.
