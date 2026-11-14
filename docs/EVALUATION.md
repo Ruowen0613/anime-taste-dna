@@ -72,6 +72,25 @@ The hybrid also improved with additional observations: NDCG@10 was 0.58966041, 0
 baseline on both ranking metrics while increasing coverage. Its iteration, training parameters,
 fold-in regularization, and blend weight are now frozen before the first and only test-user run.
 
+### Frozen strict test result
+
+The frozen candidate was retrained deterministically for two iterations and evaluated once on all
+1,809 untouched test users. No test-time parameter search occurred. The same users, targets,
+complete train-supported catalog, relevance threshold, and exposed-rating exclusions were used for
+the count baseline and hybrid.
+
+| Model | Mean Recall@10 | Mean NDCG@10 | 10-rating coverage |
+|---|---:|---:|---:|
+| Interaction-count popularity | 0.02719940 | 0.56787919 | 14 items |
+| Weighted ALS + popularity | 0.03011625 | 0.60966969 | 83 items |
+
+The hybrid improved Recall@10 by approximately 10.7% and NDCG@10 by approximately 7.4% while
+expanding 10-rating coverage almost sixfold. Its NDCG@10 increased from 0.59900206 at five ratings
+to 0.62035020 at twenty ratings. Both predeclared metrics beat the baseline, so
+`weighted-als-hybrid-v1` passed the export gate. The exported artifact contains fixed item factors,
+interaction counts, canonical MAL IDs, titles, supported-item mask, and all inference parameters;
+historical user factors and identifiers are excluded.
+
 ## Protocol
 
 Both models use the same deterministic per-user chronological train, validation, and test split.

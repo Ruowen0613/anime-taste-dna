@@ -1,0 +1,75 @@
+{
+  "protocol": {
+    "split": "strict untouched test users",
+    "test_users": 1809,
+    "parameter_search": "none; all values frozen from validation",
+    "candidate_exclusion": "only exposed ratings"
+  },
+  "fixed_selection": {
+    "iterations": 2,
+    "fold_in_regularization": 100.0,
+    "popularity_blend": 32.0
+  },
+  "interaction_count_baseline": {
+    "mean_recall_at_10": 0.0271994,
+    "mean_ndcg_at_10": 0.56787919,
+    "by_observed_ratings": {
+      "5": {
+        "eligible_users": 1809,
+        "recall_at_10": 0.02695903,
+        "ndcg_at_10": 0.56523413,
+        "catalog_coverage_items": 13,
+        "candidate_exclusion": "only the 5 exposed ratings"
+      },
+      "10": {
+        "eligible_users": 1809,
+        "recall_at_10": 0.02709435,
+        "ndcg_at_10": 0.56707082,
+        "catalog_coverage_items": 14,
+        "candidate_exclusion": "only the 10 exposed ratings"
+      },
+      "20": {
+        "eligible_users": 1809,
+        "recall_at_10": 0.02754483,
+        "ndcg_at_10": 0.57133261,
+        "catalog_coverage_items": 16,
+        "candidate_exclusion": "only the 20 exposed ratings"
+      }
+    }
+  },
+  "weighted_als_hybrid": {
+    "mean_recall_at_10": 0.03011625,
+    "mean_ndcg_at_10": 0.60966969,
+    "by_observed_ratings": {
+      "5": {
+        "eligible_users": 1809,
+        "recall_at_10": 0.02958939,
+        "ndcg_at_10": 0.59900206,
+        "mean_user_factor_norm": 0.04949648,
+        "catalog_coverage_items": 91,
+        "catalog_coverage_fraction": 0.00638149
+      },
+      "10": {
+        "eligible_users": 1809,
+        "recall_at_10": 0.03011072,
+        "ndcg_at_10": 0.60965682,
+        "mean_user_factor_norm": 0.09499195,
+        "catalog_coverage_items": 83,
+        "catalog_coverage_fraction": 0.00582048
+      },
+      "20": {
+        "eligible_users": 1809,
+        "recall_at_10": 0.03064865,
+        "ndcg_at_10": 0.6203502,
+        "mean_user_factor_norm": 0.17972605,
+        "catalog_coverage_items": 51,
+        "catalog_coverage_fraction": 0.00357644
+      }
+    }
+  },
+  "passed_both_metrics": true,
+  "artifact": {
+    "path": "/Users/wangruowen/Downloads/anime-taste-dna/data/artifacts/weighted-als-hybrid-v1/weighted_als_hybrid.npz",
+    "exported": true
+  }
+}

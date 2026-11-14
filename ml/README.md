@@ -104,6 +104,17 @@ The broad and refined validation searches are recorded in
 `reports/strict-cold-start-weighted-als-hybrid-refinement-v1.json`. These commands do not access
 test users or export a production artifact.
 
+After freezing the validation winner, run the one-time strict test and gated artifact export:
+
+```bash
+anime-taste-weighted-als-test --config configs/weighted_als_test.toml
+```
+
+The executed result is `reports/strict-cold-start-weighted-als-test-v1.json`. The fixed hybrid beat
+interaction-count popularity on both test Recall@10 and NDCG@10, so the command exported
+`data/artifacts/weighted-als-hybrid-v1/weighted_als_hybrid.npz`. Generated artifacts remain
+Git-ignored.
+
 ## Pairwise Taste Quiz evaluation
 
 Evaluate the experimental pairwise protocol against the fixed exported model:

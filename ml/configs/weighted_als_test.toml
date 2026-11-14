@@ -1,0 +1,24 @@
+[paths]
+split_directory = "../data/processed/v2-user-holdout"
+processed_directory = "../data/processed/v1"
+output_report = "reports/strict-cold-start-weighted-als-test-v1.json"
+artifact_path = "../data/artifacts/weighted-als-hybrid-v1/weighted_als_hybrid.npz"
+
+[training]
+dimensions = 32
+alpha = 10.0
+regularization = 1.0
+positive_rating_threshold = 8
+seed = 42
+
+[fixed_selection]
+iterations = 2
+fold_in_regularization = 100.0
+popularity_blend = 32.0
+
+[evaluation]
+observed_ratings = [5, 10, 20]
+relevance_threshold = 8
+ranking_k = 10
+user_batch_size = 128
+parquet_batch_size = 131072
