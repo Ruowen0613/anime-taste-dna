@@ -38,7 +38,13 @@ export function RecommendationCard({ item, onOpen, onRate, onArchive }: Recommen
       <div className="flex min-w-0 flex-1 flex-col p-5">
         <div className="flex items-start justify-between gap-3">
           <h2 className="line-clamp-2 text-lg font-semibold leading-snug">{item.title}</h2>
-          <div className="shrink-0 text-right"><strong className="block text-lg text-violet">{item.predicted_rating.toFixed(1)}</strong><span className="text-[11px] text-slate-500">predicted / 10</span></div>
+          <div className="shrink-0 text-right">
+            {item.predicted_rating === null ? (
+              <><strong className="block text-lg text-violet">#{item.rank}</strong><span className="text-[11px] text-slate-500">model pick</span></>
+            ) : (
+              <><strong className="block text-lg text-violet">{item.predicted_rating.toFixed(1)}</strong><span className="text-[11px] text-slate-500">predicted / 10</span></>
+            )}
+          </div>
         </div>
         <div className="mt-3 flex flex-wrap gap-1.5 text-xs text-slate-300">
           {item.year && <span className="rounded-full bg-white/10 px-2.5 py-1">{item.year}</span>}

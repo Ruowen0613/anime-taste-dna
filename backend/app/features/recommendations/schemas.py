@@ -43,7 +43,7 @@ class RecommendationItem(BaseModel):
     mal_id: int
     title: str
     rank: int
-    predicted_rating: float
+    predicted_rating: float | None = None
     anilist_id: int | None = None
     cover_image_url: str | None = None
     year: int | None = None

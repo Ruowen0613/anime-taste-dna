@@ -2,7 +2,7 @@
 
 A personalized anime recommendation app that uses offline-trained collaborative filtering, cold-start user fold-in, and interpretable metadata-derived taste profiles.
 
-This repository contains an end-to-end recommendation slice: AniList-backed discovery, browser-persisted ratings, offline-trained matrix factorization, cold-start fold-in inference, and an enriched Top 10 recommendations view.
+This repository contains an end-to-end recommendation slice: AniList-backed discovery, browser-persisted ratings, a strictly evaluated Weighted ALS and popularity hybrid, cold-start fold-in inference, and an enriched Top 10 recommendations view.
 
 ## Repository layout
 
@@ -49,7 +49,7 @@ python -m pip install -e '.[dev]'
 uvicorn app.main:app --reload --port 8000
 ```
 
-Then visit <http://localhost:8000/health> or <http://localhost:8000/docs>. The frontend uses `GET /api/v1/anime/search`; AniList results without a MyAnimeList ID remain visible but cannot be rated because MAL ID is the canonical model item identity. After running the ML export, `POST /api/v1/recommendations` loads the default artifact from `data/artifacts/matrix-factorization-v1/matrix_factorization.npz`. Set `MODEL_ARTIFACT_PATH` to override it.
+Then visit <http://localhost:8000/health> or <http://localhost:8000/docs>. The frontend uses `GET /api/v1/anime/search`; AniList results without a MyAnimeList ID remain visible but cannot be rated because MAL ID is the canonical model item identity. After running the ML export, `POST /api/v1/recommendations` loads the default artifact from `data/artifacts/weighted-als-hybrid-v1/weighted_als_hybrid.npz`. Set `MODEL_ARTIFACT_PATH` to override it.
 
 Run checks from `backend/`:
 
@@ -61,9 +61,9 @@ pytest
 ## Current status
 
 - Implemented: AniList title search, normalized search cards, 1–10 rating add/edit/remove, versioned local-storage persistence, and lazy-loaded anime detail modals with AniList community scores and public review summaries.
-- Implemented in ML: reproducible download/audit, anonymous preprocessing, chronological splits, evaluated popularity baseline, PyTorch matrix factorization, regularized cold-start fold-in, and a versioned inference artifact.
-- Implemented in the API: typed recommendation contract, artifact validation/loading, MAL ID mapping, bounded fold-in/ranking, rated-item filtering, explicit unmapped-ID reporting, and batched AniList metadata enrichment with graceful degradation.
-- Implemented in the frontend: a model-backed Top 10 view with predicted ratings clearly separated from AniList community scores, responsive cards, retry/regenerate states, reusable anime detail modals, in-place scoring of already-watched recommendations, and browser-local “not interested” archives with automatic replacement and selective restore.
+- Implemented in ML: strict held-out-user evaluation, popularity and bias baselines, explicit MF/BPR diagnostics, Weighted ALS, popularity-aware reranking, and a gated versioned inference artifact.
+- Implemented in the API: typed recommendation contract, Weighted ALS artifact validation/loading, MAL ID mapping, bounded implicit fold-in/hybrid ranking, rated-item filtering, explicit unmapped-ID reporting, and batched AniList metadata enrichment with graceful degradation.
+- Implemented in the frontend: a model-ranked Top 10 view clearly separated from AniList community scores, responsive cards, retry/regenerate states, reusable anime detail modals, in-place scoring of already-watched recommendations, and browser-local “not interested” archives with automatic replacement and selective restore.
 - Implemented experimentally: a four-title, genre-diverse Taste Quiz with short AniList summaries. Most/least-interest choices are stored separately from ratings; least-interest choices are excluded from recommendations.
 - Not implemented: production artifact packaging/deployment and Taste DNA.
 - Evaluated: the current linear pairwise fold-in did not improve validation ranking, so its production weight is 0. Quiz choices are retained for future pairwise-aware model experiments and are never converted into fake ratings.
@@ -71,7 +71,7 @@ pytest
 
 ## ML status
 
-The executed matrix-factorization model beats the shared popularity baseline by roughly 43% on Recall@10 and 38% on NDCG@10 under the documented test protocol. Raw data and generated model files are Git-ignored; sanitized reports are committed under `ml/reports/`. See [docs/EVALUATION.md](docs/EVALUATION.md) for exact metrics and limitations.
+On one frozen strict test of 1,809 users absent from global training, the Weighted ALS hybrid improved Recall@10 by about 10.7% and NDCG@10 by about 7.4% over interaction-count popularity while increasing 10-rating catalog coverage from 14 to 83 items. Raw data and generated model files are Git-ignored; sanitized reports are committed under `ml/reports/`. See [docs/EVALUATION.md](docs/EVALUATION.md) for exact metrics, protocol, and limitations.
 
 See [SPEC.md](SPEC.md) for requirements and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the planned system design.
 

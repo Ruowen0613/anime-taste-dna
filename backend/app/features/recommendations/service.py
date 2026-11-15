@@ -7,7 +7,9 @@ import numpy as np
 from app.config import get_settings
 from app.features.recommendations.artifact import (
     RecommendationArtifact,
+    WeightedAlsArtifact,
     get_recommendation_artifact,
+    get_weighted_als_artifact,
 )
 from app.features.recommendations.schemas import (
     RecommendationItem,
@@ -146,6 +148,106 @@ class RecommendationService:
         return parameters[:-1], float(parameters[-1])
 
 
+class WeightedAlsRecommendationService:
+    def __init__(self, artifact: WeightedAlsArtifact, minimum_mapped_ratings: int) -> None:
+        self.artifact = artifact
+        self.minimum_mapped_ratings = minimum_mapped_ratings
+        self._item_by_mal_id = {
+            int(mal_id): item_index for item_index, mal_id in enumerate(artifact.mal_ids)
+        }
+        supported_factors = artifact.item_factors[artifact.supported]
+        self._factor_gram = supported_factors.T @ supported_factors
+        popularity = np.log1p(artifact.item_counts).astype(np.float32)
+        supported_popularity = popularity[artifact.supported]
+        popularity_std = float(supported_popularity.std())
+        if popularity_std >= 1e-8:
+            self._popularity = (
+                popularity - float(supported_popularity.mean())
+            ) / popularity_std
+        else:
+            self._popularity = np.zeros_like(popularity)
+
+    def recommend(self, request: RecommendationRequest) -> RecommendationResponse:
+        mapped: list[tuple[int, int]] = []
+        unmapped_mal_ids: list[int] = []
+        for user_rating in request.ratings:
+            item_index = self._item_by_mal_id.get(user_rating.mal_id)
+            if item_index is None or not self.artifact.supported[item_index]:
+                unmapped_mal_ids.append(user_rating.mal_id)
+            else:
+                mapped.append((item_index, user_rating.rating))
+        if len(mapped) < self.minimum_mapped_ratings:
+            raise InsufficientMappedRatingsError(
+                f"At least {self.minimum_mapped_ratings} ratings must map to "
+                f"model-supported anime; received {len(mapped)}"
+            )
+
+        observed_items = np.asarray([item for item, _ in mapped], dtype=np.int32)
+        observed_ratings = np.asarray([rating for _, rating in mapped], dtype=np.float32)
+        user_factor = self._fold_in(observed_items, observed_ratings)
+        scores = self.artifact.item_factors @ user_factor
+        supported_scores = scores[self.artifact.supported]
+        score_std = float(supported_scores.std())
+        if score_std >= 1e-8:
+            scores = (scores - float(supported_scores.mean())) / score_std
+        else:
+            scores = np.zeros_like(scores)
+        scores += self.artifact.popularity_blend * self._popularity
+        scores[~self.artifact.supported] = -np.inf
+        scores[observed_items] = -np.inf
+        excluded_items = [
+            self._item_by_mal_id[mal_id]
+            for mal_id in request.excluded_mal_ids
+            if mal_id in self._item_by_mal_id
+        ]
+        scores[excluded_items] = -np.inf
+        candidates = np.flatnonzero(np.isfinite(scores))
+        result_limit = min(request.limit, len(candidates))
+        if result_limit:
+            candidate_scores = scores[candidates]
+            selected = np.argpartition(candidate_scores, -result_limit)[-result_limit:]
+            selected_items = candidates[selected]
+            selected_items = selected_items[
+                np.lexsort((self.artifact.mal_ids[selected_items], -scores[selected_items]))
+            ]
+        else:
+            selected_items = np.asarray([], dtype=np.int64)
+        items = [
+            RecommendationItem(
+                mal_id=int(self.artifact.mal_ids[item_index]),
+                title=str(self.artifact.titles[item_index]),
+                rank=rank,
+            )
+            for rank, item_index in enumerate(selected_items, start=1)
+        ]
+        return RecommendationResponse(
+            model_version=self.artifact.model_version,
+            mapped_ratings=len(mapped),
+            mapped_preferences=0,
+            pairwise_refinement_active=False,
+            unmapped_mal_ids=unmapped_mal_ids,
+            items=items,
+        )
+
+    def _fold_in(
+        self, observed_items: np.ndarray, observed_ratings: np.ndarray
+    ) -> np.ndarray:
+        positive = observed_ratings >= self.artifact.positive_rating_threshold
+        if not positive.any():
+            return np.zeros(self.artifact.item_factors.shape[1], dtype=np.float32)
+        items = observed_items[positive]
+        ratings = observed_ratings[positive]
+        factors = self.artifact.item_factors[items]
+        strength = ratings - self.artifact.positive_rating_threshold + 1.0
+        confidence = 1.0 + self.artifact.alpha * strength
+        system = self._factor_gram + (factors.T * (confidence - 1.0)) @ factors
+        system += np.eye(factors.shape[1], dtype=np.float32) * (
+            self.artifact.fold_in_regularization
+        )
+        target = factors.T @ confidence
+        return np.linalg.solve(system, target)
+
+
 @lru_cache
 def get_recommendation_service() -> RecommendationService:
     settings = get_settings()
@@ -153,4 +255,13 @@ def get_recommendation_service() -> RecommendationService:
         artifact=get_recommendation_artifact(),
         minimum_mapped_ratings=settings.minimum_mapped_ratings,
         preference_weight=settings.pairwise_preference_weight,
+    )
+
+
+@lru_cache
+def get_weighted_als_recommendation_service() -> WeightedAlsRecommendationService:
+    settings = get_settings()
+    return WeightedAlsRecommendationService(
+        artifact=get_weighted_als_artifact(),
+        minimum_mapped_ratings=settings.minimum_mapped_ratings,
     )

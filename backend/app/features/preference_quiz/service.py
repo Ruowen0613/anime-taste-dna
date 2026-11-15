@@ -5,20 +5,20 @@ from functools import lru_cache
 import numpy as np
 
 from app.features.recommendations.artifact import (
-    RecommendationArtifact,
-    get_recommendation_artifact,
+    WeightedAlsArtifact,
+    get_weighted_als_artifact,
 )
 
 
 class PreferenceQuizService:
-    def __init__(self, artifact: RecommendationArtifact) -> None:
+    def __init__(self, artifact: WeightedAlsArtifact) -> None:
         self.artifact = artifact
 
     def candidate_mal_ids(self, excluded_mal_ids: list[int], pool_size: int = 24) -> list[int]:
         excluded = set(excluded_mal_ids)
         supported = np.flatnonzero(self.artifact.supported)
         supported = supported[
-            np.argsort(self.artifact.item_bias[supported], kind="stable")[::-1]
+            np.argsort(self.artifact.item_counts[supported], kind="stable")[::-1]
         ][: min(1000, len(supported))]
         available = np.asarray(
             [index for index in supported if int(self.artifact.mal_ids[index]) not in excluded],
@@ -33,4 +33,4 @@ class PreferenceQuizService:
 
 @lru_cache
 def get_preference_quiz_service() -> PreferenceQuizService:
-    return PreferenceQuizService(get_recommendation_artifact())
+    return PreferenceQuizService(get_weighted_als_artifact())

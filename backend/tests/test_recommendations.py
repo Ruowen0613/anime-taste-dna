@@ -3,10 +3,13 @@ from fastapi.testclient import TestClient
 
 from app.features.anime.client import AniListError, get_anilist_client
 from app.features.anime.schemas import AnimeSearchResult
-from app.features.recommendations.artifact import RecommendationArtifact
+from app.features.recommendations.artifact import RecommendationArtifact, WeightedAlsArtifact
 from app.features.recommendations.router import get_available_recommendation_service
 from app.features.recommendations.schemas import RecommendationRequest
-from app.features.recommendations.service import RecommendationService
+from app.features.recommendations.service import (
+    RecommendationService,
+    WeightedAlsRecommendationService,
+)
 from app.main import app
 
 
@@ -26,6 +29,39 @@ def _service(preference_weight: float = 0.0) -> RecommendationService:
         minimum_mapped_ratings=2,
         preference_weight=preference_weight,
     )
+
+
+def _weighted_als_service() -> WeightedAlsRecommendationService:
+    artifact = WeightedAlsArtifact(
+        item_factors=np.asarray(
+            [[1.0, 0.0], [0.0, 1.0], [0.9, 0.1], [0.1, 0.9]], dtype=np.float32
+        ),
+        item_counts=np.ones(4, dtype=np.int64),
+        mal_ids=np.asarray([1, 2, 3, 4], dtype=np.int64),
+        titles=np.asarray(["One", "Two", "Three", "Four"]),
+        supported=np.ones(4, dtype=np.bool_),
+        alpha=10.0,
+        fold_in_regularization=1.0,
+        popularity_blend=0.0,
+        positive_rating_threshold=8,
+        model_version="weighted-fixture-v1",
+    )
+    return WeightedAlsRecommendationService(artifact, minimum_mapped_ratings=2)
+
+
+def test_weighted_als_recommendations_fold_in_and_do_not_fake_predicted_ratings() -> None:
+    ratings = [
+        {"mal_id": mal_id, "rating": 10 if mal_id == 1 else 1}
+        for mal_id in [1, 2, 100, 101, 102, 103, 104, 105, 106, 107]
+    ]
+
+    result = _weighted_als_service().recommend(
+        RecommendationRequest(ratings=ratings, limit=2)
+    )
+
+    assert result.model_version == "weighted-fixture-v1"
+    assert [item.mal_id for item in result.items] == [3, 4]
+    assert all(item.predicted_rating is None for item in result.items)
 
 
 class FakeRecommendationMetadataClient:

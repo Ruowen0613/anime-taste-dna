@@ -2,7 +2,7 @@ export type RecommendationItem = {
   mal_id: number
   title: string
   rank: number
-  predicted_rating: number
+  predicted_rating: number | null
   anilist_id: number | null
   cover_image_url: string | null
   year: number | null

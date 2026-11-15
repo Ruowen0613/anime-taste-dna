@@ -8,15 +8,16 @@ from app.features.recommendations.schemas import RecommendationRequest, Recommen
 from app.features.recommendations.service import (
     InsufficientMappedRatingsError,
     RecommendationService,
-    get_recommendation_service,
+    WeightedAlsRecommendationService,
+    get_weighted_als_recommendation_service,
 )
 
 router = APIRouter(prefix="/api/v1/recommendations", tags=["recommendations"])
 
 
-def get_available_recommendation_service() -> RecommendationService:
+def get_available_recommendation_service() -> WeightedAlsRecommendationService:
     try:
-        return get_recommendation_service()
+        return get_weighted_als_recommendation_service()
     except ArtifactError as error:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -27,7 +28,10 @@ def get_available_recommendation_service() -> RecommendationService:
 @router.post("", response_model=RecommendationResponse)
 async def recommend(
     request: RecommendationRequest,
-    service: Annotated[RecommendationService, Depends(get_available_recommendation_service)],
+    service: Annotated[
+        RecommendationService | WeightedAlsRecommendationService,
+        Depends(get_available_recommendation_service),
+    ],
     anilist_client: Annotated[AniListClient, Depends(get_anilist_client)],
 ) -> RecommendationResponse:
     try:

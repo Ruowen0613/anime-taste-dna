@@ -45,7 +45,7 @@ export function RecommendationsPage({ ratings, preferences, onRate, onBack }: Re
     <section className="py-16" aria-labelledby="recommendations-heading">
       <button className="text-sm text-violet transition hover:text-white" type="button" onClick={onBack}>← Back to your ratings</button>
       <div className="mt-8 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
-        <div><p className="text-sm font-semibold uppercase tracking-[0.28em] text-violet">Your next watch</p><h1 id="recommendations-heading" className="mt-3 text-4xl font-bold sm:text-6xl">Recommendations</h1><p className="mt-4 max-w-2xl text-slate-300">Ranked by the matrix-factorization model from your ratings. Predicted ratings are model estimates, not community scores.</p></div>
+        <div><p className="text-sm font-semibold uppercase tracking-[0.28em] text-violet">Your next watch</p><h1 id="recommendations-heading" className="mt-3 text-4xl font-bold sm:text-6xl">Recommendations</h1><p className="mt-4 max-w-2xl text-slate-300">Ranked by a validated Weighted ALS and popularity hybrid from your ratings. Model order is separate from AniList community scores.</p></div>
         <button className="self-start rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm transition hover:bg-white/10 disabled:opacity-50 lg:self-auto" type="button" disabled={recommendations.loading} onClick={() => void recommendations.generate()}>Regenerate</button>
       </div>
       {recommendations.loading && <div className="mt-12 grid gap-4 md:grid-cols-2" aria-label="Loading recommendations">{Array.from({ length: 4 }, (_, index) => <div className="h-52 animate-pulse rounded-2xl bg-white/5" key={index} />)}</div>}

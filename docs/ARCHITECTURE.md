@@ -44,11 +44,11 @@ Preprocessing parameters must be configuration, not hidden notebook state.
 
 ## Offline training and evaluation
 
-The popularity model computes training-only item statistics with shrinkage/minimum support. Matrix factorization learns user/item embeddings and biases from training ratings with validation-based model selection. Seeds, hyperparameters, filters, and dataset fingerprints accompany each run.
+The production candidate uses implicit Weighted ALS item factors plus a validation-selected popularity blend. Global factors train only on the strict training-user group; validation and test users are disjoint. Seeds, hyperparameters, filters, and dataset fingerprints accompany each run.
 
-Evaluation simulates new users: expose 5, 10, or 20 training-history ratings, fold in a user representation with frozen item parameters, and rank a documented candidate set containing held-out relevant items. Both models share splits/candidates. Report Recall@10 and NDCG@10 with eligible-user counts and limitations.
+Evaluation simulates genuinely new users: expose 5, 10, or 20 ratings from users absent from global training, fold in a user representation with frozen item parameters, and rank the complete train-supported catalog while excluding only exposed ratings. Models share users, targets, candidates, and relevance rules. Report Recall@10, NDCG@10, catalog coverage, eligible-user counts, and limitations.
 
-Export a compact, versioned bundle containing item embeddings/biases, item-index maps, rating normalization, popularity fallback, metadata lookup, model/config version, and integrity metadata. Raw training data and training-only user embeddings are not required by the API.
+Export a compact, versioned bundle containing item factors, interaction counts, MAL-ID maps, the supported mask, fixed fold-in/blend parameters, titles, and model version. Raw training data and historical user factors are not required by the API.
 
 ## Online inference
 
@@ -56,10 +56,10 @@ At process startup, FastAPI loads and validates one artifact bundle. For a recom
 
 1. validates 10–20 unique MAL IDs and 1–10 ratings;
 2. resolves known item indices and reports/handles unmapped inputs;
-3. initializes and optimizes a regularized user vector (and optional bias) while item parameters stay frozen;
-4. scores candidate items, masks rated/unavailable titles, and selects Top K;
+3. solves the confidence-weighted implicit ALS normal equation for a regularized user vector while item factors stay frozen;
+4. standardizes collaborative scores, blends standardized log interaction counts with the validation-selected weight, masks rated/unavailable titles, and selects Top K;
 5. batch-enriches ranked MAL IDs with runtime AniList metadata while preserving the model ranking;
-6. uses the popularity artifact as an explicit fallback when too few inputs map.
+6. returns a typed validation error when too few inputs map to the supported model universe.
 
 Inference is bounded and CPU-friendly. The artifact is immutable per deployment, making replicas stateless and results traceable to a model version.
 
@@ -98,7 +98,8 @@ The implemented `POST /api/v1/recommendations` accepts
 integer ratings from 1–10 and a limit from 1–20. At least five ratings must map to supported model
 items. The response is
 `{ model_version, mapped_ratings, mapped_preferences, unmapped_mal_ids, metadata_status, items: [{ mal_id, anilist_id, title, rank, predicted_rating, cover_image_url, year, format, genres, average_score }] }`.
-The service loads fold-in regularization, item factors/biases, titles, supported-item mask, and MAL
+`predicted_rating` is nullable: the Weighted ALS production engine returns `null` because its score
+is a ranking signal, not a calibrated 1–10 rating. The service loads fold-in regularization, item factors/counts, blend parameters, titles, supported-item mask, and MAL
 mapping from the versioned artifact; it never loads historical user parameters. Unmapped ratings
 are reported explicitly and never title-matched. The API sends ranked MAL IDs to AniList in one
 `idMal_in` query and joins only on the returned `idMal`. `metadata_status` is `complete`, `partial`,
