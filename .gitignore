@@ -42,3 +42,4 @@ ml/checkpoints/
 htmlcov/
 coverage/
 *.log
+.vercel
