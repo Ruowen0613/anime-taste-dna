@@ -1,0 +1,25 @@
+[paths]
+split_directory = "../data/processed/v2-user-holdout"
+artifact_path = "../data/artifacts/weighted-als-hybrid-v1/weighted_als_hybrid.npz"
+output_report = "reports/negative-feedback-validation-v1.json"
+
+[model]
+dimensions = 32
+iterations = 2
+positive_alpha = 10.0
+training_regularization = 1.0
+positive_rating_threshold = 8
+fold_in_regularization = 100.0
+popularity_blend = 32.0
+seed = 42
+
+[search]
+negative_thresholds = [3, 4, 5, 6, 7]
+negative_alphas = [1.0, 5.0, 10.0, 20.0, 40.0]
+
+[evaluation]
+observed_ratings = [5, 10, 20]
+relevance_threshold = 8
+ranking_k = 10
+user_batch_size = 128
+parquet_batch_size = 131072

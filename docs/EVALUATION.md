@@ -91,6 +91,22 @@ to 0.62035020 at twenty ratings. Both predeclared metrics beat the baseline, so
 interaction counts, canonical MAL IDs, titles, supported-item mask, and all inference parameters;
 historical user factors and identifiers are excluded.
 
+### Explicit low-rating fold-in experiment
+
+After freezing the production candidate, a validation-only experiment tested whether ratings below
+the positive threshold should actively shape the user vector. Positive ratings retained the
+production confidence rule. Ratings at or below thresholds 3–7 were added as confidence-weighted
+implicit targets with preference `p=0`; negative confidence multipliers 1, 5, 10, 20, and 40 were
+searched. Global item factors, popularity blend, users, candidates, and targets stayed fixed, and
+test users were not accessed again.
+
+The selected setting used threshold 6 and multiplier 10, but improved mean Recall@10 by only
+0.00000692 and mean NDCG@10 by only 0.00007377. Ten-rating catalog coverage remained 86 items.
+This is not a practically meaningful improvement, so explicit low ratings are not enabled in the
+production fold-in. They remain candidate exclusions. Future negative-feedback work should use a
+model trained jointly with signed or pairwise preferences, and must establish a material validation
+effect before receiving a new independent evaluation.
+
 ## Protocol
 
 Both models use the same deterministic per-user chronological train, validation, and test split.

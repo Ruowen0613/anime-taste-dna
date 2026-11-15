@@ -81,6 +81,7 @@ def solve_implicit_factors(
     confidence: np.ndarray,
     fixed_factors: np.ndarray,
     regularization: float,
+    preference: np.ndarray | None = None,
 ) -> np.ndarray:
     dimensions = fixed_factors.shape[1]
     result = np.zeros((len(offsets) - 1, dimensions), dtype=np.float32)
@@ -92,8 +93,11 @@ def solve_implicit_factors(
             continue
         factors = fixed_factors[related_indices[start:end]]
         weights = confidence[start:end]
+        preferences = (
+            np.ones_like(weights) if preference is None else preference[start:end]
+        )
         system = base + (factors.T * (weights - 1.0)) @ factors + penalty
-        target = factors.T @ weights
+        target = factors.T @ (weights * preferences)
         result[entity] = np.linalg.solve(system, target)
     return result
 
@@ -134,6 +138,43 @@ def fold_in_implicit_users(
     )
 
 
+def fold_in_signed_implicit_users(
+    item_factors: np.ndarray,
+    observed_items: np.ndarray,
+    observed_ratings: np.ndarray,
+    positive_threshold: int,
+    positive_alpha: float,
+    negative_threshold: int,
+    negative_alpha: float,
+    regularization: float,
+) -> np.ndarray:
+    positive = observed_ratings >= positive_threshold
+    negative = observed_ratings <= negative_threshold
+    selected = positive | negative
+    counts = selected.sum(axis=1, dtype=np.int64)
+    offsets = np.zeros(len(observed_items) + 1, dtype=np.int64)
+    np.cumsum(counts, out=offsets[1:])
+    if offsets[-1] == 0:
+        return np.zeros((len(observed_items), item_factors.shape[1]), dtype=np.float32)
+    selected_ratings = observed_ratings[selected]
+    selected_positive = positive[selected]
+    confidence = np.empty(len(selected_ratings), dtype=np.float32)
+    confidence[selected_positive] = implicit_confidence(
+        selected_ratings[selected_positive], positive_threshold, positive_alpha
+    )
+    negative_strength = negative_threshold - selected_ratings[~selected_positive] + 1.0
+    confidence[~selected_positive] = 1.0 + negative_alpha * negative_strength
+    preference = selected_positive.astype(np.float32)
+    return solve_implicit_factors(
+        offsets,
+        observed_items[selected],
+        confidence,
+        item_factors,
+        regularization,
+        preference,
+    )
+
+
 def evaluate_weighted_als(
     users: np.ndarray,
     history: InteractionCsr,
@@ -144,6 +185,8 @@ def evaluate_weighted_als(
     fold_in_regularization: float,
     popularity_blend: float,
     config: WeightedAlsConfig,
+    negative_rating_threshold: int | None = None,
+    negative_alpha: float = 0.0,
 ) -> dict[str, float | int]:
     supported = item_counts > 0
     discounts = 1.0 / np.log2(np.arange(2, config.ranking_k + 2))
@@ -160,14 +203,26 @@ def evaluate_weighted_als(
         observed_ratings = np.stack(
             [history.user_ratings(int(user))[-observed_count:] for user in batch_users]
         )
-        user_factors = fold_in_implicit_users(
-            item_factors,
-            observed_items,
-            observed_ratings,
-            config.positive_rating_threshold,
-            config.alpha,
-            fold_in_regularization,
-        )
+        if negative_rating_threshold is None or negative_alpha <= 0:
+            user_factors = fold_in_implicit_users(
+                item_factors,
+                observed_items,
+                observed_ratings,
+                config.positive_rating_threshold,
+                config.alpha,
+                fold_in_regularization,
+            )
+        else:
+            user_factors = fold_in_signed_implicit_users(
+                item_factors,
+                observed_items,
+                observed_ratings,
+                config.positive_rating_threshold,
+                config.alpha,
+                negative_rating_threshold,
+                negative_alpha,
+                fold_in_regularization,
+            )
         scores = user_factors @ item_factors.T
         supported_scores = scores[:, supported]
         score_mean = supported_scores.mean(axis=1, keepdims=True)

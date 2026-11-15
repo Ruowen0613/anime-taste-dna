@@ -36,6 +36,7 @@ anime-taste-strict-cold-start = "anime_taste_dna.evaluation.strict_cold_start:ma
 anime-taste-strict-mf = "anime_taste_dna.models.strict_matrix_factorization:main"
 anime-taste-weighted-als = "anime_taste_dna.models.weighted_als:main"
 anime-taste-weighted-als-test = "anime_taste_dna.evaluation.weighted_als_test:main"
+anime-taste-negative-feedback = "anime_taste_dna.evaluation.negative_feedback:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

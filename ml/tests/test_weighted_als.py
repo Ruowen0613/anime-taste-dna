@@ -2,6 +2,7 @@ import numpy as np
 
 from anime_taste_dna.models.weighted_als import (
     fold_in_implicit_users,
+    fold_in_signed_implicit_users,
     implicit_confidence,
     solve_implicit_factors,
 )
@@ -40,3 +41,20 @@ def test_fold_in_ignores_below_threshold_ratings() -> None:
     )
 
     assert user[0, 0] > user[0, 1]
+
+
+def test_signed_fold_in_pushes_away_from_explicit_negative() -> None:
+    factors = np.asarray([[1.0, 0.0], [0.0, 1.0]], dtype=np.float32)
+    user = fold_in_signed_implicit_users(
+        factors,
+        observed_items=np.asarray([[0, 1]], dtype=np.int32),
+        observed_ratings=np.asarray([[10, 2]], dtype=np.uint8),
+        positive_threshold=8,
+        positive_alpha=10.0,
+        negative_threshold=4,
+        negative_alpha=10.0,
+        regularization=1.0,
+    )
+
+    scores = user @ factors.T
+    assert scores[0, 0] > scores[0, 1]

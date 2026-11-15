@@ -115,6 +115,16 @@ interaction-count popularity on both test Recall@10 and NDCG@10, so the command 
 `data/artifacts/weighted-als-hybrid-v1/weighted_als_hybrid.npz`. Generated artifacts remain
 Git-ignored.
 
+Evaluate explicit low ratings as confidence-weighted negative fold-in signals without retraining the
+global model or touching test users:
+
+```bash
+anime-taste-negative-feedback --config configs/negative_feedback.toml
+```
+
+The executed report is `reports/negative-feedback-validation-v1.json`. The measured improvement was
+negligible, so this behavior is not enabled in production.
+
 ## Pairwise Taste Quiz evaluation
 
 Evaluate the experimental pairwise protocol against the fixed exported model:
