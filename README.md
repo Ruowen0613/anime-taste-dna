@@ -4,6 +4,12 @@ A personalized anime recommendation app that uses offline-trained collaborative 
 
 This repository contains an end-to-end recommendation slice: AniList-backed discovery, browser-persisted ratings, a strictly evaluated Weighted ALS and popularity hybrid, cold-start fold-in inference, and an enriched Top 10 recommendations view.
 
+## Live deployment
+
+- Frontend: <https://frontend-snowy-five-79.vercel.app>
+- API health: <https://anime-taste-dna-api-197238956100.northamerica-northeast2.run.app/health>
+- API documentation: <https://anime-taste-dna-api-197238956100.northamerica-northeast2.run.app/docs>
+
 ## Repository layout
 
 ```text
