@@ -51,6 +51,20 @@ uvicorn app.main:app --reload --port 8000
 
 Then visit <http://localhost:8000/health> or <http://localhost:8000/docs>. The frontend uses `GET /api/v1/anime/search`; AniList results without a MyAnimeList ID remain visible but cannot be rated because MAL ID is the canonical model item identity. After running the ML export, `POST /api/v1/recommendations` loads the default artifact from `data/artifacts/weighted-als-hybrid-v1/weighted_als_hybrid.npz`. Set `MODEL_ARTIFACT_PATH` to override it.
 
+### Production backend image
+
+The production model is ignored by Git, so restore the verified artifact at
+`data/artifacts/weighted-als-hybrid-v1/weighted_als_hybrid.npz` before building from the repository root:
+
+```bash
+docker build -f backend/Dockerfile -t anime-taste-dna-backend:weighted-als-v1 .
+docker run --rm -p 8080:8080 anime-taste-dna-backend:weighted-als-v1
+```
+
+The image build validates the artifact's byte size, SHA-256, model version, required arrays, and
+item dimensions against `backend/model/weighted-als-hybrid-v1.json`. A missing, stale, or corrupt
+model therefore fails the build instead of reaching Cloud Run.
+
 Run checks from `backend/`:
 
 ```bash
@@ -65,7 +79,7 @@ pytest
 - Implemented in the API: typed recommendation contract, Weighted ALS artifact validation/loading, MAL ID mapping, bounded implicit fold-in/hybrid ranking, rated-item filtering, explicit unmapped-ID reporting, and batched AniList metadata enrichment with graceful degradation.
 - Implemented in the frontend: a model-ranked Top 10 view clearly separated from AniList community scores, responsive cards, retry/regenerate states, reusable anime detail modals, in-place scoring of already-watched recommendations, and browser-local “not interested” archives with automatic replacement and selective restore.
 - Implemented experimentally: a four-title, genre-diverse Taste Quiz with short AniList summaries. Most/least-interest choices are stored separately from ratings; least-interest choices are excluded from recommendations.
-- Not implemented: production artifact packaging/deployment and Taste DNA.
+- Not implemented: Cloud Run/Vercel release and Taste DNA.
 - Evaluated: the current linear pairwise fold-in did not improve validation ranking, so its production weight is 0. Quiz choices are retained for future pairwise-aware model experiments and are never converted into fake ratings.
 - Hidden by default: set `VITE_ENABLE_TASTE_QUIZ=true` only for experimental development; the production-facing navigation does not expose it.
 
