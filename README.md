@@ -6,7 +6,7 @@ This repository contains an end-to-end recommendation slice: AniList-backed disc
 
 ## Live deployment
 
-- Frontend: <https://frontend-snowy-five-79.vercel.app>
+- Frontend: <https://anime-taste-dna.vercel.app>
 - API health: <https://anime-taste-dna-api-197238956100.northamerica-northeast2.run.app/health>
 - API documentation: <https://anime-taste-dna-api-197238956100.northamerica-northeast2.run.app/docs>
 
