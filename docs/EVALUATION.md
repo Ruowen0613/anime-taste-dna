@@ -107,6 +107,36 @@ production fold-in. They remain candidate exclusions. Future negative-feedback w
 model trained jointly with signed or pairwise preferences, and must establish a material validation
 effect before receiving a new independent evaluation.
 
+### Signed explicit-rating hybrid
+
+A later product counterfactual exposed a missing acceptance criterion: changing multiple high
+ratings to 1 could leave the displayed Top 10 effectively unchanged. The production Weighted ALS
+fold-in ignored ratings below 8, while its standardized popularity term used weight 32. On the
+strict test cohort, its ten-rating recommendations overlapped pure interaction-count popularity by
+78.94%, covered only 83 items, and retained 78.94% Top-10 overlap after all exposed ratings of 8 or
+higher were changed to 1.
+
+The replacement candidate keeps the fixed ALS item factors and the original score as a relevance
+prior, then adds a small signed explicit-rating residual. Every rating is mapped linearly around
+5.5, fixed normalized item factors are folded into a second user vector, and the standardized signed
+score is added with validation-selected weight 0.05. Validation also selected signed fold-in
+regularization 100. Selection required counterfactual Top-10 overlap at most 70%, popularity overlap
+at most 70%, and catalog coverage of at least 1%, before optimizing NDCG@10 and Recall@10.
+
+The parameters were frozen before one final test over 1,809 users:
+
+| Model | Recall@10 | NDCG@10 | 10-rating coverage | Popularity overlap | High-to-low overlap |
+|---|---:|---:|---:|---:|---:|
+| Interaction-count popularity | 0.02719940 | 0.56787919 | 14 | 100% | 100% |
+| Previous production hybrid | 0.03011625 | 0.60966969 | 83 | 78.94% | 78.94% |
+| Signed-rating hybrid | 0.02909078 | 0.58536808 | 249 | 68.09% | 7.71% |
+
+The signed hybrid gives up 3.4% Recall and 4.0% NDCG relative to the previous popularity-heavy
+model, but still beats the declared popularity baseline on both metrics while making explicit low
+ratings materially affect ranking and tripling catalog coverage. It therefore passed the revised
+production gate. Full executed validation and test evidence is stored in
+`signed-hybrid-validation-v1.json` and `signed-hybrid-test-v1.json`.
+
 ## Protocol
 
 Both models use the same deterministic per-user chronological train, validation, and test split.

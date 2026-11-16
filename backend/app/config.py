@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     allowed_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
     model_artifact_path: Path = (
         Path(__file__).resolve().parents[2]
-        / "data/artifacts/weighted-als-hybrid-v1/weighted_als_hybrid.npz"
+        / "data/artifacts/signed-rating-hybrid-v1/signed_rating_hybrid.npz"
     )
     minimum_mapped_ratings: int = 5
     pairwise_preference_weight: float = 0.0

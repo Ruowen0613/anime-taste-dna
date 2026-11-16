@@ -1,0 +1,7 @@
+{
+  "model_version": "signed-rating-hybrid-v1",
+  "filename": "signed_rating_hybrid.npz",
+  "size_bytes": 1675411,
+  "sha256": "4635955c568185bbf96f589008874f2f936c66558b3e3dc2c2e7abf03880ae6d",
+  "strict_test_report": "ml/reports/signed-hybrid-test-v1.json"
+}

@@ -13,6 +13,6 @@ data/raw
 data/processed
 data/working
 data/artifacts/*
-!data/artifacts/weighted-als-hybrid-v1/
-data/artifacts/weighted-als-hybrid-v1/*
-!data/artifacts/weighted-als-hybrid-v1/weighted_als_hybrid.npz
+!data/artifacts/signed-rating-hybrid-v1/
+data/artifacts/signed-rating-hybrid-v1/*
+!data/artifacts/signed-rating-hybrid-v1/signed_rating_hybrid.npz

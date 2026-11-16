@@ -7,9 +7,9 @@ import numpy as np
 from app.config import get_settings
 from app.features.recommendations.artifact import (
     RecommendationArtifact,
-    WeightedAlsArtifact,
+    SignedHybridArtifact,
     get_recommendation_artifact,
-    get_weighted_als_artifact,
+    get_signed_hybrid_artifact,
 )
 from app.features.recommendations.schemas import (
     RecommendationItem,
@@ -148,8 +148,8 @@ class RecommendationService:
         return parameters[:-1], float(parameters[-1])
 
 
-class WeightedAlsRecommendationService:
-    def __init__(self, artifact: WeightedAlsArtifact, minimum_mapped_ratings: int) -> None:
+class SignedHybridRecommendationService:
+    def __init__(self, artifact: SignedHybridArtifact, minimum_mapped_ratings: int) -> None:
         self.artifact = artifact
         self.minimum_mapped_ratings = minimum_mapped_ratings
         self._item_by_mal_id = {
@@ -157,6 +157,10 @@ class WeightedAlsRecommendationService:
         }
         supported_factors = artifact.item_factors[artifact.supported]
         self._factor_gram = supported_factors.T @ supported_factors
+        factor_norms = np.linalg.norm(artifact.item_factors, axis=1, keepdims=True)
+        self._normalized_item_factors = artifact.item_factors / np.where(
+            factor_norms >= 1e-8, factor_norms, 1.0
+        )
         popularity = np.log1p(artifact.item_counts).astype(np.float32)
         supported_popularity = popularity[artifact.supported]
         popularity_std = float(supported_popularity.std())
@@ -184,15 +188,17 @@ class WeightedAlsRecommendationService:
 
         observed_items = np.asarray([item for item, _ in mapped], dtype=np.int32)
         observed_ratings = np.asarray([rating for _, rating in mapped], dtype=np.float32)
-        user_factor = self._fold_in(observed_items, observed_ratings)
-        scores = self.artifact.item_factors @ user_factor
-        supported_scores = scores[self.artifact.supported]
-        score_std = float(supported_scores.std())
-        if score_std >= 1e-8:
-            scores = (scores - float(supported_scores.mean())) / score_std
-        else:
-            scores = np.zeros_like(scores)
-        scores += self.artifact.popularity_blend * self._popularity
+        implicit_factor = self._fold_in_implicit(observed_items, observed_ratings)
+        production_scores = self._standardize(
+            self.artifact.item_factors @ implicit_factor
+        )
+        production_scores += self.artifact.popularity_blend * self._popularity
+        production_scores = self._standardize(production_scores)
+        signed_factor = self._fold_in_signed(observed_items, observed_ratings)
+        signed_scores = self._standardize(
+            self._normalized_item_factors @ signed_factor
+        )
+        scores = production_scores + self.artifact.signed_score_weight * signed_scores
         scores[~self.artifact.supported] = -np.inf
         scores[observed_items] = -np.inf
         excluded_items = [
@@ -229,7 +235,14 @@ class WeightedAlsRecommendationService:
             items=items,
         )
 
-    def _fold_in(
+    def _standardize(self, scores: np.ndarray) -> np.ndarray:
+        supported_scores = scores[self.artifact.supported]
+        score_std = float(supported_scores.std())
+        if score_std < 1e-8:
+            return np.zeros_like(scores)
+        return (scores - float(supported_scores.mean())) / score_std
+
+    def _fold_in_implicit(
         self, observed_items: np.ndarray, observed_ratings: np.ndarray
     ) -> np.ndarray:
         positive = observed_ratings >= self.artifact.positive_rating_threshold
@@ -247,6 +260,15 @@ class WeightedAlsRecommendationService:
         target = factors.T @ confidence
         return np.linalg.solve(system, target)
 
+    def _fold_in_signed(
+        self, observed_items: np.ndarray, observed_ratings: np.ndarray
+    ) -> np.ndarray:
+        factors = self._normalized_item_factors[observed_items]
+        targets = np.clip((observed_ratings - 5.5) / 4.5, -1.0, 1.0)
+        penalty = np.eye(factors.shape[1], dtype=np.float32)
+        penalty *= self.artifact.signed_fold_in_regularization
+        return np.linalg.solve(factors.T @ factors + penalty, factors.T @ targets)
+
 
 @lru_cache
 def get_recommendation_service() -> RecommendationService:
@@ -259,9 +281,9 @@ def get_recommendation_service() -> RecommendationService:
 
 
 @lru_cache
-def get_weighted_als_recommendation_service() -> WeightedAlsRecommendationService:
+def get_signed_hybrid_recommendation_service() -> SignedHybridRecommendationService:
     settings = get_settings()
-    return WeightedAlsRecommendationService(
-        artifact=get_weighted_als_artifact(),
+    return SignedHybridRecommendationService(
+        artifact=get_signed_hybrid_artifact(),
         minimum_mapped_ratings=settings.minimum_mapped_ratings,
     )

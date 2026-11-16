@@ -80,7 +80,7 @@ def get_recommendation_artifact() -> RecommendationArtifact:
 
 
 @dataclass(frozen=True)
-class WeightedAlsArtifact:
+class SignedHybridArtifact:
     item_factors: np.ndarray
     item_counts: np.ndarray
     mal_ids: np.ndarray
@@ -90,10 +90,12 @@ class WeightedAlsArtifact:
     fold_in_regularization: float
     popularity_blend: float
     positive_rating_threshold: int
+    signed_fold_in_regularization: float
+    signed_score_weight: float
     model_version: str
 
     @classmethod
-    def from_npz(cls, path: Path) -> WeightedAlsArtifact:
+    def from_npz(cls, path: Path) -> SignedHybridArtifact:
         if not path.is_file():
             raise ArtifactError(f"Recommendation artifact not found: {path}")
         try:
@@ -108,6 +110,8 @@ class WeightedAlsArtifact:
                     "fold_in_regularization",
                     "popularity_blend",
                     "positive_rating_threshold",
+                    "signed_fold_in_regularization",
+                    "signed_score_weight",
                     "model_version",
                 }
                 missing = required - set(data.files)
@@ -123,6 +127,10 @@ class WeightedAlsArtifact:
                     fold_in_regularization=float(data["fold_in_regularization"][0]),
                     popularity_blend=float(data["popularity_blend"][0]),
                     positive_rating_threshold=int(data["positive_rating_threshold"][0]),
+                    signed_fold_in_regularization=float(
+                        data["signed_fold_in_regularization"][0]
+                    ),
+                    signed_score_weight=float(data["signed_score_weight"][0]),
                     model_version=str(data["model_version"][0]),
                 )
         except (OSError, ValueError, IndexError) as error:
@@ -148,11 +156,13 @@ class WeightedAlsArtifact:
             or self.fold_in_regularization <= 0
             or self.popularity_blend < 0
             or not 1 <= self.positive_rating_threshold <= 10
+            or self.signed_fold_in_regularization <= 0
+            or self.signed_score_weight <= 0
             or not self.model_version
         ):
             raise ArtifactError("Artifact scalar parameters are invalid")
 
 
 @lru_cache
-def get_weighted_als_artifact() -> WeightedAlsArtifact:
-    return WeightedAlsArtifact.from_npz(get_settings().model_artifact_path)
+def get_signed_hybrid_artifact() -> SignedHybridArtifact:
+    return SignedHybridArtifact.from_npz(get_settings().model_artifact_path)

@@ -3,12 +3,12 @@ from fastapi.testclient import TestClient
 
 from app.features.anime.client import AniListError, get_anilist_client
 from app.features.anime.schemas import AnimeSearchResult
-from app.features.recommendations.artifact import RecommendationArtifact, WeightedAlsArtifact
+from app.features.recommendations.artifact import RecommendationArtifact, SignedHybridArtifact
 from app.features.recommendations.router import get_available_recommendation_service
 from app.features.recommendations.schemas import RecommendationRequest
 from app.features.recommendations.service import (
     RecommendationService,
-    WeightedAlsRecommendationService,
+    SignedHybridRecommendationService,
 )
 from app.main import app
 
@@ -31,8 +31,8 @@ def _service(preference_weight: float = 0.0) -> RecommendationService:
     )
 
 
-def _weighted_als_service() -> WeightedAlsRecommendationService:
-    artifact = WeightedAlsArtifact(
+def _signed_hybrid_service() -> SignedHybridRecommendationService:
+    artifact = SignedHybridArtifact(
         item_factors=np.asarray(
             [[1.0, 0.0], [0.0, 1.0], [0.9, 0.1], [0.1, 0.9]], dtype=np.float32
         ),
@@ -44,24 +44,54 @@ def _weighted_als_service() -> WeightedAlsRecommendationService:
         fold_in_regularization=1.0,
         popularity_blend=0.0,
         positive_rating_threshold=8,
-        model_version="weighted-fixture-v1",
+        signed_fold_in_regularization=1.0,
+        signed_score_weight=0.5,
+        model_version="signed-hybrid-fixture-v1",
     )
-    return WeightedAlsRecommendationService(artifact, minimum_mapped_ratings=2)
+    return SignedHybridRecommendationService(artifact, minimum_mapped_ratings=2)
 
 
-def test_weighted_als_recommendations_fold_in_and_do_not_fake_predicted_ratings() -> None:
+def test_signed_hybrid_uses_low_ratings_and_does_not_fake_predicted_ratings() -> None:
     ratings = [
         {"mal_id": mal_id, "rating": 10 if mal_id == 1 else 1}
         for mal_id in [1, 2, 100, 101, 102, 103, 104, 105, 106, 107]
     ]
 
-    result = _weighted_als_service().recommend(
+    result = _signed_hybrid_service().recommend(
         RecommendationRequest(ratings=ratings, limit=2)
     )
 
-    assert result.model_version == "weighted-fixture-v1"
+    assert result.model_version == "signed-hybrid-fixture-v1"
     assert [item.mal_id for item in result.items] == [3, 4]
     assert all(item.predicted_rating is None for item in result.items)
+
+
+def test_changing_high_rating_to_low_changes_signed_hybrid_ranking() -> None:
+    service = _signed_hybrid_service()
+    unmapped = [{"mal_id": mal_id, "rating": 5} for mal_id in range(100, 108)]
+    high_first = service.recommend(
+        RecommendationRequest(
+            ratings=[
+                {"mal_id": 1, "rating": 10},
+                {"mal_id": 2, "rating": 1},
+                *unmapped,
+            ],
+            limit=2,
+        )
+    )
+    low_first = service.recommend(
+        RecommendationRequest(
+            ratings=[
+                {"mal_id": 1, "rating": 1},
+                {"mal_id": 2, "rating": 10},
+                *unmapped,
+            ],
+            limit=2,
+        )
+    )
+
+    assert [item.mal_id for item in high_first.items] == [3, 4]
+    assert [item.mal_id for item in low_first.items] == [4, 3]
 
 
 class FakeRecommendationMetadataClient:
