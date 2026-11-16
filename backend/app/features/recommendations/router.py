@@ -1,7 +1,9 @@
+import asyncio
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
+from app.features.anime.cache import TtlCache
 from app.features.anime.client import AniListClient, AniListError, get_anilist_client
 from app.features.recommendations.artifact import ArtifactError
 from app.features.recommendations.schemas import RecommendationRequest, RecommendationResponse
@@ -13,11 +15,19 @@ from app.features.recommendations.service import (
 )
 
 router = APIRouter(prefix="/api/v1/recommendations", tags=["recommendations"])
+SEASON_FAMILY_CACHE = TtlCache[tuple[int, ...], set[int]](
+    ttl_seconds=24 * 60 * 60,
+    max_entries=1_000,
+)
 
 
 async def expand_season_family(
     client: AniListClient, seed_mal_ids: list[int]
 ) -> set[int]:
+    cache_key = tuple(sorted(set(seed_mal_ids)))
+    cached = SEASON_FAMILY_CACHE.get(cache_key)
+    if cached is not None:
+        return set(cached)
     discovered = set(seed_mal_ids)
     frontier = set(seed_mal_ids)
     while frontier and len(discovered) < 500:
@@ -25,6 +35,7 @@ async def expand_season_family(
         neighbors = {related for values in relations.values() for related in values}
         frontier = neighbors - discovered
         discovered.update(frontier)
+    SEASON_FAMILY_CACHE.set(cache_key, set(discovered))
     return discovered
 
 
@@ -107,13 +118,17 @@ async def recommend(
             detail=str(error),
         ) from error
     try:
-        relations = await anilist_client.get_season_relations(
-            [item.mal_id for item in response.items]
+        candidate_ids = [item.mal_id for item in response.items]
+        provisional_ids = candidate_ids[:requested_limit]
+        relations, metadata = await asyncio.gather(
+            anilist_client.get_season_relations(candidate_ids),
+            anilist_client.get_by_mal_ids(provisional_ids),
         )
         response = deduplicate_seasons(response, relations, requested_limit)
-        metadata = await anilist_client.get_by_mal_ids(
-            [item.mal_id for item in response.items]
-        )
+        selected_ids = [item.mal_id for item in response.items]
+        missing_metadata_ids = [mal_id for mal_id in selected_ids if mal_id not in metadata]
+        if missing_metadata_ids:
+            metadata.update(await anilist_client.get_by_mal_ids(missing_metadata_ids))
     except AniListError:
         response = response.model_copy(update={"items": response.items[:requested_limit]})
         return response.model_copy(update={"metadata_status": "unavailable"})

@@ -116,6 +116,12 @@ or `unavailable`; an AniList outage never discards the model results.
 
 The implemented search response is `{ items: AnimeSearchResult[] }`, where each item includes `anilist_id`, nullable `mal_id`, title, cover URL, year, format, genres, AniList average score, and popularity count. Its `sort` query parameter accepts `popularity` (default), `score`, `relevance`, or `newest`; ordering is performed by AniList before limiting results. A null `mal_id` is never replaced by a title match; the frontend shows that result but disables rating it.
 
+AniList access uses one process-scoped async HTTP client with keep-alive connection pooling. Anime
+metadata is cached for six hours; season relations and expanded franchise exclusions are cached for
+24 hours with bounded entry counts. Recommendation enrichment starts the candidate-relation query
+and provisional Top-K metadata query concurrently, then fetches only metadata made newly necessary
+by season deduplication. The model ranker remains independent of AniList availability.
+
 The recommendations client submits every locally rated or archived MAL ID as an explicit ranking
 exclusion and displays the returned Top 10. Scoring an already-watched recommendation persists it through the shared
 ratings feature and triggers a fresh request, so the title disappears and the next unseen candidate

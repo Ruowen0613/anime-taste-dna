@@ -1,3 +1,4 @@
+import asyncio
 from dataclasses import replace
 
 import numpy as np
@@ -9,6 +10,7 @@ from app.features.anime.client import AniListError, get_anilist_client
 from app.features.anime.schemas import AnimeSearchResult
 from app.features.recommendations.artifact import RecommendationArtifact, SignedHybridArtifact
 from app.features.recommendations.router import (
+    SEASON_FAMILY_CACHE,
     deduplicate_seasons,
     expand_season_family,
     get_available_recommendation_service,
@@ -164,6 +166,26 @@ class FailingRecommendationMetadataClient:
         raise AniListError("AniList is unavailable")
 
 
+class ConcurrentRecommendationMetadataClient(FakeRecommendationMetadataClient):
+    def __init__(self) -> None:
+        self.started = 0
+        self.both_started = asyncio.Event()
+
+    async def _meet(self) -> None:
+        self.started += 1
+        if self.started == 2:
+            self.both_started.set()
+        await asyncio.wait_for(self.both_started.wait(), timeout=0.5)
+
+    async def get_season_relations(self, mal_ids: list[int]) -> dict[int, set[int]]:
+        await self._meet()
+        return {mal_id: set() for mal_id in mal_ids}
+
+    async def get_by_mal_ids(self, mal_ids: list[int]) -> dict[int, AnimeSearchResult]:
+        await self._meet()
+        return await super().get_by_mal_ids(mal_ids)
+
+
 def test_deduplicate_seasons_keeps_highest_ranked_title_per_family() -> None:
     response = RecommendationResponse(
         model_version="fixture",
@@ -192,12 +214,50 @@ class FakeSeasonGraphClient:
         return {mal_id: graph.get(mal_id, set()) for mal_id in mal_ids}
 
 
-def test_not_interested_expands_across_entire_season_chain() -> None:
-    import asyncio
+class CountingSeasonGraphClient(FakeSeasonGraphClient):
+    def __init__(self) -> None:
+        self.calls = 0
 
+    async def get_season_relations(self, mal_ids: list[int]) -> dict[int, set[int]]:
+        self.calls += 1
+        return await super().get_season_relations(mal_ids)
+
+
+def test_not_interested_expands_across_entire_season_chain() -> None:
     expanded = asyncio.run(expand_season_family(FakeSeasonGraphClient(), [1]))
 
     assert expanded == {1, 2, 3}
+
+
+def test_expanded_season_family_is_cached() -> None:
+    SEASON_FAMILY_CACHE.clear()
+    client = CountingSeasonGraphClient()
+    first = asyncio.run(expand_season_family(client, [1]))
+    second = asyncio.run(expand_season_family(client, [1]))
+    SEASON_FAMILY_CACHE.clear()
+
+    assert first == second == {1, 2, 3}
+    assert client.calls == 3
+
+
+def test_candidate_relations_and_metadata_are_fetched_concurrently() -> None:
+    service = _service()
+    client = ConcurrentRecommendationMetadataClient()
+    app.dependency_overrides[get_available_recommendation_service] = lambda: service
+    app.dependency_overrides[get_anilist_client] = lambda: client
+    ratings = [
+        {"mal_id": mal_id, "rating": 10 if mal_id == 1 else 1}
+        for mal_id in [1, 2, 100, 101, 102, 103, 104, 105, 106, 107]
+    ]
+    try:
+        response = TestClient(app).post(
+            "/api/v1/recommendations", json={"ratings": ratings, "limit": 2}
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 200
+    assert client.started == 2
 
 
 def test_recommendations_fold_in_user_and_exclude_rated_items() -> None:

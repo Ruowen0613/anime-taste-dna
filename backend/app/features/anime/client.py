@@ -1,9 +1,11 @@
 import html
 import re
+from functools import lru_cache
 from typing import Any
 
 import httpx
 
+from app.features.anime.cache import TtlCache
 from app.features.anime.schemas import AnimeDetails, AnimeReview, AnimeSearchResult
 
 ANILIST_API_URL = "https://graphql.anilist.co"
@@ -89,7 +91,9 @@ query AnimeSeasonRelations($malIds: [Int], $perPage: Int!) {
 }
 """
 
-SEASON_RELATION_CACHE: dict[int, set[int]] = {}
+METADATA_CACHE_TTL_SECONDS = 6 * 60 * 60
+RELATION_CACHE_TTL_SECONDS = 24 * 60 * 60
+ANILIST_CACHE_MAX_ENTRIES = 5_000
 
 
 class AniListError(RuntimeError):
@@ -99,6 +103,14 @@ class AniListError(RuntimeError):
 class AniListClient:
     def __init__(self, client: httpx.AsyncClient | None = None) -> None:
         self._client = client
+        self._metadata_cache = TtlCache[int, AnimeSearchResult](
+            ttl_seconds=METADATA_CACHE_TTL_SECONDS,
+            max_entries=ANILIST_CACHE_MAX_ENTRIES,
+        )
+        self._season_relation_cache = TtlCache[int, set[int]](
+            ttl_seconds=RELATION_CACHE_TTL_SECONDS,
+            max_entries=ANILIST_CACHE_MAX_ENTRIES,
+        )
 
     async def search(self, query: str, limit: int, sort: str) -> list[AnimeSearchResult]:
         owns_client = self._client is None
@@ -151,22 +163,43 @@ class AniListClient:
             raise AniListError("AniList returned an invalid response") from exc
 
     async def get_by_mal_ids(self, mal_ids: list[int]) -> dict[int, AnimeSearchResult]:
-        if not mal_ids:
-            return {}
-        payload = await self._request(
-            MAL_IDS_QUERY,
-            {"malIds": mal_ids, "perPage": len(mal_ids)},
-        )
-        try:
-            media = payload["data"]["Page"]["media"]
-            parsed = [self._parse_item(item) for item in media]
-            return {item.mal_id: item for item in parsed if item.mal_id is not None}
-        except (KeyError, TypeError, AttributeError) as exc:
-            raise AniListError("AniList returned invalid recommendation metadata") from exc
+        unique_ids = list(dict.fromkeys(mal_ids))
+        result: dict[int, AnimeSearchResult] = {}
+        missing = []
+        for mal_id in unique_ids:
+            cached = self._metadata_cache.get(mal_id)
+            if cached is None:
+                missing.append(mal_id)
+            else:
+                result[mal_id] = cached
+        for start in range(0, len(missing), 50):
+            batch = missing[start : start + 50]
+            payload = await self._request(
+                MAL_IDS_QUERY,
+                {"malIds": batch, "perPage": len(batch)},
+            )
+            try:
+                media = payload["data"]["Page"]["media"]
+                for item in media:
+                    parsed = self._parse_item(item)
+                    if parsed.mal_id is None:
+                        continue
+                    result[parsed.mal_id] = parsed
+                    self._metadata_cache.set(parsed.mal_id, parsed)
+            except (KeyError, TypeError, AttributeError) as exc:
+                raise AniListError("AniList returned invalid recommendation metadata") from exc
+        return result
 
     async def get_season_relations(self, mal_ids: list[int]) -> dict[int, set[int]]:
         unique_ids = list(dict.fromkeys(mal_ids))
-        missing = [mal_id for mal_id in unique_ids if mal_id not in SEASON_RELATION_CACHE]
+        result: dict[int, set[int]] = {}
+        missing = []
+        for mal_id in unique_ids:
+            cached = self._season_relation_cache.get(mal_id)
+            if cached is None:
+                missing.append(mal_id)
+            else:
+                result[mal_id] = set(cached)
         for start in range(0, len(missing), 50):
             batch = missing[start : start + 50]
             payload = await self._request(
@@ -175,13 +208,12 @@ class AniListClient:
             )
             try:
                 media = payload["data"]["Page"]["media"]
-                for mal_id in batch:
-                    SEASON_RELATION_CACHE.setdefault(mal_id, set())
+                batch_relations = {mal_id: set() for mal_id in batch}
                 for item in media:
                     mal_id = item.get("idMal")
                     if mal_id is None:
                         continue
-                    neighbors = SEASON_RELATION_CACHE.setdefault(mal_id, set())
+                    neighbors = batch_relations.setdefault(mal_id, set())
                     for edge in (item.get("relations") or {}).get("edges") or []:
                         node = edge.get("node") or {}
                         related_mal_id = node.get("idMal")
@@ -191,12 +223,16 @@ class AniListClient:
                             and related_mal_id is not None
                         ):
                             neighbors.add(int(related_mal_id))
+                for mal_id, neighbors in batch_relations.items():
+                    self._season_relation_cache.set(mal_id, set(neighbors))
+                    result[mal_id] = neighbors
             except (KeyError, TypeError, AttributeError) as exc:
                 raise AniListError("AniList returned invalid season relations") from exc
-        return {
-            mal_id: set(SEASON_RELATION_CACHE.get(mal_id, set()))
-            for mal_id in unique_ids
-        }
+        return {mal_id: set(result.get(mal_id, set())) for mal_id in unique_ids}
+
+    async def aclose(self) -> None:
+        if self._client is not None:
+            await self._client.aclose()
 
     async def _request(self, query: str, variables: dict[str, Any]) -> dict[str, Any]:
         owns_client = self._client is None
@@ -259,5 +295,16 @@ class AniListClient:
         return html.unescape(without_tags).strip()
 
 
+@lru_cache
 def get_anilist_client() -> AniListClient:
-    return AniListClient()
+    http_client = httpx.AsyncClient(
+        timeout=8.0,
+        limits=httpx.Limits(max_connections=20, max_keepalive_connections=10),
+    )
+    return AniListClient(http_client)
+
+
+async def close_anilist_client() -> None:
+    if get_anilist_client.cache_info().currsize:
+        await get_anilist_client().aclose()
+        get_anilist_client.cache_clear()
