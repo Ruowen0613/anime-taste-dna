@@ -125,6 +125,33 @@ anime-taste-negative-feedback --config configs/negative_feedback.toml
 The executed report is `reports/negative-feedback-validation-v1.json`. The measured improvement was
 negligible, so this behavior is not enabled in production.
 
+## Signed explicit-rating hybrid
+
+Validate a bounded signed residual on top of the fixed Weighted ALS production score:
+
+```bash
+anime-taste-signed-hybrid-validation --config configs/signed_hybrid_validation.toml
+```
+
+The selection protocol requires Recall@10/NDCG@10 together with three product-behavior gates:
+changing high ratings to 1 must materially change Top 10, recommendations must not reproduce the
+pure popularity Top 10, and catalog coverage must exceed 1% of supported items. After freezing the
+winner, run the final test once:
+
+```bash
+anime-taste-signed-hybrid-test --config configs/signed_hybrid_test.toml
+```
+
+The frozen candidate passed both ranking metrics against interaction-count popularity and all
+behavior gates. Export its derived artifact without re-running evaluation:
+
+```bash
+anime-taste-export-signed-hybrid \
+  --source-artifact ../data/artifacts/weighted-als-hybrid-v1/weighted_als_hybrid.npz \
+  --test-report reports/signed-hybrid-test-v1.json \
+  --output-artifact ../data/artifacts/signed-rating-hybrid-v1/signed_rating_hybrid.npz
+```
+
 ## Pairwise Taste Quiz evaluation
 
 Evaluate the experimental pairwise protocol against the fixed exported model:

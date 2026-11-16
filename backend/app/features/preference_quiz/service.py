@@ -5,13 +5,13 @@ from functools import lru_cache
 import numpy as np
 
 from app.features.recommendations.artifact import (
-    WeightedAlsArtifact,
-    get_weighted_als_artifact,
+    SignedHybridArtifact,
+    get_signed_hybrid_artifact,
 )
 
 
 class PreferenceQuizService:
-    def __init__(self, artifact: WeightedAlsArtifact) -> None:
+    def __init__(self, artifact: SignedHybridArtifact) -> None:
         self.artifact = artifact
 
     def candidate_mal_ids(self, excluded_mal_ids: list[int], pool_size: int = 24) -> list[int]:
@@ -33,4 +33,4 @@ class PreferenceQuizService:
 
 @lru_cache
 def get_preference_quiz_service() -> PreferenceQuizService:
-    return PreferenceQuizService(get_weighted_als_artifact())
+    return PreferenceQuizService(get_signed_hybrid_artifact())

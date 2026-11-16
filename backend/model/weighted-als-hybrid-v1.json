@@ -1,7 +1,0 @@
-{
-  "model_version": "weighted-als-hybrid-v1",
-  "filename": "weighted_als_hybrid.npz",
-  "size_bytes": 1674702,
-  "sha256": "7137ffdd78543bf70322e1978b1f00307a96efc27baca84ff7640e0c5a2e0288",
-  "strict_test_report": "ml/reports/strict-cold-start-weighted-als-test-v1.json"
-}

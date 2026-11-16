@@ -37,6 +37,9 @@ anime-taste-strict-mf = "anime_taste_dna.models.strict_matrix_factorization:main
 anime-taste-weighted-als = "anime_taste_dna.models.weighted_als:main"
 anime-taste-weighted-als-test = "anime_taste_dna.evaluation.weighted_als_test:main"
 anime-taste-negative-feedback = "anime_taste_dna.evaluation.negative_feedback:main"
+anime-taste-signed-hybrid-validation = "anime_taste_dna.evaluation.signed_hybrid_validation:main"
+anime-taste-signed-hybrid-test = "anime_taste_dna.evaluation.signed_hybrid_test:main"
+anime-taste-export-signed-hybrid = "anime_taste_dna.models.export_signed_hybrid:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

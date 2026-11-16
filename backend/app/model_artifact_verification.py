@@ -34,6 +34,8 @@ def verify_model_artifact(artifact_path: Path, manifest_path: Path) -> None:
         "fold_in_regularization",
         "popularity_blend",
         "positive_rating_threshold",
+        "signed_fold_in_regularization",
+        "signed_score_weight",
         "model_version",
     }
     with np.load(artifact_path, allow_pickle=False) as artifact:
