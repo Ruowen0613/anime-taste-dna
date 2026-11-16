@@ -122,5 +122,8 @@ page header while a replacement is generated.
 
 - **Vercel:** builds `frontend/`; injects public `VITE_API_BASE_URL` pointing to Cloud Run.
 - **Cloud Run:** runs the backend Docker image containing API code and the selected compact inference artifact. The build verifies the artifact against the committed size, SHA-256, schema, and model-version manifest. Uvicorn exposes the configured port and replicas remain stateless.
-- **GitHub Actions:** on pull requests/pushes, installs locked dependencies and runs frontend lint/type-check/build plus Python lint/tests. Deployment workflows are added after environments and credentials exist.
+- **GitHub Actions:** pull requests run frontend lint/type-check/build plus Python lint/tests. After
+  those checks pass on `main`, a keyless Workload Identity Federation workflow restores the
+  versioned model from private GCS, builds and pushes an immutable backend image, deploys it to
+  Cloud Run, and smoke-tests the resulting service.
 - **Artifacts/data:** large datasets, experimental checkpoints, and the production artifact stay outside Git. The release image is built only after the selected artifact has been restored to its ignored versioned path; the Docker build enforces the committed manifest before packaging it. The resulting immutable image, rather than an unverified loose artifact, is promoted to Cloud Run.

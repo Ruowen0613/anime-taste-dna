@@ -43,3 +43,4 @@ htmlcov/
 coverage/
 *.log
 .vercel
+gha-creds-*.json
