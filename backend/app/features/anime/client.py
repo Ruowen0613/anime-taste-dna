@@ -73,6 +73,23 @@ query AnimeByMalIds($malIds: [Int], $perPage: Int!) {
   }
 }
 """
+SEASON_RELATIONS_QUERY = """
+query AnimeSeasonRelations($malIds: [Int], $perPage: Int!) {
+  Page(page: 1, perPage: $perPage) {
+    media(type: ANIME, idMal_in: $malIds) {
+      idMal
+      relations {
+        edges {
+          relationType
+          node { type idMal }
+        }
+      }
+    }
+  }
+}
+"""
+
+SEASON_RELATION_CACHE: dict[int, set[int]] = {}
 
 
 class AniListError(RuntimeError):
@@ -146,6 +163,40 @@ class AniListClient:
             return {item.mal_id: item for item in parsed if item.mal_id is not None}
         except (KeyError, TypeError, AttributeError) as exc:
             raise AniListError("AniList returned invalid recommendation metadata") from exc
+
+    async def get_season_relations(self, mal_ids: list[int]) -> dict[int, set[int]]:
+        unique_ids = list(dict.fromkeys(mal_ids))
+        missing = [mal_id for mal_id in unique_ids if mal_id not in SEASON_RELATION_CACHE]
+        for start in range(0, len(missing), 50):
+            batch = missing[start : start + 50]
+            payload = await self._request(
+                SEASON_RELATIONS_QUERY,
+                {"malIds": batch, "perPage": len(batch)},
+            )
+            try:
+                media = payload["data"]["Page"]["media"]
+                for mal_id in batch:
+                    SEASON_RELATION_CACHE.setdefault(mal_id, set())
+                for item in media:
+                    mal_id = item.get("idMal")
+                    if mal_id is None:
+                        continue
+                    neighbors = SEASON_RELATION_CACHE.setdefault(mal_id, set())
+                    for edge in (item.get("relations") or {}).get("edges") or []:
+                        node = edge.get("node") or {}
+                        related_mal_id = node.get("idMal")
+                        if (
+                            edge.get("relationType") in {"PREQUEL", "SEQUEL"}
+                            and node.get("type") == "ANIME"
+                            and related_mal_id is not None
+                        ):
+                            neighbors.add(int(related_mal_id))
+            except (KeyError, TypeError, AttributeError) as exc:
+                raise AniListError("AniList returned invalid season relations") from exc
+        return {
+            mal_id: set(SEASON_RELATION_CACHE.get(mal_id, set()))
+            for mal_id in unique_ids
+        }
 
     async def _request(self, query: str, variables: dict[str, Any]) -> dict[str, Any]:
         owns_client = self._client is None

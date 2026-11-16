@@ -165,6 +165,7 @@ def recommend_signed_hybrid(
     ranking_k: int,
     user_batch_size: int,
     flip_high_ratings: bool = False,
+    popularity_blend_override: float | None = None,
 ) -> tuple[np.ndarray, float]:
     recommendations = []
     signed_norm_sum = 0.0
@@ -191,7 +192,12 @@ def recommend_signed_hybrid(
         production_scores = _standardize_rows(
             implicit_profiles @ raw_item_factors.T, supported
         )
-        production_scores += artifact_parameters.popularity_blend * popularity[None, :]
+        popularity_blend = (
+            artifact_parameters.popularity_blend
+            if popularity_blend_override is None
+            else popularity_blend_override
+        )
+        production_scores += popularity_blend * popularity[None, :]
         production_scores = _standardize_rows(production_scores, supported)
 
         signed_profiles = fold_in_signed_profiles(
@@ -226,6 +232,7 @@ def evaluate_candidate(
     artifact_parameters: FixedArtifactParameters,
     config: SignedHybridValidationConfig,
     include_counterfactual: bool,
+    popularity_blend_override: float | None = None,
 ) -> dict[str, float | int]:
     recommendations, mean_norm = recommend_signed_hybrid(
         users,
@@ -240,6 +247,7 @@ def evaluate_candidate(
         artifact_parameters,
         config.ranking_k,
         config.user_batch_size,
+        popularity_blend_override=popularity_blend_override,
     )
     recall, ndcg = _ranking_metrics(
         users,
@@ -282,6 +290,7 @@ def evaluate_candidate(
             config.ranking_k,
             config.user_batch_size,
             flip_high_ratings=True,
+            popularity_blend_override=popularity_blend_override,
         )
         metrics["high_to_low_counterfactual_top_10_overlap"] = round(
             _top_k_overlap(recommendations, flipped), 8

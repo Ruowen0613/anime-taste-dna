@@ -14,6 +14,12 @@ export function useAnimeDetails() {
     controller.current?.abort()
     setSelected(anime)
     setError('')
+    if (anime.anilist_id === null) {
+      setDetails(null)
+      setLoading(false)
+      setError('Details are not available for this title yet.')
+      return
+    }
     const cached = cache.current.get(anime.anilist_id)
     if (cached) {
       setDetails(cached)

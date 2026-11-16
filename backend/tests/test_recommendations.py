@@ -1,11 +1,23 @@
+from dataclasses import replace
+
 import numpy as np
+import pytest
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 
 from app.features.anime.client import AniListError, get_anilist_client
 from app.features.anime.schemas import AnimeSearchResult
 from app.features.recommendations.artifact import RecommendationArtifact, SignedHybridArtifact
-from app.features.recommendations.router import get_available_recommendation_service
-from app.features.recommendations.schemas import RecommendationRequest
+from app.features.recommendations.router import (
+    deduplicate_seasons,
+    expand_season_family,
+    get_available_recommendation_service,
+)
+from app.features.recommendations.schemas import (
+    RecommendationItem,
+    RecommendationRequest,
+    RecommendationResponse,
+)
 from app.features.recommendations.service import (
     RecommendationService,
     SignedHybridRecommendationService,
@@ -46,6 +58,8 @@ def _signed_hybrid_service() -> SignedHybridRecommendationService:
         positive_rating_threshold=8,
         signed_fold_in_regularization=1.0,
         signed_score_weight=0.5,
+        popularity_decay_pivot=10,
+        popularity_decay_exponent=1.0,
         model_version="signed-hybrid-fixture-v1",
     )
     return SignedHybridRecommendationService(artifact, minimum_mapped_ratings=2)
@@ -94,7 +108,37 @@ def test_changing_high_rating_to_low_changes_signed_hybrid_ranking() -> None:
     assert [item.mal_id for item in low_first.items] == [4, 3]
 
 
+def test_popularity_blend_decays_after_rating_pivot() -> None:
+    fixture = _signed_hybrid_service()
+    service = SignedHybridRecommendationService(
+        replace(fixture.artifact, popularity_blend=32.0), minimum_mapped_ratings=2
+    )
+
+    assert service._effective_popularity_blend(5) == 32.0
+    assert service._effective_popularity_blend(10) == 32.0
+    assert service._effective_popularity_blend(20) == 16.0
+    assert service._effective_popularity_blend(80) == 4.0
+
+
+def test_request_accepts_up_to_100_unique_ratings() -> None:
+    request = RecommendationRequest(
+        ratings=[{"mal_id": mal_id, "rating": 8} for mal_id in range(1, 101)]
+    )
+
+    assert len(request.ratings) == 100
+
+
+def test_request_rejects_more_than_100_ratings() -> None:
+    with pytest.raises(ValidationError):
+        RecommendationRequest(
+            ratings=[{"mal_id": mal_id, "rating": 8} for mal_id in range(1, 102)]
+        )
+
+
 class FakeRecommendationMetadataClient:
+    async def get_season_relations(self, mal_ids: list[int]) -> dict[int, set[int]]:
+        return {mal_id: set() for mal_id in mal_ids}
+
     async def get_by_mal_ids(self, mal_ids: list[int]) -> dict[int, AnimeSearchResult]:
         assert mal_ids == [3, 4]
         return {
@@ -113,8 +157,47 @@ class FakeRecommendationMetadataClient:
 
 
 class FailingRecommendationMetadataClient:
+    async def get_season_relations(self, mal_ids: list[int]) -> dict[int, set[int]]:
+        raise AniListError("AniList is unavailable")
+
     async def get_by_mal_ids(self, mal_ids: list[int]) -> dict[int, AnimeSearchResult]:
         raise AniListError("AniList is unavailable")
+
+
+def test_deduplicate_seasons_keeps_highest_ranked_title_per_family() -> None:
+    response = RecommendationResponse(
+        model_version="fixture",
+        mapped_ratings=10,
+        unmapped_mal_ids=[],
+        items=[
+            RecommendationItem(mal_id=1, title="Season 1", rank=1),
+            RecommendationItem(mal_id=2, title="Season 2", rank=2),
+            RecommendationItem(mal_id=3, title="Another show", rank=3),
+        ],
+    )
+
+    deduplicated = deduplicate_seasons(
+        response,
+        {1: {2}, 2: {1}, 3: set()},
+        limit=10,
+    )
+
+    assert [item.mal_id for item in deduplicated.items] == [1, 3]
+    assert [item.rank for item in deduplicated.items] == [1, 2]
+
+
+class FakeSeasonGraphClient:
+    async def get_season_relations(self, mal_ids: list[int]) -> dict[int, set[int]]:
+        graph = {1: {2}, 2: {1, 3}, 3: {2}}
+        return {mal_id: graph.get(mal_id, set()) for mal_id in mal_ids}
+
+
+def test_not_interested_expands_across_entire_season_chain() -> None:
+    import asyncio
+
+    expanded = asyncio.run(expand_season_family(FakeSeasonGraphClient(), [1]))
+
+    assert expanded == {1, 2, 3}
 
 
 def test_recommendations_fold_in_user_and_exclude_rated_items() -> None:

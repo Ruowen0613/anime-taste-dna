@@ -137,6 +137,32 @@ ratings materially affect ranking and tripling catalog coverage. It therefore pa
 production gate. Full executed validation and test evidence is stored in
 `signed-hybrid-validation-v1.json` and `signed-hybrid-test-v1.json`.
 
+### Rating-count-aware popularity decay
+
+The initial signed hybrid still used the same popularity blend of 32 whether a new user supplied
+5 or 80 ratings. On a common validation cohort of 1,801 users, keeping that fixed blend caused
+popularity overlap to rise from 63.72% at five ratings to 73.66% at 80 ratings while catalog
+coverage fell from 297 to 102 items. More user evidence was therefore making the result set less
+diverse and more popularity-like.
+
+Validation compared fixed popularity with square-root and linear decay after a ten-rating pivot.
+The linear schedule `32 * min(1, 10 / mapped_ratings)` was frozen because it produced the lowest
+popularity overlap while staying within the preregistered 3% mean Recall/NDCG tolerance. No test
+data was accessed during selection.
+
+The frozen schedule was then evaluated once on 1,798 strict test users:
+
+| Model | Mean Recall@10 | Mean NDCG@10 | Mean popularity overlap | 80-rating coverage |
+|---|---:|---:|---:|---:|
+| Fixed popularity blend | 0.02997806 | 0.61059988 | 69.76% | 96 items |
+| Rating-count-aware decay | 0.03021223 | 0.61320374 | 62.26% | 189 items |
+
+At 80 ratings specifically, decay improved Recall@10 from 0.03232034 to 0.03299997 and NDCG@10
+from 0.65499733 to 0.66080215, while reducing popularity overlap from 73.40% to 51.91%. The change
+therefore improved both ranking accuracy and personalization rather than trading one for the other.
+The exported production artifact is `signed-rating-hybrid-v2`; validation and test evidence is in
+`rating-scale-validation-v1.json` and `rating-scale-test-v1.json`.
+
 ## Protocol
 
 Both models use the same deterministic per-user chronological train, validation, and test split.

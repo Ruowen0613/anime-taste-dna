@@ -15,9 +15,10 @@ export async function getRecommendations(ratings: RatedAnime[], archivedMalIds: 
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        ratings: ratings.slice(-20).map(({ mal_id, rating }) => ({ mal_id, rating })),
+        ratings: ratings.slice(-100).map(({ mal_id, rating }) => ({ mal_id, rating })),
         preferences: preferences.slice(-20),
         excluded_mal_ids: excludedMalIds,
+        not_interested_mal_ids: archivedMalIds,
         limit: 10,
       }),
       signal: controller.signal,
