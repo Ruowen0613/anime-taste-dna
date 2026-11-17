@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, PositiveInt
 
 
 class AnimeSearchResult(BaseModel):
@@ -16,6 +16,10 @@ class AnimeSearchResult(BaseModel):
 
 class AnimeSearchResponse(BaseModel):
     items: list[AnimeSearchResult]
+
+
+class AnimeMetadataRequest(BaseModel):
+    mal_ids: list[PositiveInt] = Field(min_length=1, max_length=100)
 
 
 class AnimeReview(BaseModel):

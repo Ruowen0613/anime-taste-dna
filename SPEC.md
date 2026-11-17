@@ -2,7 +2,7 @@
 
 ## Overview and goals
 
-Anime Taste DNA is a personalized anime discovery web app. A visitor rates 10–20 watched titles, receives a machine-learning-generated Top 10, and explores an interpretable profile of their genre and theme preferences.
+Anime Taste DNA is a personalized anime discovery web app. A visitor rates at least 10 watched titles, can strengthen the profile through a model-supported Popular Picks catalog, and receives a machine-learning-generated Top 10.
 
 The MVP should be functional, deployed, reproducible, and credible as an AI/Applied Computing portfolio project by **October 31, 2026**. Success means a polished end-to-end product backed by honest offline evaluation—not an LLM or a disguised popularity list.
 
@@ -18,12 +18,18 @@ The MVP should be functional, deployed, reproducible, and credible as an AI/Appl
 
 ## Main screens
 
-### Discover
+### Popular Picks
 
-- Search by title and show cover, title, year/format, and genres.
-- Rate titles from 1–10 and show the current rated list.
-- Edit or remove any rating.
-- Indicate progress toward the minimum recommended input count.
+- Show the 100 most-interacted-with titles supported by the model for direct rating.
+- Use one type-ahead search to filter those titles and surface AniList results outside the Top 100.
+- Let visitors rate 1–10 or mark a title not interested without searching first.
+
+### My Ratings
+
+- Show every locally rated title with cover, title, year/format, and genres.
+- Edit or remove any rating and sort the collection.
+- Manage not-interested titles in a collapsed card section and selectively restore them to the recommendation pool.
+- Indicate progress toward the minimum recommended input count and open recommendations.
 
 ### Recommendations
 
@@ -40,8 +46,8 @@ The MVP should be functional, deployed, reproducible, and credible as an AI/Appl
 
 ## User journey
 
-1. The visitor lands on Discover and searches for watched anime.
-2. They rate at least 10 titles; ratings remain available after refresh.
+1. The visitor lands on Popular Picks and rates familiar titles or searches the AniList catalog.
+2. They manage at least 10 local ratings in My Ratings; ratings remain available after refresh.
 3. They request recommendations; the frontend submits item IDs and ratings.
 4. The backend validates input, folds the new user into fixed item embeddings, ranks unseen items, and enriches the Top 10 with metadata.
 5. The visitor reviews explanations, adjusts ratings if desired, and explores Taste DNA.
@@ -51,7 +57,7 @@ The MVP should be functional, deployed, reproducible, and credible as an AI/Appl
 - FR-1: Search accepts a non-empty query and returns consistently identified anime metadata.
 - FR-2: Ratings accept integer values 1–10 and are uniquely keyed by canonical anime ID.
 - FR-3: Local ratings survive reload and can be edited/deleted.
-- FR-4: Recommendation requests accept 10–20 ratings for the primary flow and return no rated item.
+- FR-4: Recommendation requests accept 10–100 ratings, reduce popularity influence as mapped evidence grows beyond 10 ratings, and return no rated item.
 - FR-5: Results are deterministic for a fixed artifact, request, and seed where optimization permits.
 - FR-6: Explanations cite metadata or computable item/user similarity; they must not make unsupported causal claims.
 - FR-7: Taste DNA scores are derived reproducibly from ratings and metadata.

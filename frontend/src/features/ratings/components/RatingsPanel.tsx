@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import type { AnimeSearchResult, RatedAnime } from '../types'
+import type { AnimeSearchResult, RatedAnime } from '../../discover/types'
 
 type SortOption = 'score-desc' | 'score-asc' | 'title' | 'year-desc'
 
@@ -9,9 +9,10 @@ type RatingsPanelProps = {
   onRemove: (malId: number) => void
   onOpen: (anime: AnimeSearchResult) => void
   onRecommend: () => void
+  hideVisualTitle?: boolean
 }
 
-export function RatingsPanel({ ratings, onRate, onRemove, onOpen, onRecommend }: RatingsPanelProps) {
+export function RatingsPanel({ ratings, onRate, onRemove, onOpen, onRecommend, hideVisualTitle = false }: RatingsPanelProps) {
   const [editingMalId, setEditingMalId] = useState<number | null>(null)
   const [sortBy, setSortBy] = useState<SortOption>('score-desc')
   const sortedRatings = useMemo(() => [...ratings].sort((left, right) => {
@@ -25,7 +26,7 @@ export function RatingsPanel({ ratings, onRate, onRemove, onOpen, onRecommend }:
     <section className="border-t border-white/10 py-10" aria-labelledby="ratings-heading">
       <div className="flex items-end justify-between gap-4">
         <div>
-          <h2 id="ratings-heading" className="text-2xl font-semibold">Your ratings</h2>
+          <h2 id="ratings-heading" className={hideVisualTitle ? 'sr-only' : 'text-2xl font-semibold'}>Your ratings</h2>
           <p className="mt-1 text-sm text-slate-400">{ratings.length}/10 minimum ratings</p>
         </div>
         <div className="flex flex-col items-end gap-3">
@@ -55,7 +56,7 @@ export function RatingsPanel({ ratings, onRate, onRemove, onOpen, onRecommend }:
         </div>
       )}
       {ratings.length === 0 ? (
-        <p className="mt-8 rounded-2xl border border-dashed border-white/15 p-8 text-center text-slate-400">Search above and rate your first anime.</p>
+        <p className="mt-8 rounded-2xl border border-dashed border-white/15 p-8 text-center text-slate-400">Go to Popular Picks to rate your first anime.</p>
       ) : (
         <ul className="mt-8 grid gap-4 md:grid-cols-2">
           {sortedRatings.map((anime) => (

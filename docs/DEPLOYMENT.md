@@ -18,11 +18,11 @@ The workflow downloads this versioned artifact before building:
 
 ```text
 gs://anime-taste-dna-models-197238956100/
-  signed-rating-hybrid-v1/signed_rating_hybrid.npz
+  signed-rating-hybrid-v2/signed_rating_hybrid.npz
 ```
 
 The Docker build fails unless the artifact matches the committed byte size, SHA-256, required
-arrays, dimensions, and model version in `backend/model/signed-rating-hybrid-v1.json`. A successful
+arrays, dimensions, and model version in `backend/model/signed-rating-hybrid-v2.json`. A successful
 build is pushed under the source commit SHA, deployed with `min-instances=0` and `max-instances=1`,
 and accepted only after the public `/health` smoke test passes.
 

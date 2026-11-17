@@ -1,6 +1,6 @@
 export type AnimeSearchResult = {
   mal_id: number | null
-  anilist_id: number
+  anilist_id: number | null
   title: string
   cover_image_url: string | null
   year: number | null

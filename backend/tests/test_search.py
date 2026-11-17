@@ -61,6 +61,48 @@ def test_search_converts_upstream_failure_to_bad_gateway() -> None:
     assert response.json() == {"detail": "AniList search is temporarily unavailable"}
 
 
+class FakeMetadataClient:
+    async def get_by_mal_ids(self, mal_ids: list[int]) -> dict[int, AnimeSearchResult]:
+        assert mal_ids == [5114, 16498]
+        return {
+            16498: AnimeSearchResult(
+                mal_id=16498,
+                anilist_id=16498,
+                title="Attack on Titan",
+                year=2013,
+                format="TV",
+                genres=["Action", "Drama"],
+            ),
+            5114: AnimeSearchResult(
+                mal_id=5114,
+                anilist_id=5114,
+                title="Fullmetal Alchemist: Brotherhood",
+                year=2009,
+                format="TV",
+                genres=["Action", "Adventure"],
+            ),
+        }
+
+
+def test_metadata_returns_items_in_requested_order_and_deduplicates_ids() -> None:
+    app.dependency_overrides[get_anilist_client] = lambda: FakeMetadataClient()
+    try:
+        response = TestClient(app).post(
+            "/api/v1/anime/metadata",
+            json={"mal_ids": [5114, 16498, 5114]},
+        )
+    finally:
+        app.dependency_overrides.clear()
+
+    assert response.status_code == 200
+    assert [item["mal_id"] for item in response.json()["items"]] == [5114, 16498]
+
+
+def test_metadata_rejects_empty_ids() -> None:
+    response = TestClient(app).post("/api/v1/anime/metadata", json={"mal_ids": []})
+    assert response.status_code == 422
+
+
 class FakeDetailsClient:
     async def get_details(self, anilist_id: int) -> AnimeDetails | None:
         assert anilist_id == 16498

@@ -92,6 +92,8 @@ class SignedHybridArtifact:
     positive_rating_threshold: int
     signed_fold_in_regularization: float
     signed_score_weight: float
+    popularity_decay_pivot: int
+    popularity_decay_exponent: float
     model_version: str
 
     @classmethod
@@ -112,6 +114,8 @@ class SignedHybridArtifact:
                     "positive_rating_threshold",
                     "signed_fold_in_regularization",
                     "signed_score_weight",
+                    "popularity_decay_pivot",
+                    "popularity_decay_exponent",
                     "model_version",
                 }
                 missing = required - set(data.files)
@@ -131,6 +135,8 @@ class SignedHybridArtifact:
                         data["signed_fold_in_regularization"][0]
                     ),
                     signed_score_weight=float(data["signed_score_weight"][0]),
+                    popularity_decay_pivot=int(data["popularity_decay_pivot"][0]),
+                    popularity_decay_exponent=float(data["popularity_decay_exponent"][0]),
                     model_version=str(data["model_version"][0]),
                 )
         except (OSError, ValueError, IndexError) as error:
@@ -158,6 +164,8 @@ class SignedHybridArtifact:
             or not 1 <= self.positive_rating_threshold <= 10
             or self.signed_fold_in_regularization <= 0
             or self.signed_score_weight <= 0
+            or self.popularity_decay_pivot <= 0
+            or self.popularity_decay_exponent < 0
             or not self.model_version
         ):
             raise ArtifactError("Artifact scalar parameters are invalid")

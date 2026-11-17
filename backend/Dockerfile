@@ -10,9 +10,9 @@ COPY backend/pyproject.toml /tmp/backend/pyproject.toml
 COPY backend/app /tmp/backend/app
 RUN python -m pip install --no-cache-dir /tmp/backend
 
-COPY backend/model/signed-rating-hybrid-v1.json /app/model-manifest.json
+COPY backend/model/signed-rating-hybrid-v2.json /app/model-manifest.json
 COPY backend/scripts/verify_model_artifact.py /app/scripts/verify_model_artifact.py
-COPY data/artifacts/signed-rating-hybrid-v1/signed_rating_hybrid.npz /app/data/signed_rating_hybrid.npz
+COPY data/artifacts/signed-rating-hybrid-v2/signed_rating_hybrid.npz /app/data/signed_rating_hybrid.npz
 
 RUN python /app/scripts/verify_model_artifact.py \
     --artifact /app/data/signed_rating_hybrid.npz \

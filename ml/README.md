@@ -148,8 +148,9 @@ behavior gates. Export its derived artifact without re-running evaluation:
 ```bash
 anime-taste-export-signed-hybrid \
   --source-artifact ../data/artifacts/weighted-als-hybrid-v1/weighted_als_hybrid.npz \
-  --test-report reports/signed-hybrid-test-v1.json \
-  --output-artifact ../data/artifacts/signed-rating-hybrid-v1/signed_rating_hybrid.npz
+  --signed-test-report reports/signed-hybrid-test-v1.json \
+  --rating-scale-test-report reports/rating-scale-test-v1.json \
+  --output-artifact ../data/artifacts/signed-rating-hybrid-v2/signed_rating_hybrid.npz
 ```
 
 ## Pairwise Taste Quiz evaluation

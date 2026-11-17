@@ -16,7 +16,7 @@ The deployable system has one static frontend and one stateless API. Data prepar
 
 ## Components
 
-- `frontend/`: React/TypeScript SPA, rating state in local storage, REST client, Discover/Recommendations/Taste DNA views.
+- `frontend/`: React/TypeScript SPA, rating state in local storage, REST client, Popular Picks/My Ratings/Recommendations/Taste DNA views.
 - `backend/`: FastAPI application, request validation, AniList adapter, artifact loader, cold-start inference, ranking, explanation/Taste DNA services.
 - `ml/`: dataset preparation, split creation, baseline, PyTorch training, fold-in/evaluation, and artifact export.
 - `scripts/`: repeatable developer and data utility entry points.
@@ -51,7 +51,7 @@ factors instead of disappearing from the user profile. Global factors train only
 training-user group; validation and test users are disjoint. Seeds, hyperparameters, filters, and
 dataset fingerprints accompany each run.
 
-Evaluation simulates genuinely new users: expose 5, 10, or 20 ratings from users absent from global training, fold in a user representation with frozen item parameters, and rank the complete train-supported catalog while excluding only exposed ratings. Models share users, targets, candidates, and relevance rules. Report Recall@10, NDCG@10, catalog coverage, eligible-user counts, and limitations.
+Evaluation simulates genuinely new users: expose 5, 10, 20, 40, or 80 ratings from users absent from global training, fold in a user representation with frozen item parameters, and rank the complete train-supported catalog while excluding only exposed ratings. Models share users, targets, candidates, and relevance rules. Report Recall@10, NDCG@10, catalog coverage, popularity overlap, eligible-user counts, and limitations.
 
 Export a compact, versioned bundle containing item factors, interaction counts, MAL-ID maps, the
 supported mask, both fixed fold-in configurations, blend parameters, titles, and model version. Raw
@@ -61,10 +61,10 @@ training data and historical user factors are not required by the API.
 
 At process startup, FastAPI loads and validates one artifact bundle. For a recommendation request it:
 
-1. validates 10–20 unique MAL IDs and 1–10 ratings;
+1. validates 10–100 unique MAL IDs and 1–10 ratings;
 2. resolves known item indices and reports/handles unmapped inputs;
-3. solves both the positive implicit ALS fold-in and a regularized signed fold-in over all explicit ratings while item factors stay frozen;
-4. standardizes the production ALS/popularity score, adds the validation-selected signed residual, masks rated/unavailable titles, and selects Top K;
+3. solves both the positive implicit ALS fold-in and a regularized signed fold-in over up to 100 explicit ratings while item factors stay frozen;
+4. reduces the popularity blend after 10 mapped ratings using `base_blend * min(1, 10 / mapped_ratings)`, standardizes the ALS/popularity score, adds the validation-selected signed residual, masks rated/unavailable titles, and selects Top K;
 5. batch-enriches ranked MAL IDs with runtime AniList metadata while preserving the model ranking;
 6. returns a typed validation error when too few inputs map to the supported model universe.
 
@@ -94,14 +94,16 @@ AniList GraphQL provides search, covers, titles, descriptions, genres, tags, for
 |---|---|---|
 | GET | `/health` | Lightweight process health check |
 | GET | `/api/v1/anime/search?q=...&limit=...` | Proxied/cached AniList search with IDs normalized |
+| POST | `/api/v1/anime/metadata` | Batch-enrich up to 100 canonical MAL IDs for local library cards |
 | GET | `/api/v1/anime/{anilist_id}` | Lazy-loaded description, community score, metadata, and public review summaries |
+| GET | `/api/v1/popular-picks` | Return the model universe's 100 most-interacted-with titles for direct rating |
 | POST | `/api/v1/recommendations` | Validate ratings and return ranked unseen anime, explanations, and model version |
 | POST | `/api/v1/preference-quiz/options` | Return four model-supported, metadata-enriched quiz options |
 | POST | `/api/v1/taste-dna` | Return metadata-derived dimension scores and supporting titles |
 | GET | `/api/v1/model/info` | Expose safe model version and training/evaluation metadata |
 
 The implemented `POST /api/v1/recommendations` accepts
-`{ ratings: [{ mal_id, rating }], preferences: [{ most_mal_id, least_mal_id }], excluded_mal_ids: [], limit: 10 }`. It requires 10–20 unique positive MAL IDs with
+`{ ratings: [{ mal_id, rating }], preferences: [{ most_mal_id, least_mal_id }], excluded_mal_ids: [], limit: 10 }`. It requires 10–100 unique positive MAL IDs with
 integer ratings from 1–10 and a limit from 1–20. At least five ratings must map to supported model
 items. The response is
 `{ model_version, mapped_ratings, mapped_preferences, unmapped_mal_ids, metadata_status, items: [{ mal_id, anilist_id, title, rank, predicted_rating, cover_image_url, year, format, genres, average_score }] }`.
@@ -115,16 +117,31 @@ or `unavailable`; an AniList outage never discards the model results.
 
 The implemented search response is `{ items: AnimeSearchResult[] }`, where each item includes `anilist_id`, nullable `mal_id`, title, cover URL, year, format, genres, AniList average score, and popularity count. Its `sort` query parameter accepts `popularity` (default), `score`, `relevance`, or `newest`; ordering is performed by AniList before limiting results. A null `mal_id` is never replaced by a title match; the frontend shows that result but disables rating it.
 
+AniList access uses one process-scoped async HTTP client with keep-alive connection pooling. Anime
+metadata is cached for six hours; season relations and expanded franchise exclusions are cached for
+24 hours with bounded entry counts. Recommendation enrichment starts the candidate-relation query
+and provisional Top-K metadata query concurrently, then fetches only metadata made newly necessary
+by season deduplication. The model ranker remains independent of AniList availability.
+
 The recommendations client submits every locally rated or archived MAL ID as an explicit ranking
 exclusion and displays the returned Top 10. Scoring an already-watched recommendation persists it through the shared
 ratings feature and triggers a fresh request, so the title disappears and the next unseen candidate
-fills its position. When more than 20 local ratings exist, the latest 20 are used for fold-in while
+fills its position. When more than 100 local ratings exist, the latest 100 are used for fold-in while
 the complete local rated-ID set remains excluded from the displayed results.
+
+The client also identifies archived titles separately as `not_interested_mal_ids`. The API expands
+those IDs through AniList's explicit `PREQUEL`/`SEQUEL` relations before ranking, so every season in
+the discovered chain is excluded without relying on title matching. It over-fetches model candidates,
+groups them by the same relation graph, and keeps only the highest-ranked season from each franchise
+in the final Top 10. If AniList relations are temporarily unavailable, ranking degrades to exact-ID
+exclusion and preserves model order.
 “Not interested” archives are also versioned in browser local storage. They filter ranking
 candidates without becoming synthetic low ratings, so dismissing a title does not distort the
-collaborative-filtering user vector. Users can restore selected archived titles from the recommendation
-status row through a multi-select manager. Archiving a recommendation returns the viewport to the
-page header while a replacement is generated.
+collaborative-filtering user vector. My Ratings owns a collapsed card-based manager where users can
+review metadata and restore individual or selected archived titles. Legacy title-only records are
+enriched through the bounded `POST /api/v1/anime/metadata` batch contract when the manager opens.
+The Recommendations view only ranks and collects feedback; archiving a recommendation returns the
+viewport to the page header while a replacement is generated.
 
 ## Deployment
 

@@ -22,7 +22,7 @@ env:
   REPOSITORY: anime-taste-dna
   SERVICE: anime-taste-dna-api
   MODEL_BUCKET: anime-taste-dna-models-197238956100
-  MODEL_OBJECT: signed-rating-hybrid-v1/signed_rating_hybrid.npz
+  MODEL_OBJECT: signed-rating-hybrid-v2/signed_rating_hybrid.npz
   RUNTIME_SERVICE_ACCOUNT: anime-taste-dna-runtime@anime-taste-dna.iam.gserviceaccount.com
   FRONTEND_ORIGIN: https://anime-taste-dna.vercel.app
 
@@ -61,10 +61,10 @@ jobs:
 
       - name: Restore production model artifact
         run: |
-          mkdir -p data/artifacts/signed-rating-hybrid-v1
+          mkdir -p data/artifacts/signed-rating-hybrid-v2
           gcloud storage cp \
             "gs://${MODEL_BUCKET}/${MODEL_OBJECT}" \
-            data/artifacts/signed-rating-hybrid-v1/signed_rating_hybrid.npz
+            data/artifacts/signed-rating-hybrid-v2/signed_rating_hybrid.npz
 
       - name: Configure Artifact Registry authentication
         run: gcloud auth configure-docker "${REGION}-docker.pkg.dev" --quiet

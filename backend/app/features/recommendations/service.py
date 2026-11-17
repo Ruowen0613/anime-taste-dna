@@ -192,7 +192,7 @@ class SignedHybridRecommendationService:
         production_scores = self._standardize(
             self.artifact.item_factors @ implicit_factor
         )
-        production_scores += self.artifact.popularity_blend * self._popularity
+        production_scores += self._effective_popularity_blend(len(mapped)) * self._popularity
         production_scores = self._standardize(production_scores)
         signed_factor = self._fold_in_signed(observed_items, observed_ratings)
         signed_scores = self._standardize(
@@ -241,6 +241,14 @@ class SignedHybridRecommendationService:
         if score_std < 1e-8:
             return np.zeros_like(scores)
         return (scores - float(supported_scores.mean())) / score_std
+
+    def _effective_popularity_blend(self, mapped_ratings: int) -> float:
+        scale = min(
+            1.0,
+            (self.artifact.popularity_decay_pivot / mapped_ratings)
+            ** self.artifact.popularity_decay_exponent,
+        )
+        return self.artifact.popularity_blend * scale
 
     def _fold_in_implicit(
         self, observed_items: np.ndarray, observed_ratings: np.ndarray

@@ -40,6 +40,8 @@ anime-taste-negative-feedback = "anime_taste_dna.evaluation.negative_feedback:ma
 anime-taste-signed-hybrid-validation = "anime_taste_dna.evaluation.signed_hybrid_validation:main"
 anime-taste-signed-hybrid-test = "anime_taste_dna.evaluation.signed_hybrid_test:main"
 anime-taste-export-signed-hybrid = "anime_taste_dna.models.export_signed_hybrid:main"
+anime-taste-rating-scale-validation = "anime_taste_dna.evaluation.rating_scale_validation:main"
+anime-taste-rating-scale-test = "anime_taste_dna.evaluation.rating_scale_test:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
