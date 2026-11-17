@@ -3,7 +3,7 @@ from typing import Annotated, Literal
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.features.anime.client import AniListClient, AniListError, get_anilist_client
-from app.features.anime.schemas import AnimeDetails, AnimeSearchResponse
+from app.features.anime.schemas import AnimeDetails, AnimeMetadataRequest, AnimeSearchResponse
 
 router = APIRouter(prefix="/api/v1/anime", tags=["anime"])
 
@@ -31,6 +31,19 @@ async def search_anime(
     except AniListError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
     return AnimeSearchResponse(items=items)
+
+
+@router.post("/metadata", response_model=AnimeSearchResponse)
+async def get_anime_metadata(
+    request: AnimeMetadataRequest,
+    client: Annotated[AniListClient, Depends(get_anilist_client)],
+) -> AnimeSearchResponse:
+    mal_ids = list(dict.fromkeys(request.mal_ids))
+    try:
+        metadata = await client.get_by_mal_ids(mal_ids)
+    except AniListError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return AnimeSearchResponse(items=[metadata[mal_id] for mal_id in mal_ids if mal_id in metadata])
 
 
 @router.get("/{anilist_id}", response_model=AnimeDetails)

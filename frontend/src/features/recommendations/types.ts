@@ -11,8 +11,6 @@ export type RecommendationItem = {
   average_score: number | null
 }
 
-export type ArchivedRecommendation = Pick<RecommendationItem, 'mal_id' | 'title'>
-
 export type RecommendationResponse = {
   model_version: string
   mapped_ratings: number

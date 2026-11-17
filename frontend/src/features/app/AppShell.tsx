@@ -43,7 +43,7 @@ export function AppShell() {
         {view === 'popular' ? (
           <PopularPicksPage ratings={ratings.ratings} onRate={ratings.setRating} onRemove={ratings.removeRating} onRecommend={() => setView('recommendations')} />
         ) : view === 'ratings' ? (
-          <MyRatingsPage ratings={ratings.ratings} onRate={ratings.setRating} onRemove={ratings.removeRating} onRecommend={() => setView('recommendations')} />
+          <MyRatingsPage ratings={ratings.ratings} onRate={ratings.setRating} onRemove={ratings.removeRating} onRecommend={() => setView('recommendations')} onPopularPicks={() => setView('popular')} />
         ) : (
           <RecommendationsPage ratings={ratings.ratings} preferences={quiz.preferences} onRate={ratings.setRating} onBack={() => setView('ratings')} />
         )}

@@ -28,6 +28,7 @@ The MVP should be functional, deployed, reproducible, and credible as an AI/Appl
 
 - Show every locally rated title with cover, title, year/format, and genres.
 - Edit or remove any rating and sort the collection.
+- Manage not-interested titles in a collapsed card section and selectively restore them to the recommendation pool.
 - Indicate progress toward the minimum recommended input count and open recommendations.
 
 ### Recommendations

@@ -4,7 +4,7 @@ import { useAnimeDetails } from '../animeDetails/useAnimeDetails'
 import { SearchResults } from '../discover/components/SearchResults'
 import type { AnimeSearchResult, RatedAnime } from '../discover/types'
 import { useAnimeSearch } from '../discover/useAnimeSearch'
-import { useArchivedRecommendations } from '../recommendations/useArchivedRecommendations'
+import { useNotInterested } from '../ratings/useNotInterested'
 import { PopularPickCard } from './components/PopularPickCard'
 import { PopularPicksSearch } from './components/PopularPicksSearch'
 import { usePopularPicks } from './usePopularPicks'
@@ -20,9 +20,9 @@ export function PopularPicksPage({ ratings, onRate, onRemove, onRecommend }: Pop
   const search = useAnimeSearch()
   const popular = usePopularPicks()
   const animeDetails = useAnimeDetails()
-  const archive = useArchivedRecommendations()
+  const notInterested = useNotInterested()
   const ratingsByMalId = new Map(ratings.map((rating) => [rating.mal_id, rating]))
-  const archivedMalIds = new Set(archive.archivedMalIds)
+  const archivedMalIds = new Set(notInterested.malIds)
   const ratedPopularCount = popular.data?.items.filter((item) => ratingsByMalId.has(item.mal_id)).length ?? 0
   const normalizedQuery = search.query.trim().toLocaleLowerCase()
   const filteredItems = useMemo(() => {
@@ -69,8 +69,8 @@ export function PopularPicksPage({ ratings, onRate, onRemove, onRecommend }: Pop
                 notInterested={archivedMalIds.has(anime.mal_id)}
                 onRate={onRate}
                 onRemove={onRemove}
-                onNotInterested={(item) => archive.archive({ mal_id: item.mal_id, title: item.title })}
-                onRestoreInterest={(malId) => archive.restore([malId])}
+                onNotInterested={notInterested.add}
+                onRestoreInterest={(malId) => notInterested.restore([malId])}
                 onOpen={animeDetails.open}
                 key={anime.mal_id}
               />
@@ -88,8 +88,8 @@ export function PopularPicksPage({ ratings, onRate, onRemove, onRecommend }: Pop
                 searching={search.searching}
                 archivedMalIds={archivedMalIds}
                 onRemove={onRemove}
-                onNotInterested={(item) => archive.archive({ mal_id: item.mal_id, title: item.title })}
-                onRestoreInterest={(malId) => archive.restore([malId])}
+                onNotInterested={notInterested.add}
+                onRestoreInterest={(malId) => notInterested.restore([malId])}
               />
             </div>
           )}

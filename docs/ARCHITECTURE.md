@@ -94,6 +94,7 @@ AniList GraphQL provides search, covers, titles, descriptions, genres, tags, for
 |---|---|---|
 | GET | `/health` | Lightweight process health check |
 | GET | `/api/v1/anime/search?q=...&limit=...` | Proxied/cached AniList search with IDs normalized |
+| POST | `/api/v1/anime/metadata` | Batch-enrich up to 100 canonical MAL IDs for local library cards |
 | GET | `/api/v1/anime/{anilist_id}` | Lazy-loaded description, community score, metadata, and public review summaries |
 | GET | `/api/v1/popular-picks` | Return the model universe's 100 most-interacted-with titles for direct rating |
 | POST | `/api/v1/recommendations` | Validate ratings and return ranked unseen anime, explanations, and model version |
@@ -136,9 +137,11 @@ in the final Top 10. If AniList relations are temporarily unavailable, ranking d
 exclusion and preserves model order.
 “Not interested” archives are also versioned in browser local storage. They filter ranking
 candidates without becoming synthetic low ratings, so dismissing a title does not distort the
-collaborative-filtering user vector. Users can restore selected archived titles from the recommendation
-status row through a multi-select manager. Archiving a recommendation returns the viewport to the
-page header while a replacement is generated.
+collaborative-filtering user vector. My Ratings owns a collapsed card-based manager where users can
+review metadata and restore individual or selected archived titles. Legacy title-only records are
+enriched through the bounded `POST /api/v1/anime/metadata` batch contract when the manager opens.
+The Recommendations view only ranks and collects feedback; archiving a recommendation returns the
+viewport to the page header while a replacement is generated.
 
 ## Deployment
 
