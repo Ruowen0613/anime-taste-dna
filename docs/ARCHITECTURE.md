@@ -143,6 +143,20 @@ enriched through the bounded `POST /api/v1/anime/metadata` batch contract when t
 The Recommendations view only ranks and collects feedback; archiving a recommendation returns the
 viewport to the page header while a replacement is generated.
 
+### Taste DNA
+
+Taste DNA is intentionally separate from collaborative-filtering latent factors. The client sends
+up to 100 locally rated titles with canonical MAL IDs to `POST /api/v1/taste-dna`; the service batch
+enriches them with AniList genres and ranked tags. Scores center explicit ratings around 5.5, weight
+tags by AniList relevance, add two neutral prior observations, and map the result to `[0, 100]`.
+A score of 50 is therefore neutral rather than an arbitrary chart midpoint.
+
+The response always contains the same eight genre axes: Action, Comedy, Drama, Romance, Fantasy,
+Sci-Fi, Slice of Life, and Psychological. It also returns the top five non-adult, non-spoiler tags
+for Story Themes (`Theme-*`), World & Settings (`Setting-*`), and Character (`Cast-*`). Genre and
+tag affinities remain metadata-derived and never assign semantic names to model embeddings.
+Profiles require five ratings, while the UI explains that additional ratings improve support.
+
 ## Deployment
 
 - **Vercel:** builds `frontend/`; injects public `VITE_API_BASE_URL` pointing to Cloud Run.

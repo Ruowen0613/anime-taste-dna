@@ -1,6 +1,15 @@
 from pydantic import BaseModel, Field, PositiveInt
 
 
+class AnimeTag(BaseModel):
+    name: str
+    rank: int = Field(ge=0, le=100)
+    category: str
+    is_adult: bool = False
+    is_general_spoiler: bool = False
+    is_media_spoiler: bool = False
+
+
 class AnimeSearchResult(BaseModel):
     mal_id: int | None
     anilist_id: int
@@ -9,6 +18,7 @@ class AnimeSearchResult(BaseModel):
     year: int | None = None
     format: str | None = None
     genres: list[str]
+    tags: list[AnimeTag] = Field(default_factory=list)
     average_score: int | None = None
     popularity: int = 0
     summary: str | None = None

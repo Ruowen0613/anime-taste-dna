@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { PreferenceQuizModal } from '../preferenceQuiz/components/PreferenceQuizModal'
 import { usePreferenceQuiz } from '../preferenceQuiz/usePreferenceQuiz'
 import { PopularPicksPage } from '../popularPicks/PopularPicksPage'
@@ -7,7 +7,9 @@ import { RecommendationsPage } from '../recommendations/RecommendationsPage'
 import { useRatings } from '../ratings/useRatings'
 import { ApiStatus } from '../system/ApiStatus'
 
-type View = 'ratings' | 'popular' | 'recommendations'
+const TasteDnaPage = lazy(() => import('../tasteDna/TasteDnaPage').then((module) => ({ default: module.TasteDnaPage })))
+
+type View = 'ratings' | 'popular' | 'recommendations' | 'taste-dna'
 const TASTE_QUIZ_ENABLED = import.meta.env.VITE_ENABLE_TASTE_QUIZ === 'true'
 
 export function AppShell() {
@@ -26,6 +28,7 @@ export function AppShell() {
           <div className="flex items-center gap-3">
             <button aria-current={view === 'popular' ? 'page' : undefined} className={`rounded-full border px-4 py-2 text-sm transition ${view === 'popular' ? 'border-violet bg-violet/20 text-white' : 'border-white/15 bg-white/5 text-slate-300 hover:border-violet/50 hover:text-white'}`} type="button" onClick={() => setView('popular')}>Popular Picks</button>
             <button aria-current={view === 'ratings' ? 'page' : undefined} className={`rounded-full border px-4 py-2 text-sm transition ${view === 'ratings' ? 'border-violet bg-violet/20 text-white' : 'border-white/15 bg-white/5 text-slate-300 hover:border-violet/50 hover:text-white'}`} type="button" onClick={() => setView('ratings')}>My Ratings</button>
+            <button aria-current={view === 'taste-dna' ? 'page' : undefined} className={`rounded-full border px-4 py-2 text-sm transition ${view === 'taste-dna' ? 'border-violet bg-violet/20 text-white' : 'border-white/15 bg-white/5 text-slate-300 hover:border-violet/50 hover:text-white'}`} type="button" onClick={() => setView('taste-dna')}>Taste DNA</button>
             {TASTE_QUIZ_ENABLED && <button className="rounded-full border border-sakura/30 bg-sakura/10 px-4 py-2 text-sm text-sakura transition hover:bg-sakura/20 hover:text-white" type="button" onClick={() => setQuizOpen(true)}>Taste quiz</button>}
             {ratings.ratings.length >= 10 && (
               <button
@@ -44,6 +47,10 @@ export function AppShell() {
           <PopularPicksPage ratings={ratings.ratings} onRate={ratings.setRating} onRemove={ratings.removeRating} onRecommend={() => setView('recommendations')} />
         ) : view === 'ratings' ? (
           <MyRatingsPage ratings={ratings.ratings} onRate={ratings.setRating} onRemove={ratings.removeRating} onRecommend={() => setView('recommendations')} onPopularPicks={() => setView('popular')} />
+        ) : view === 'taste-dna' ? (
+          <Suspense fallback={<div className="mt-16 h-[520px] animate-pulse rounded-3xl bg-white/5" aria-label="Loading Taste DNA" />}>
+            <TasteDnaPage ratings={ratings.ratings} onPopularPicks={() => setView('popular')} />
+          </Suspense>
         ) : (
           <RecommendationsPage ratings={ratings.ratings} preferences={quiz.preferences} onRate={ratings.setRating} onBack={() => setView('ratings')} />
         )}
