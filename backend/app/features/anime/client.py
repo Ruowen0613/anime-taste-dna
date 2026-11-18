@@ -6,7 +6,7 @@ from typing import Any
 import httpx
 
 from app.features.anime.cache import TtlCache
-from app.features.anime.schemas import AnimeDetails, AnimeReview, AnimeSearchResult
+from app.features.anime.schemas import AnimeDetails, AnimeReview, AnimeSearchResult, AnimeTag
 
 ANILIST_API_URL = "https://graphql.anilist.co"
 SEARCH_QUERY = """
@@ -21,6 +21,7 @@ query SearchAnime($search: String!, $perPage: Int!, $sort: [MediaSort!]!) {
       seasonYear
       format
       genres
+      tags { name rank category isAdult isGeneralSpoiler isMediaSpoiler }
       averageScore
       popularity
     }
@@ -44,6 +45,7 @@ query AnimeDetails($id: Int!) {
     seasonYear
     format
     genres
+    tags { name rank category isAdult isGeneralSpoiler isMediaSpoiler }
     siteUrl
     reviews(page: 1, perPage: 3, sort: RATING_DESC) {
       nodes {
@@ -69,6 +71,7 @@ query AnimeByMalIds($malIds: [Int], $perPage: Int!) {
       seasonYear
       format
       genres
+      tags { name rank category isAdult isGeneralSpoiler isMediaSpoiler }
       averageScore
       popularity
     }
@@ -268,6 +271,17 @@ class AniListClient:
             year=item.get("seasonYear"),
             format=item.get("format"),
             genres=item.get("genres") or [],
+            tags=[
+                AnimeTag(
+                    name=tag["name"],
+                    rank=tag.get("rank") or 0,
+                    category=tag.get("category") or "",
+                    is_adult=tag.get("isAdult") or False,
+                    is_general_spoiler=tag.get("isGeneralSpoiler") or False,
+                    is_media_spoiler=tag.get("isMediaSpoiler") or False,
+                )
+                for tag in item.get("tags") or []
+            ],
             average_score=item.get("averageScore"),
             popularity=item.get("popularity") or 0,
             summary=AniListClient._clean_text(item.get("description")),

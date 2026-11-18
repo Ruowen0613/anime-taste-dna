@@ -15,6 +15,7 @@ A deployed, end-to-end anime recommender that learns a new visitor's taste from 
 - Reduces popularity influence as the user supplies more evidence instead of applying one fixed global blend.
 - Prevents multiple seasons of the same franchise from filling the Top 10.
 - Treats **Not interested** as a hard title/franchise exclusion, managed through a collapsed card section in My Ratings rather than as a fabricated low score.
+- Visualizes a reproducible Taste DNA with eight fixed genre axes plus top AniList story-theme, world/setting, and character tags; scores are rating-aware, relevance-weighted, and shrunk toward neutral when evidence is sparse.
 - Enriches cards and detail modals with AniList covers, genres, community scores, descriptions, and public review summaries.
 
 ## Recommendation pipeline
@@ -152,6 +153,7 @@ pytest
 | `POST` | `/api/v1/anime/metadata` | Batch metadata for browser-local library cards |
 | `GET` | `/api/v1/popular-picks` | 100 high-interaction titles supported by the model |
 | `POST` | `/api/v1/recommendations` | Cold-start fold-in, ranking, filtering, and Top 10 enrichment |
+| `POST` | `/api/v1/taste-dna` | Metadata-derived genre affinities and supporting titles |
 
 ## Dataset and reproducibility
 
