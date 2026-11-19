@@ -25,6 +25,7 @@ class WeightedAlsConfig:
     alpha: float
     regularization: float
     positive_rating_threshold: int
+    rating_confidence_overrides: tuple[tuple[int, float], ...]
     seed: int
     fold_in_regularization_candidates: tuple[float, ...]
     popularity_blend_candidates: tuple[float, ...]
@@ -51,6 +52,14 @@ class WeightedAlsConfig:
             alpha=float(raw["training"]["alpha"]),
             regularization=float(raw["training"]["regularization"]),
             positive_rating_threshold=int(raw["training"]["positive_rating_threshold"]),
+            rating_confidence_overrides=tuple(
+                sorted(
+                    (int(rating), float(confidence))
+                    for rating, confidence in raw["training"].get(
+                        "rating_confidence_overrides", {}
+                    ).items()
+                )
+            ),
             seed=int(raw["training"]["seed"]),
             fold_in_regularization_candidates=tuple(
                 float(value) for value in raw["validation"]["regularization_candidates"]
@@ -69,10 +78,28 @@ class WeightedAlsConfig:
 
 
 def implicit_confidence(
-    ratings: np.ndarray, threshold: int, alpha: float
+    ratings: np.ndarray,
+    threshold: int,
+    alpha: float,
+    overrides: tuple[tuple[int, float], ...] = (),
 ) -> np.ndarray:
     strength = ratings.astype(np.float32) - threshold + 1.0
-    return 1.0 + alpha * np.maximum(strength, 0.0)
+    confidence = 1.0 + alpha * np.maximum(strength, 0.0)
+    for rating, override in overrides:
+        confidence[ratings == rating] = override
+    return confidence
+
+
+def positive_rating_mask(
+    ratings: np.ndarray,
+    threshold: int,
+    overrides: tuple[tuple[int, float], ...] = (),
+) -> np.ndarray:
+    positive = ratings >= threshold
+    for rating, confidence in overrides:
+        if confidence > 1.0:
+            positive |= ratings == rating
+    return positive
 
 
 def solve_implicit_factors(
@@ -123,16 +150,19 @@ def fold_in_implicit_users(
     threshold: int,
     alpha: float,
     regularization: float,
+    confidence_overrides: tuple[tuple[int, float], ...] = (),
 ) -> np.ndarray:
     batch, observations = observed_items.shape
-    positive = observed_ratings >= threshold
+    positive = positive_rating_mask(observed_ratings, threshold, confidence_overrides)
     counts = positive.sum(axis=1, dtype=np.int64)
     offsets = np.zeros(batch + 1, dtype=np.int64)
     np.cumsum(counts, out=offsets[1:])
     if offsets[-1] == 0:
         return np.zeros((batch, item_factors.shape[1]), dtype=np.float32)
     selected_items = observed_items[positive]
-    confidence = implicit_confidence(observed_ratings[positive], threshold, alpha)
+    confidence = implicit_confidence(
+        observed_ratings[positive], threshold, alpha, confidence_overrides
+    )
     return solve_implicit_factors(
         offsets, selected_items, confidence, item_factors, regularization
     )
@@ -211,6 +241,7 @@ def evaluate_weighted_als(
                 config.positive_rating_threshold,
                 config.alpha,
                 fold_in_regularization,
+                config.rating_confidence_overrides,
             )
         else:
             user_factors = fold_in_signed_implicit_users(
@@ -289,11 +320,18 @@ def train_and_validate(config: WeightedAlsConfig) -> dict[str, Any]:
         config.parquet_batch_size,
     )
     all_train_users = _users_for_csr(train)
-    positive = train.ratings >= config.positive_rating_threshold
+    positive = positive_rating_mask(
+        train.ratings,
+        config.positive_rating_threshold,
+        config.rating_confidence_overrides,
+    )
     positive_users = all_train_users[positive]
     positive_items = train.item_indices[positive]
     confidence = implicit_confidence(
-        train.ratings[positive], config.positive_rating_threshold, config.alpha
+        train.ratings[positive],
+        config.positive_rating_threshold,
+        config.alpha,
+        config.rating_confidence_overrides,
     )
     user_counts = np.bincount(positive_users, minlength=users_count)
     user_offsets = np.zeros(users_count + 1, dtype=np.int64)
@@ -403,6 +441,7 @@ def train_and_validate(config: WeightedAlsConfig) -> dict[str, Any]:
             "alpha": config.alpha,
             "training_regularization": config.regularization,
             "positive_rating_threshold": config.positive_rating_threshold,
+            "rating_confidence_overrides": dict(config.rating_confidence_overrides),
             "score_blend": "per-user standardized ALS score + weight * standardized log count",
             "positive_interactions": len(positive_items),
             "best_iteration": best_entry["iteration"],

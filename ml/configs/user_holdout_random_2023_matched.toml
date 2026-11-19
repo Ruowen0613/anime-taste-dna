@@ -1,0 +1,13 @@
+[paths]
+processed_directory = "../data/processed/v1"
+output_directory = "../data/processed/v3-user-holdout-random"
+working_directory = "../data/working/user-holdout-random-2023"
+
+[split]
+validation_user_fraction = 0.1
+test_user_fraction = 0.1
+target_fraction = 0.2
+minimum_target_interactions = 10
+user_buckets = 64
+batch_size = 131072
+seed = 20250718

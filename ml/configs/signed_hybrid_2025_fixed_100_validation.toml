@@ -1,0 +1,22 @@
+[paths]
+split_directory = "../data/processed/user-animelist-2025-fixed-100"
+artifact_path = "../data/artifacts/weighted-als-2025-fixed-100-v1/weighted_als_hybrid.npz"
+output_report = "reports/signed-hybrid-2025-fixed-100-validation-v1.json"
+
+[selection]
+users = 512
+signed_regularization_candidates = [1.0, 10.0, 100.0]
+signed_weight_candidates = [0.03, 0.04, 0.05, 0.06, 0.075, 0.1]
+
+[behavior_gates]
+max_counterfactual_top_10_overlap = 0.7
+max_popularity_top_10_overlap = 0.7
+minimum_catalog_coverage_fraction = 0.01
+
+[evaluation]
+observed_ratings = [5, 10, 20, 40, 80]
+relevance_threshold = 8
+ranking_k = 10
+user_batch_size = 128
+parquet_batch_size = 131072
+seed = 42

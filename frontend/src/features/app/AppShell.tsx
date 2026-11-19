@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { PreferenceQuizModal } from '../preferenceQuiz/components/PreferenceQuizModal'
 import { usePreferenceQuiz } from '../preferenceQuiz/usePreferenceQuiz'
 import { PopularPicksPage } from '../popularPicks/PopularPicksPage'
@@ -18,6 +18,10 @@ export function AppShell() {
   const ratings = useRatings()
   const quiz = usePreferenceQuiz()
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0 })
+  }, [view])
+
   return (
     <main className="min-h-screen bg-ink text-white">
       <div className={`mx-auto px-6 py-8 sm:px-10 ${view === 'popular' ? 'max-w-[1800px]' : 'max-w-6xl'}`}>
@@ -25,7 +29,7 @@ export function AppShell() {
           <button className="text-lg font-semibold tracking-tight" type="button" onClick={() => setView('popular')}>
             Anime Taste <span className="text-sakura">DNA</span>
           </button>
-          <div className="flex items-center gap-3">
+          <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto sm:justify-end sm:gap-3">
             <button aria-current={view === 'popular' ? 'page' : undefined} className={`rounded-full border px-4 py-2 text-sm transition ${view === 'popular' ? 'border-violet bg-violet/20 text-white' : 'border-white/15 bg-white/5 text-slate-300 hover:border-violet/50 hover:text-white'}`} type="button" onClick={() => setView('popular')}>Popular Picks</button>
             <button aria-current={view === 'ratings' ? 'page' : undefined} className={`rounded-full border px-4 py-2 text-sm transition ${view === 'ratings' ? 'border-violet bg-violet/20 text-white' : 'border-white/15 bg-white/5 text-slate-300 hover:border-violet/50 hover:text-white'}`} type="button" onClick={() => setView('ratings')}>My Ratings</button>
             <button aria-current={view === 'taste-dna' ? 'page' : undefined} className={`rounded-full border px-4 py-2 text-sm transition ${view === 'taste-dna' ? 'border-violet bg-violet/20 text-white' : 'border-white/15 bg-white/5 text-slate-300 hover:border-violet/50 hover:text-white'}`} type="button" onClick={() => setView('taste-dna')}>Taste DNA</button>

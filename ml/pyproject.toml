@@ -22,6 +22,8 @@ dev = [
 
 [project.scripts]
 anime-taste-audit = "anime_taste_dna.data.audit:main"
+anime-taste-audit-user-animelist-2025 = "anime_taste_dna.data.audit_user_animelist_2025:main"
+anime-taste-prepare-user-animelist-2025 = "anime_taste_dna.data.prepare_user_animelist_2025_pilot:main"
 anime-taste-preprocess = "anime_taste_dna.data.preprocess:main"
 anime-taste-split = "anime_taste_dna.data.split:main"
 anime-taste-popularity = "anime_taste_dna.models.popularity:main"
@@ -32,6 +34,8 @@ anime-taste-fold-in-diagnostic = "anime_taste_dna.evaluation.fold_in_diagnostic:
 anime-taste-mf-training-diagnostic = "anime_taste_dna.evaluation.mf_training_diagnostic:main"
 anime-taste-bpr = "anime_taste_dna.models.bpr:main"
 anime-taste-user-holdout-split = "anime_taste_dna.data.user_holdout_split:main"
+anime-taste-random-user-holdout-split = "anime_taste_dna.data.random_user_holdout_split:main"
+anime-taste-fixed-user-holdout = "anime_taste_dna.data.resample_fixed_user_holdout:main"
 anime-taste-strict-cold-start = "anime_taste_dna.evaluation.strict_cold_start:main"
 anime-taste-strict-mf = "anime_taste_dna.models.strict_matrix_factorization:main"
 anime-taste-weighted-als = "anime_taste_dna.models.weighted_als:main"
@@ -42,6 +46,7 @@ anime-taste-signed-hybrid-test = "anime_taste_dna.evaluation.signed_hybrid_test:
 anime-taste-export-signed-hybrid = "anime_taste_dna.models.export_signed_hybrid:main"
 anime-taste-rating-scale-validation = "anime_taste_dna.evaluation.rating_scale_validation:main"
 anime-taste-rating-scale-test = "anime_taste_dna.evaluation.rating_scale_test:main"
+anime-taste-rating-pairwise = "anime_taste_dna.models.rating_pairwise:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

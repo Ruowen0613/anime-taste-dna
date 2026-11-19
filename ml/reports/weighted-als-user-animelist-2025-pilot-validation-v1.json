@@ -1,0 +1,467 @@
+{
+  "protocol": {
+    "split": "strict held-out validation users",
+    "global_fit_users": 106222,
+    "validation_users": 1365,
+    "candidate_exclusion": "only exposed ratings",
+    "test_access": "none"
+  },
+  "model": {
+    "name": "implicit weighted alternating least squares",
+    "dimensions": 16,
+    "alpha": 10.0,
+    "training_regularization": 1.0,
+    "positive_rating_threshold": 8,
+    "rating_confidence_overrides": {},
+    "score_blend": "per-user standardized ALS score + weight * standardized log count",
+    "positive_interactions": 5093891,
+    "best_iteration": 2,
+    "history": [
+      {
+        "iteration": 1,
+        "trials": [
+          {
+            "regularization": 100.0,
+            "popularity_blend": 8.0,
+            "mean_ndcg_at_10": 0.12571421,
+            "mean_recall_at_10": 0.06309471,
+            "by_observed_ratings": {
+              "5": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05269383,
+                "ndcg_at_10": 0.10667746,
+                "mean_user_factor_norm": 0.12026577,
+                "catalog_coverage_items": 136,
+                "catalog_coverage_fraction": 0.00804686
+              },
+              "10": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05526883,
+                "ndcg_at_10": 0.11090667,
+                "mean_user_factor_norm": 0.20865315,
+                "catalog_coverage_items": 110,
+                "catalog_coverage_fraction": 0.00650849
+              },
+              "20": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05877161,
+                "ndcg_at_10": 0.11684376,
+                "mean_user_factor_norm": 0.36143148,
+                "catalog_coverage_items": 78,
+                "catalog_coverage_fraction": 0.00461511
+              },
+              "40": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.06586042,
+                "ndcg_at_10": 0.13015682,
+                "mean_user_factor_norm": 0.61599216,
+                "catalog_coverage_items": 58,
+                "catalog_coverage_fraction": 0.00343175
+              },
+              "80": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.08287887,
+                "ndcg_at_10": 0.16398634,
+                "mean_user_factor_norm": 0.99434223,
+                "catalog_coverage_items": 56,
+                "catalog_coverage_fraction": 0.00331341
+              }
+            }
+          },
+          {
+            "regularization": 100.0,
+            "popularity_blend": 16.0,
+            "mean_ndcg_at_10": 0.12226284,
+            "mean_recall_at_10": 0.06154998,
+            "by_observed_ratings": {
+              "5": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05264275,
+                "ndcg_at_10": 0.10640919,
+                "mean_user_factor_norm": 0.12026577,
+                "catalog_coverage_items": 55,
+                "catalog_coverage_fraction": 0.00325425
+              },
+              "10": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05418163,
+                "ndcg_at_10": 0.10688794,
+                "mean_user_factor_norm": 0.20865315,
+                "catalog_coverage_items": 46,
+                "catalog_coverage_fraction": 0.00272173
+              },
+              "20": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.0569854,
+                "ndcg_at_10": 0.11355959,
+                "mean_user_factor_norm": 0.36143148,
+                "catalog_coverage_items": 37,
+                "catalog_coverage_fraction": 0.00218922
+              },
+              "40": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.06399468,
+                "ndcg_at_10": 0.12650461,
+                "mean_user_factor_norm": 0.61599216,
+                "catalog_coverage_items": 32,
+                "catalog_coverage_fraction": 0.00189338
+              },
+              "80": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.07994542,
+                "ndcg_at_10": 0.15795287,
+                "mean_user_factor_norm": 0.99434223,
+                "catalog_coverage_items": 41,
+                "catalog_coverage_fraction": 0.00242589
+              }
+            }
+          },
+          {
+            "regularization": 100.0,
+            "popularity_blend": 32.0,
+            "mean_ndcg_at_10": 0.11976693,
+            "mean_recall_at_10": 0.0600441,
+            "by_observed_ratings": {
+              "5": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05222766,
+                "ndcg_at_10": 0.10486626,
+                "mean_user_factor_norm": 0.12026577,
+                "catalog_coverage_items": 28,
+                "catalog_coverage_fraction": 0.00165671
+              },
+              "10": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05335647,
+                "ndcg_at_10": 0.10658774,
+                "mean_user_factor_norm": 0.20865315,
+                "catalog_coverage_items": 26,
+                "catalog_coverage_fraction": 0.00153837
+              },
+              "20": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05646247,
+                "ndcg_at_10": 0.11236832,
+                "mean_user_factor_norm": 0.36143148,
+                "catalog_coverage_items": 24,
+                "catalog_coverage_fraction": 0.00142003
+              },
+              "40": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.0617936,
+                "ndcg_at_10": 0.12273045,
+                "mean_user_factor_norm": 0.61599216,
+                "catalog_coverage_items": 26,
+                "catalog_coverage_fraction": 0.00153837
+              },
+              "80": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.07638031,
+                "ndcg_at_10": 0.15228189,
+                "mean_user_factor_norm": 0.99434223,
+                "catalog_coverage_items": 36,
+                "catalog_coverage_fraction": 0.00213005
+              }
+            }
+          }
+        ],
+        "selected": {
+          "regularization": 100.0,
+          "popularity_blend": 8.0,
+          "mean_ndcg_at_10": 0.12571421,
+          "mean_recall_at_10": 0.06309471,
+          "by_observed_ratings": {
+            "5": {
+              "eligible_users": 1365,
+              "recall_at_10": 0.05269383,
+              "ndcg_at_10": 0.10667746,
+              "mean_user_factor_norm": 0.12026577,
+              "catalog_coverage_items": 136,
+              "catalog_coverage_fraction": 0.00804686
+            },
+            "10": {
+              "eligible_users": 1365,
+              "recall_at_10": 0.05526883,
+              "ndcg_at_10": 0.11090667,
+              "mean_user_factor_norm": 0.20865315,
+              "catalog_coverage_items": 110,
+              "catalog_coverage_fraction": 0.00650849
+            },
+            "20": {
+              "eligible_users": 1365,
+              "recall_at_10": 0.05877161,
+              "ndcg_at_10": 0.11684376,
+              "mean_user_factor_norm": 0.36143148,
+              "catalog_coverage_items": 78,
+              "catalog_coverage_fraction": 0.00461511
+            },
+            "40": {
+              "eligible_users": 1365,
+              "recall_at_10": 0.06586042,
+              "ndcg_at_10": 0.13015682,
+              "mean_user_factor_norm": 0.61599216,
+              "catalog_coverage_items": 58,
+              "catalog_coverage_fraction": 0.00343175
+            },
+            "80": {
+              "eligible_users": 1365,
+              "recall_at_10": 0.08287887,
+              "ndcg_at_10": 0.16398634,
+              "mean_user_factor_norm": 0.99434223,
+              "catalog_coverage_items": 56,
+              "catalog_coverage_fraction": 0.00331341
+            }
+          }
+        }
+      },
+      {
+        "iteration": 2,
+        "trials": [
+          {
+            "regularization": 100.0,
+            "popularity_blend": 8.0,
+            "mean_ndcg_at_10": 0.13256402,
+            "mean_recall_at_10": 0.06671473,
+            "by_observed_ratings": {
+              "5": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05414153,
+                "ndcg_at_10": 0.11127264,
+                "mean_user_factor_norm": 0.12817363,
+                "catalog_coverage_items": 206,
+                "catalog_coverage_fraction": 0.01218863
+              },
+              "10": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05762703,
+                "ndcg_at_10": 0.11519171,
+                "mean_user_factor_norm": 0.22115179,
+                "catalog_coverage_items": 167,
+                "catalog_coverage_fraction": 0.00988107
+              },
+              "20": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.06260611,
+                "ndcg_at_10": 0.12326978,
+                "mean_user_factor_norm": 0.3806232,
+                "catalog_coverage_items": 119,
+                "catalog_coverage_fraction": 0.007041
+              },
+              "40": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.07063905,
+                "ndcg_at_10": 0.13932956,
+                "mean_user_factor_norm": 0.64480303,
+                "catalog_coverage_items": 86,
+                "catalog_coverage_fraction": 0.00508846
+              },
+              "80": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.08855995,
+                "ndcg_at_10": 0.17375639,
+                "mean_user_factor_norm": 1.03459695,
+                "catalog_coverage_items": 74,
+                "catalog_coverage_fraction": 0.00437844
+              }
+            }
+          },
+          {
+            "regularization": 100.0,
+            "popularity_blend": 16.0,
+            "mean_ndcg_at_10": 0.12450985,
+            "mean_recall_at_10": 0.06261875,
+            "by_observed_ratings": {
+              "5": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05218635,
+                "ndcg_at_10": 0.10734272,
+                "mean_user_factor_norm": 0.12817363,
+                "catalog_coverage_items": 72,
+                "catalog_coverage_fraction": 0.0042601
+              },
+              "10": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05436072,
+                "ndcg_at_10": 0.10867949,
+                "mean_user_factor_norm": 0.22115179,
+                "catalog_coverage_items": 62,
+                "catalog_coverage_fraction": 0.00366842
+              },
+              "20": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05791378,
+                "ndcg_at_10": 0.11592506,
+                "mean_user_factor_norm": 0.3806232,
+                "catalog_coverage_items": 45,
+                "catalog_coverage_fraction": 0.00266256
+              },
+              "40": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.06586906,
+                "ndcg_at_10": 0.12920467,
+                "mean_user_factor_norm": 0.64480303,
+                "catalog_coverage_items": 40,
+                "catalog_coverage_fraction": 0.00236672
+              },
+              "80": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.08276384,
+                "ndcg_at_10": 0.16139731,
+                "mean_user_factor_norm": 1.03459695,
+                "catalog_coverage_items": 43,
+                "catalog_coverage_fraction": 0.00254423
+              }
+            }
+          },
+          {
+            "regularization": 100.0,
+            "popularity_blend": 32.0,
+            "mean_ndcg_at_10": 0.12141891,
+            "mean_recall_at_10": 0.06061864,
+            "by_observed_ratings": {
+              "5": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05204374,
+                "ndcg_at_10": 0.10624219,
+                "mean_user_factor_norm": 0.12817363,
+                "catalog_coverage_items": 28,
+                "catalog_coverage_fraction": 0.00165671
+              },
+              "10": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05305102,
+                "ndcg_at_10": 0.10751519,
+                "mean_user_factor_norm": 0.22115179,
+                "catalog_coverage_items": 26,
+                "catalog_coverage_fraction": 0.00153837
+              },
+              "20": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.05684061,
+                "ndcg_at_10": 0.11349497,
+                "mean_user_factor_norm": 0.3806232,
+                "catalog_coverage_items": 23,
+                "catalog_coverage_fraction": 0.00136087
+              },
+              "40": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.06267604,
+                "ndcg_at_10": 0.12406136,
+                "mean_user_factor_norm": 0.64480303,
+                "catalog_coverage_items": 26,
+                "catalog_coverage_fraction": 0.00153837
+              },
+              "80": {
+                "eligible_users": 1365,
+                "recall_at_10": 0.07848181,
+                "ndcg_at_10": 0.15578084,
+                "mean_user_factor_norm": 1.03459695,
+                "catalog_coverage_items": 37,
+                "catalog_coverage_fraction": 0.00218922
+              }
+            }
+          }
+        ],
+        "selected": {
+          "regularization": 100.0,
+          "popularity_blend": 8.0,
+          "mean_ndcg_at_10": 0.13256402,
+          "mean_recall_at_10": 0.06671473,
+          "by_observed_ratings": {
+            "5": {
+              "eligible_users": 1365,
+              "recall_at_10": 0.05414153,
+              "ndcg_at_10": 0.11127264,
+              "mean_user_factor_norm": 0.12817363,
+              "catalog_coverage_items": 206,
+              "catalog_coverage_fraction": 0.01218863
+            },
+            "10": {
+              "eligible_users": 1365,
+              "recall_at_10": 0.05762703,
+              "ndcg_at_10": 0.11519171,
+              "mean_user_factor_norm": 0.22115179,
+              "catalog_coverage_items": 167,
+              "catalog_coverage_fraction": 0.00988107
+            },
+            "20": {
+              "eligible_users": 1365,
+              "recall_at_10": 0.06260611,
+              "ndcg_at_10": 0.12326978,
+              "mean_user_factor_norm": 0.3806232,
+              "catalog_coverage_items": 119,
+              "catalog_coverage_fraction": 0.007041
+            },
+            "40": {
+              "eligible_users": 1365,
+              "recall_at_10": 0.07063905,
+              "ndcg_at_10": 0.13932956,
+              "mean_user_factor_norm": 0.64480303,
+              "catalog_coverage_items": 86,
+              "catalog_coverage_fraction": 0.00508846
+            },
+            "80": {
+              "eligible_users": 1365,
+              "recall_at_10": 0.08855995,
+              "ndcg_at_10": 0.17375639,
+              "mean_user_factor_norm": 1.03459695,
+              "catalog_coverage_items": 74,
+              "catalog_coverage_fraction": 0.00437844
+            }
+          }
+        }
+      }
+    ]
+  },
+  "selected_validation": {
+    "regularization": 100.0,
+    "popularity_blend": 8.0,
+    "mean_ndcg_at_10": 0.13256402,
+    "mean_recall_at_10": 0.06671473,
+    "by_observed_ratings": {
+      "5": {
+        "eligible_users": 1365,
+        "recall_at_10": 0.05414153,
+        "ndcg_at_10": 0.11127264,
+        "mean_user_factor_norm": 0.12817363,
+        "catalog_coverage_items": 206,
+        "catalog_coverage_fraction": 0.01218863
+      },
+      "10": {
+        "eligible_users": 1365,
+        "recall_at_10": 0.05762703,
+        "ndcg_at_10": 0.11519171,
+        "mean_user_factor_norm": 0.22115179,
+        "catalog_coverage_items": 167,
+        "catalog_coverage_fraction": 0.00988107
+      },
+      "20": {
+        "eligible_users": 1365,
+        "recall_at_10": 0.06260611,
+        "ndcg_at_10": 0.12326978,
+        "mean_user_factor_norm": 0.3806232,
+        "catalog_coverage_items": 119,
+        "catalog_coverage_fraction": 0.007041
+      },
+      "40": {
+        "eligible_users": 1365,
+        "recall_at_10": 0.07063905,
+        "ndcg_at_10": 0.13932956,
+        "mean_user_factor_norm": 0.64480303,
+        "catalog_coverage_items": 86,
+        "catalog_coverage_fraction": 0.00508846
+      },
+      "80": {
+        "eligible_users": 1365,
+        "recall_at_10": 0.08855995,
+        "ndcg_at_10": 0.17375639,
+        "mean_user_factor_norm": 1.03459695,
+        "catalog_coverage_items": 74,
+        "catalog_coverage_fraction": 0.00437844
+      }
+    }
+  },
+  "reproducibility": {
+    "seed": 42
+  }
+}

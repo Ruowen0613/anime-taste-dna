@@ -13,7 +13,6 @@ METHOD_VERSION = "metadata-affinity-v2"
 NEUTRAL_RATING = 5.5
 RATING_HALF_RANGE = 4.5
 PRIOR_STRENGTH = 2.0
-MAX_CONTRIBUTIONS = 3
 MAX_TAGS_PER_GROUP = 5
 GENRE_AXES = (
     "Action",
@@ -151,6 +150,6 @@ def _build_dimension(
                 title=rating.title,
                 rating=rating.rating,
             )
-            for rating, _ in ranked_contributions[:MAX_CONTRIBUTIONS]
+            for rating, _ in ranked_contributions
         ],
     )

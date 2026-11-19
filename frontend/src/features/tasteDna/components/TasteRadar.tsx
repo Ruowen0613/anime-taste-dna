@@ -15,9 +15,15 @@ type TasteRadarProps = {
 
 export function TasteRadar({ dimensions }: TasteRadarProps) {
   return (
-    <div className="h-[380px] w-full" aria-label="Taste DNA genre affinity radar chart">
+    <div className="h-[320px] min-w-0 w-full sm:h-[380px]" aria-label="Taste DNA genre affinity radar chart">
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={dimensions} cx="50%" cy="50%" outerRadius="72%">
+        <RadarChart
+          data={dimensions}
+          cx="50%"
+          cy="50%"
+          outerRadius="62%"
+          margin={{ top: 18, right: 24, bottom: 18, left: 24 }}
+        >
           <PolarGrid stroke="rgba(255,255,255,0.14)" />
           <PolarAngleAxis dataKey="label" tick={{ fill: '#cbd5e1', fontSize: 12 }} />
           <PolarRadiusAxis angle={90} domain={[0, 100]} tickCount={6} tick={{ fill: '#64748b', fontSize: 10 }} axisLine={false} />

@@ -1,3 +1,4 @@
+import { useDismissableDetails } from '../../shared/useDismissableDetails'
 import type { RatedAnime } from '../discover/types'
 import { TasteRadar } from './components/TasteRadar'
 import { TasteTagGroup } from './components/TasteTagGroup'
@@ -10,9 +11,10 @@ type TasteDnaPageProps = {
 
 export function TasteDnaPage({ ratings, onPopularPicks }: TasteDnaPageProps) {
   const tasteDna = useTasteDna(ratings)
+  const pageRef = useDismissableDetails<HTMLElement>()
 
   return (
-    <section className="pb-20 pt-16" aria-labelledby="taste-dna-heading">
+    <section ref={pageRef} className="pb-20 pt-16" aria-labelledby="taste-dna-heading">
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-violet">Your ratings, decoded</p>
@@ -42,9 +44,29 @@ export function TasteDnaPage({ ratings, onPopularPicks }: TasteDnaPageProps) {
         <>
           <div className="mt-8 flex flex-wrap items-center gap-3 text-sm text-slate-400">
             <span>{tasteDna.data.mapped_ratings}/{tasteDna.data.total_ratings} ratings mapped</span>
-            <span>·</span>
-            <span>Method {tasteDna.data.method_version}</span>
             {tasteDna.data.metadata_status !== 'complete' && <span className="text-amber-300">· Some ratings have no genre metadata</span>}
+            <details className="relative">
+              <summary className="cursor-pointer list-none rounded-full border border-white/10 px-3 py-1 text-slate-300 transition hover:border-violet/50 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-violet">
+                How this works
+              </summary>
+              <div className="absolute left-0 z-20 mt-2 w-[min(20rem,calc(100vw-3rem))] rounded-2xl border border-white/10 bg-[#151a2b] p-4 text-sm leading-6 text-slate-300 shadow-2xl">
+                Scores are derived from your ratings and AniList genres and tags. A score of 50 is neutral; limited evidence is pulled toward 50. Hidden model factors are never given genre names.
+                <p className="mt-2 text-xs text-slate-500">Method {tasteDna.data.method_version}</p>
+              </div>
+            </details>
+          </div>
+          <div className="mt-5 rounded-2xl border border-white/10 bg-white/[0.04] p-4 sm:flex sm:items-center sm:gap-5">
+            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-400">Your top affinities</p>
+            <ol className="mt-3 flex flex-wrap gap-2 sm:mt-0">
+              {[...tasteDna.data.genre_dimensions]
+                .sort((left, right) => right.score - left.score || left.label.localeCompare(right.label))
+                .slice(0, 3)
+                .map((dimension, index) => (
+                  <li className="rounded-full bg-violet/15 px-3 py-1.5 text-sm text-slate-200" key={dimension.label}>
+                    <span className="mr-1 text-slate-500">{index + 1}</span>{dimension.label} <strong className="text-violet">{dimension.score}</strong>
+                  </li>
+                ))}
+            </ol>
           </div>
           <div className="mt-8 rounded-3xl border border-white/10 bg-gradient-to-br from-violet/10 to-sakura/5 p-4 sm:p-6">
             <h2 className="px-3 pt-2 text-xl font-semibold">Genre Affinity</h2>
@@ -52,7 +74,7 @@ export function TasteDnaPage({ ratings, onPopularPicks }: TasteDnaPageProps) {
             <p className="px-3 pb-2 text-center text-xs leading-relaxed text-slate-500">Eight fixed genre signals. 50 is neutral; sparse evidence is shrunk toward the center.</p>
           </div>
           <div className="mt-6 grid gap-5 lg:grid-cols-3">
-            <TasteTagGroup title="Story Themes" description="The narrative themes that resonate with you most." dimensions={tasteDna.data.story_themes} />
+            <TasteTagGroup title="Story Themes" description="The narrative themes that resonate with you most." dimensions={tasteDna.data.story_themes} defaultExpanded />
             <TasteTagGroup title="World & Settings" description="Top 5 worlds, periods, and settings." dimensions={tasteDna.data.worlds_and_settings} />
             <TasteTagGroup title="Character" description="Top 5 cast traits and compositions." dimensions={tasteDna.data.characters} />
           </div>

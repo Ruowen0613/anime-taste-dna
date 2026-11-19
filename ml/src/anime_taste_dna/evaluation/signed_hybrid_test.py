@@ -28,6 +28,7 @@ class SignedHybridTestConfig:
     output_report: Path
     signed_regularization: float
     signed_weight: float
+    allow_production_acceptance: bool
 
     @classmethod
     def from_toml(cls, path: Path) -> SignedHybridTestConfig:
@@ -66,6 +67,9 @@ class SignedHybridTestConfig:
             output_report=validation.output_report,
             signed_regularization=float(raw["fixed_selection"]["signed_regularization"]),
             signed_weight=float(raw["fixed_selection"]["signed_weight"]),
+            allow_production_acceptance=bool(
+                raw.get("release", {}).get("allow_production_acceptance", True)
+            ),
         )
 
 
@@ -208,7 +212,13 @@ def run_final_test(config: SignedHybridTestConfig) -> dict[str, Any]:
         },
         "passed_relevance_baseline": passed_relevance_baseline,
         "passed_behavior_gates": passed_behavior,
-        "accepted_for_production": passed_relevance_baseline and passed_behavior,
+        "passed_internal_gates": passed_relevance_baseline and passed_behavior,
+        "accepted_for_production": (
+            config.allow_production_acceptance
+            and passed_relevance_baseline
+            and passed_behavior
+        ),
+        "production_acceptance_allowed": config.allow_production_acceptance,
     }
     config.output_report.parent.mkdir(parents=True, exist_ok=True)
     config.output_report.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")

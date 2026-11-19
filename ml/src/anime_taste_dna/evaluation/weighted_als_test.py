@@ -34,6 +34,7 @@ class WeightedAlsTestConfig:
     fixed_iterations: int
     fixed_fold_in_regularization: float
     fixed_popularity_blend: float
+    model_version: str
 
     @classmethod
     def from_toml(cls, path: Path) -> WeightedAlsTestConfig:
@@ -52,6 +53,14 @@ class WeightedAlsTestConfig:
             alpha=float(raw["training"]["alpha"]),
             regularization=float(raw["training"]["regularization"]),
             positive_rating_threshold=int(raw["training"]["positive_rating_threshold"]),
+            rating_confidence_overrides=tuple(
+                sorted(
+                    (int(rating), float(confidence))
+                    for rating, confidence in raw["training"].get(
+                        "rating_confidence_overrides", {}
+                    ).items()
+                )
+            ),
             seed=int(raw["training"]["seed"]),
             fold_in_regularization_candidates=(
                 float(raw["fixed_selection"]["fold_in_regularization"]),
@@ -77,6 +86,9 @@ class WeightedAlsTestConfig:
                 raw["fixed_selection"]["fold_in_regularization"]
             ),
             fixed_popularity_blend=float(raw["fixed_selection"]["popularity_blend"]),
+            model_version=str(
+                raw["fixed_selection"].get("model_version", "weighted-als-hybrid-v1")
+            ),
         )
 
 
@@ -210,7 +222,7 @@ def run_final_test(config: WeightedAlsTestConfig) -> dict[str, Any]:
             positive_rating_threshold=np.asarray(
                 [model_config.positive_rating_threshold], dtype=np.int16
             ),
-            model_version=np.asarray(["weighted-als-hybrid-v1"], dtype=np.str_),
+            model_version=np.asarray([config.model_version], dtype=np.str_),
         )
         artifact = {"path": str(config.artifact_path), "exported": True}
 

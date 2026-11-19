@@ -1,3 +1,4 @@
+import { useDismissableDetails } from '../../shared/useDismissableDetails'
 import { AnimeDetailsModal } from '../animeDetails/components/AnimeDetailsModal'
 import { useAnimeDetails } from '../animeDetails/useAnimeDetails'
 import type { AnimeSearchResult, RatedAnime } from '../discover/types'
@@ -18,6 +19,7 @@ export function RecommendationsPage({ ratings, preferences, onRate, onBack }: Re
   const notInterested = useNotInterested()
   const recommendations = useRecommendations(ratings, notInterested.malIds, preferences)
   const animeDetails = useAnimeDetails()
+  const pageRef = useDismissableDetails<HTMLElement>()
 
   function archiveRecommendation(item: NotInterestedAnime) {
     notInterested.add(item)
@@ -34,17 +36,27 @@ export function RecommendationsPage({ ratings, preferences, onRate, onBack }: Re
   }
 
   return (
-    <section className="py-16" aria-labelledby="recommendations-heading">
+    <section ref={pageRef} className="py-16" aria-labelledby="recommendations-heading">
       <button className="text-sm text-violet transition hover:text-white" type="button" onClick={onBack}>← Back to your ratings</button>
       <div className="mt-8 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
-        <div><p className="text-sm font-semibold uppercase tracking-[0.28em] text-violet">Your next watch</p><h1 id="recommendations-heading" className="mt-3 text-4xl font-bold sm:text-6xl">Recommendations</h1><p className="mt-4 max-w-2xl text-slate-300">Ranked by a validated Weighted ALS and popularity hybrid from your ratings. Model order is separate from AniList community scores.</p></div>
+        <div><p className="text-sm font-semibold uppercase tracking-[0.28em] text-violet">Your next watch</p><h1 id="recommendations-heading" className="mt-3 text-4xl font-bold sm:text-6xl">Recommendations</h1><p className="mt-4 max-w-2xl text-slate-300">Personalized from your ratings. Community scores are shown for context and do not determine this order.</p></div>
         <button className="self-start rounded-xl border border-white/15 bg-white/5 px-4 py-2.5 text-sm transition hover:bg-white/10 disabled:opacity-50 lg:self-auto" type="button" disabled={recommendations.loading} onClick={() => void recommendations.generate()}>Regenerate</button>
       </div>
       {recommendations.loading && <div className="mt-12 grid gap-4 md:grid-cols-2" aria-label="Loading recommendations">{Array.from({ length: 4 }, (_, index) => <div className="h-52 animate-pulse rounded-2xl bg-white/5" key={index} />)}</div>}
       {recommendations.error && <div className="mt-10 rounded-2xl border border-rose-400/20 bg-rose-400/10 p-5 text-rose-200" role="alert"><p>{recommendations.error}</p><button className="mt-3 text-sm underline" type="button" onClick={() => void recommendations.generate()}>Try again</button></div>}
       {recommendations.result && !recommendations.loading && (
         <>
-          <div className="mt-8 flex flex-wrap items-center gap-3 text-sm text-slate-400"><span>{recommendations.result.mapped_ratings}/{Math.min(ratings.length, 100)} ratings mapped</span><span>·</span><span>Model {recommendations.result.model_version}</span>{recommendations.result.metadata_status !== 'complete' && <span className="text-amber-300">· Some AniList metadata is unavailable</span>}</div>
+          <div className="mt-8 flex flex-wrap items-center gap-3 text-sm text-slate-400">
+            <span>{recommendations.result.mapped_ratings === Math.min(ratings.length, 100) ? `${recommendations.result.mapped_ratings} ratings used` : `${recommendations.result.mapped_ratings} of ${Math.min(ratings.length, 100)} ratings used`}</span>
+            <details className="relative">
+              <summary className="cursor-pointer list-none rounded-full border border-white/10 px-3 py-1 text-slate-300 transition hover:border-violet/50 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-violet">About these results</summary>
+              <div className="absolute left-0 z-20 mt-2 w-[min(21rem,calc(100vw-3rem))] rounded-2xl border border-white/10 bg-[#151a2b] p-4 text-sm leading-6 text-slate-300 shadow-2xl">
+                Recommendations are ranked from your ratings. AniList supplies covers, genres, and community scores but does not control the model order.
+                {recommendations.result.metadata_status !== 'complete' && <p className="mt-2 text-slate-400">Some AniList details could not be loaded, so a few cards may have limited artwork or metadata.</p>}
+                <p className="mt-2 text-xs text-slate-500">Model {recommendations.result.model_version}</p>
+              </div>
+            </details>
+          </div>
           {recommendations.result.mapped_preferences > 0 && <p className="mt-3 text-sm text-violet">{recommendations.result.mapped_preferences} taste choice{recommendations.result.mapped_preferences === 1 ? '' : 's'} saved. Least-interest choices are excluded.</p>}
           {recommendations.refinementChangedCount !== null && <p className="mt-2 text-sm text-emerald-300">Taste updated — {recommendations.refinementChangedCount} recommendation{recommendations.refinementChangedCount === 1 ? '' : 's'} changed.</p>}
           {recommendations.result.unmapped_mal_ids.length > 0 && <p className="mt-3 text-sm text-slate-500">{recommendations.result.unmapped_mal_ids.length} newer or unsupported title{recommendations.result.unmapped_mal_ids.length === 1 ? '' : 's'} could not influence this result.</p>}

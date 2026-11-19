@@ -1,0 +1,8 @@
+[paths]
+source_directory = "../data/processed/user-animelist-2025-pilot"
+output_directory = "../data/processed/user-animelist-2025-fixed-100"
+
+[resample]
+history_interactions = 80
+target_interactions = 20
+seed = 10020

@@ -1,0 +1,75 @@
+{
+  "dataset": {
+    "reference": "mramazan/User-Animelist-Dataset",
+    "snapshot_date": "2025-07-18",
+    "license": "CC-BY-4.0 (as reported by Hugging Face)",
+    "has_rating_timestamps": false
+  },
+  "ratings": {
+    "raw_rows": 148170496,
+    "valid_rows": 148064215,
+    "invalid_user_id_rows": 0,
+    "invalid_anime_id_rows": 0,
+    "invalid_rating_rows": 106281,
+    "invalid_rating_counts": {
+      "0": 106281
+    },
+    "fractional_rating_rows": 0,
+    "unique_users": 1774493,
+    "unique_items": 20237,
+    "score_mean": 7.6506,
+    "score_counts": {
+      "1": 1669398,
+      "2": 1306523,
+      "3": 1880375,
+      "4": 4825252,
+      "5": 7000477,
+      "6": 15976175,
+      "7": 28590614,
+      "8": 37188066,
+      "9": 21214109,
+      "10": 28413226
+    },
+    "metadata_missing_rows": 0,
+    "metadata_missing_unique_items": 0,
+    "user_ids_monotonic": false,
+    "duplicate_rows_beyond_first": 3384712,
+    "duplicate_groups": 2757008,
+    "conflicting_rating_groups": 57178,
+    "duplicate_count_is_exact": true,
+    "interactions_per_user": {
+      "min": 1,
+      "p25": 10.0,
+      "median": 29.0,
+      "p75": 92.0,
+      "p90": 220.0,
+      "p99": 680.0,
+      "max": 10881
+    },
+    "interactions_per_item": {
+      "min": 1,
+      "p25": 49.0,
+      "median": 263.0,
+      "p75": 2124.0,
+      "p90": 13385.6,
+      "p99": 131278.32,
+      "max": 956399
+    }
+  },
+  "anime": {
+    "raw_rows": 20237,
+    "valid_internal_ids": 20237,
+    "unique_internal_ids": 20237,
+    "duplicate_internal_id_rows": 0,
+    "valid_mal_ids": 20237,
+    "unique_mal_ids": 20237,
+    "duplicate_mal_id_rows": 0,
+    "missing_or_invalid_mal_url_rows": 0,
+    "internal_id_equals_mal_id_rows": 1
+  },
+  "limitations": [
+    "The ratings file has no timestamps, so chronological splitting is unavailable.",
+    "The source combines MyAnimeList, AniList, and Kitsu ratings on a normalized scale.",
+    "animeID is a dataset-local identifier; mal_url must be parsed for canonical MAL IDs."
+  ]
+}

@@ -125,3 +125,26 @@ def test_endpoint_rejects_duplicate_ratings() -> None:
     ]
     response = TestClient(app).post("/api/v1/taste-dna", json={"ratings": ratings})
     assert response.status_code == 422
+
+
+def test_service_returns_every_supporting_title() -> None:
+    ratings = [
+        TasteRating(
+            mal_id=mal_id,
+            title=f"Action {mal_id}",
+            rating=rating,
+            genres=["Action"],
+        )
+        for mal_id, rating in enumerate([10, 9, 8, 7, 6], start=1)
+    ]
+
+    action = build_taste_dna(ratings).genre_dimensions[0]
+
+    assert action.support == 5
+    assert [item.title for item in action.contributing_titles] == [
+        "Action 1",
+        "Action 2",
+        "Action 3",
+        "Action 4",
+        "Action 5",
+    ]

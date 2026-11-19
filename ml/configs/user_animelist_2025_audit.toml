@@ -1,0 +1,14 @@
+[dataset]
+reference = "mramazan/User-Animelist-Dataset"
+snapshot_date = "2025-07-18"
+license = "CC-BY-4.0 (as reported by Hugging Face)"
+
+[paths]
+ratings_csv = "../data/raw/user-animelist-2025/ratings.csv"
+anime_csv = "../data/raw/user-animelist-2025/animes.csv"
+report_json = "reports/user-animelist-2025-audit-v1.json"
+working_directory = "../data/working/user-animelist-2025-audit"
+
+[audit]
+chunk_size = 1000000
+duplicate_partitions = 16
