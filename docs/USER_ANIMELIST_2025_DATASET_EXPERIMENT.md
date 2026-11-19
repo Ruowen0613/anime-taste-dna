@@ -83,6 +83,35 @@ The next justified experiment is to obtain or construct a source with platform n
 timestamps, or to train the same pilot protocol on a matched deterministic sample of the 2023
 dataset. A matched-protocol comparison is required before considering a production migration.
 
+## Matched 2023 versus 2025 follow-up
+
+The follow-up removed the largest evaluation mismatch. Both datasets used pairwise-disjoint global
+training, validation, and test users. Every eligible held-out user supplied exactly 100 sampled
+interactions: 80 history ratings and 20 targets. Both models used 16 dimensions, two Weighted ALS
+iterations, the same rating threshold, the same fold-in regularization, and the same 5/10/20/40/80
+observed-rating conditions. Each dataset selected its popularity and signed weights on its own
+validation users before one frozen test.
+
+| Dataset and model | Training users | Test users | Recall@10 | NDCG@10 |
+| --- | ---: | ---: | ---: | ---: |
+| 2023 popularity | 14,477 | 1,802 | 0.00970643 | 0.01073640 |
+| 2023 Weighted ALS | 14,477 | 1,802 | 0.01104428 | 0.01180189 |
+| 2023 ALS + signed residual | 14,477 | 1,802 | 0.01092202 | 0.01157916 |
+| 2025 popularity | 106,222 | 1,237 | 0.05504488 | 0.06834265 |
+| 2025 Weighted ALS | 106,222 | 1,237 | 0.06216211 | 0.07897297 |
+| 2025 ALS + signed residual | 106,222 | 1,237 | **0.06418449** | **0.08159359** |
+
+Under this matched exam, the complete 2025 candidate achieved 5.88 times the 2023 Recall@10 and
+7.05 times its NDCG@10. The signed residual reduced the 2023 ALS metrics by 1.1% and 1.9%, but
+improved the 2025 ALS metrics by 3.3% on both measures. This is substantially stronger evidence
+that the broader user population supplies useful rating-aware structure.
+
+The comparison still does not isolate *why* the new source wins: it simultaneously changes user
+population, global-training user count, catalog, collection date, and platform mix. It supports
+advancing a 2025-based v3 candidate, not immediately replacing the chronological production v2.
+The next release gate should validate platform-ID handling and rating-scale normalization, then use
+shadow or A/B feedback from actual product users.
+
 Executed evidence is stored in:
 
 - `ml/reports/user-animelist-2025-audit-v1.json`
@@ -92,3 +121,4 @@ Executed evidence is stored in:
 - `ml/reports/weighted-als-user-animelist-2025-pilot-test-v1.json`
 - `ml/reports/signed-hybrid-user-animelist-2025-pilot-validation-v1.json`
 - `ml/reports/signed-hybrid-user-animelist-2025-pilot-test-v1.json`
+- `ml/reports/dataset-2023-vs-2025-fixed-100-comparison-v1.json`

@@ -1,0 +1,24 @@
+[paths]
+split_directory = "../data/processed/v4-user-holdout-fixed-100"
+artifact_path = "../data/artifacts/weighted-als-2023-fixed-100-v1/weighted_als_hybrid.npz"
+output_report = "reports/signed-hybrid-2023-fixed-100-test-v1.json"
+
+[fixed_selection]
+signed_regularization = 10.0
+signed_weight = 0.075
+
+[release]
+allow_production_acceptance = false
+
+[behavior_gates]
+max_counterfactual_top_10_overlap = 0.7
+max_popularity_top_10_overlap = 0.7
+minimum_catalog_coverage_fraction = 0.01
+
+[evaluation]
+observed_ratings = [5, 10, 20, 40, 80]
+relevance_threshold = 8
+ranking_k = 10
+user_batch_size = 128
+parquet_batch_size = 131072
+seed = 42

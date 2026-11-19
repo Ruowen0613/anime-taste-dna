@@ -1,0 +1,105 @@
+{
+  "protocol": {
+    "split": "strict untouched test users",
+    "test_users": 1802,
+    "parameter_search": "none; all values frozen from validation",
+    "candidate_exclusion": "only exposed ratings"
+  },
+  "fixed_selection": {
+    "iterations": 2,
+    "fold_in_regularization": 100.0,
+    "popularity_blend": 8.0
+  },
+  "interaction_count_baseline": {
+    "mean_recall_at_10": 0.00970643,
+    "mean_ndcg_at_10": 0.0107364,
+    "by_observed_ratings": {
+      "5": {
+        "eligible_users": 1802,
+        "recall_at_10": 0.00951389,
+        "ndcg_at_10": 0.01039793,
+        "catalog_coverage_items": 12,
+        "candidate_exclusion": "only the 5 exposed ratings"
+      },
+      "10": {
+        "eligible_users": 1802,
+        "recall_at_10": 0.00951389,
+        "ndcg_at_10": 0.0104175,
+        "catalog_coverage_items": 13,
+        "candidate_exclusion": "only the 10 exposed ratings"
+      },
+      "20": {
+        "eligible_users": 1802,
+        "recall_at_10": 0.0096295,
+        "ndcg_at_10": 0.0106093,
+        "catalog_coverage_items": 13,
+        "candidate_exclusion": "only the 20 exposed ratings"
+      },
+      "40": {
+        "eligible_users": 1802,
+        "recall_at_10": 0.00966649,
+        "ndcg_at_10": 0.01077789,
+        "catalog_coverage_items": 16,
+        "candidate_exclusion": "only the 40 exposed ratings"
+      },
+      "80": {
+        "eligible_users": 1802,
+        "recall_at_10": 0.01020836,
+        "ndcg_at_10": 0.01147937,
+        "catalog_coverage_items": 20,
+        "candidate_exclusion": "only the 80 exposed ratings"
+      }
+    }
+  },
+  "weighted_als_hybrid": {
+    "mean_recall_at_10": 0.01104428,
+    "mean_ndcg_at_10": 0.01180189,
+    "by_observed_ratings": {
+      "5": {
+        "eligible_users": 1802,
+        "recall_at_10": 0.01010768,
+        "ndcg_at_10": 0.01049727,
+        "mean_user_factor_norm": 0.03989844,
+        "catalog_coverage_items": 375,
+        "catalog_coverage_fraction": 0.02629734
+      },
+      "10": {
+        "eligible_users": 1802,
+        "recall_at_10": 0.01099229,
+        "ndcg_at_10": 0.01156546,
+        "mean_user_factor_norm": 0.07403478,
+        "catalog_coverage_items": 268,
+        "catalog_coverage_fraction": 0.01879383
+      },
+      "20": {
+        "eligible_users": 1802,
+        "recall_at_10": 0.01116007,
+        "ndcg_at_10": 0.01181612,
+        "mean_user_factor_norm": 0.13720931,
+        "catalog_coverage_items": 143,
+        "catalog_coverage_fraction": 0.01002805
+      },
+      "40": {
+        "eligible_users": 1802,
+        "recall_at_10": 0.01120382,
+        "ndcg_at_10": 0.01213324,
+        "mean_user_factor_norm": 0.25795778,
+        "catalog_coverage_items": 42,
+        "catalog_coverage_fraction": 0.0029453
+      },
+      "80": {
+        "eligible_users": 1802,
+        "recall_at_10": 0.01175752,
+        "ndcg_at_10": 0.01299735,
+        "mean_user_factor_norm": 0.47957677,
+        "catalog_coverage_items": 30,
+        "catalog_coverage_fraction": 0.00210379
+      }
+    }
+  },
+  "passed_both_metrics": true,
+  "artifact": {
+    "path": "/Users/wangruowen/Downloads/anime-taste-dna/data/artifacts/weighted-als-2023-fixed-100-v1/weighted_als_hybrid.npz",
+    "exported": true
+  }
+}

@@ -1,0 +1,8 @@
+[paths]
+source_directory = "../data/processed/v3-user-holdout-random"
+output_directory = "../data/processed/v4-user-holdout-fixed-100"
+
+[resample]
+history_interactions = 80
+target_interactions = 20
+seed = 10020

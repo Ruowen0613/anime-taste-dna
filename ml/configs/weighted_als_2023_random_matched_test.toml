@@ -1,0 +1,25 @@
+[paths]
+split_directory = "../data/processed/v3-user-holdout-random"
+processed_directory = "../data/processed/v1"
+output_report = "reports/weighted-als-2023-random-matched-test-v1.json"
+artifact_path = "../data/artifacts/weighted-als-2023-random-matched-v1/weighted_als_hybrid.npz"
+
+[training]
+dimensions = 16
+alpha = 10.0
+regularization = 1.0
+positive_rating_threshold = 8
+seed = 42
+
+[fixed_selection]
+iterations = 2
+fold_in_regularization = 100.0
+popularity_blend = 16.0
+model_version = "weighted-als-2023-random-matched-v1"
+
+[evaluation]
+observed_ratings = [5, 10, 20, 40, 80]
+relevance_threshold = 8
+ranking_k = 10
+user_batch_size = 128
+parquet_batch_size = 131072

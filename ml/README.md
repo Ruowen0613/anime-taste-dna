@@ -22,6 +22,12 @@ validation/frozen test using the corresponding `*_user_animelist_2025_pilot*.tom
 pilot is deliberately blocked from production acceptance; its source has no timestamps or platform
 provenance. See `docs/USER_ANIMELIST_2025_DATASET_EXPERIMENT.md` for executed results.
 
+For the fixed-size matched comparison, create or resample the 2023 and 2025 user-holdout splits
+with `user_holdout_random_2023_matched.toml`, `fixed_holdout_2023_matched.toml`, and
+`fixed_holdout_2025_matched.toml`, then run the corresponding `*_fixed_100*.toml` Weighted ALS and
+signed-hybrid configs. The aggregate decision record is
+`reports/dataset-2023-vs-2025-fixed-100-comparison-v1.json`.
+
 ## Dataset audit
 
 Install the package in an isolated environment and run the chunked audit from `ml/`:

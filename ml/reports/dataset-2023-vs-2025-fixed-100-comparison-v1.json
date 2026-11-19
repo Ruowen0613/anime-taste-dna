@@ -1,0 +1,84 @@
+{
+  "protocol": {
+    "name": "matched strict held-out users with fixed deterministic random targets",
+    "history_interactions_per_user": 80,
+    "target_interactions_per_user": 20,
+    "observed_ratings": [5, 10, 20, 40, 80],
+    "relevance_threshold": 8,
+    "ranking_k": 10,
+    "matrix_factorization": {
+      "name": "Weighted ALS",
+      "dimensions": 16,
+      "iterations": 2,
+      "alpha": 10.0,
+      "training_regularization": 1.0,
+      "fold_in_regularization": 100.0
+    },
+    "test_parameter_search": "none; each dataset froze its own validation selection"
+  },
+  "datasets": {
+    "myanimelist_2023": {
+      "global_training_users": 14477,
+      "eligible_test_users": 1802,
+      "catalog_items": 14260,
+      "selected_popularity_blend": 8.0,
+      "selected_signed_regularization": 10.0,
+      "selected_signed_weight": 0.075,
+      "interaction_count_baseline": {
+        "mean_recall_at_10": 0.00970643,
+        "mean_ndcg_at_10": 0.01073640
+      },
+      "weighted_als": {
+        "mean_recall_at_10": 0.01104428,
+        "mean_ndcg_at_10": 0.01180189
+      },
+      "signed_hybrid": {
+        "mean_recall_at_10": 0.01092202,
+        "mean_ndcg_at_10": 0.01157916
+      }
+    },
+    "cross_platform_2025_pilot": {
+      "global_training_users": 106222,
+      "eligible_test_users": 1237,
+      "catalog_items": 20237,
+      "selected_popularity_blend": 8.0,
+      "selected_signed_regularization": 10.0,
+      "selected_signed_weight": 0.1,
+      "interaction_count_baseline": {
+        "mean_recall_at_10": 0.05504488,
+        "mean_ndcg_at_10": 0.06834265
+      },
+      "weighted_als": {
+        "mean_recall_at_10": 0.06216211,
+        "mean_ndcg_at_10": 0.07897297
+      },
+      "signed_hybrid": {
+        "mean_recall_at_10": 0.06418449,
+        "mean_ndcg_at_10": 0.08159359
+      }
+    }
+  },
+  "comparison": {
+    "signed_hybrid_2025_over_2023_recall_multiple": 5.87661348,
+    "signed_hybrid_2025_over_2023_ndcg_multiple": 7.04658974,
+    "signed_residual_change_over_als_2023_recall_fraction": -0.01106998,
+    "signed_residual_change_over_als_2023_ndcg_fraction": -0.01887240,
+    "signed_residual_change_over_als_2025_recall_fraction": 0.03253397,
+    "signed_residual_change_over_als_2025_ndcg_fraction": 0.03318376
+  },
+  "decision": {
+    "advance_2025_dataset_candidate": true,
+    "replace_production_model": false,
+    "reason": "The matched protocol strongly favors the 2025 pilot, but source population, training-user count, platform normalization, missing timestamps, and missing platform provenance remain confounded."
+  },
+  "evidence": [
+    "weighted-als-2023-fixed-100-validation-v1.json",
+    "weighted-als-2023-fixed-100-test-v1.json",
+    "weighted-als-2025-fixed-100-validation-v1.json",
+    "weighted-als-2025-fixed-100-test-v1.json",
+    "signed-hybrid-2023-fixed-100-validation-v1.json",
+    "signed-hybrid-2023-fixed-100-test-v1.json",
+    "signed-hybrid-2025-fixed-100-validation-v1.json",
+    "signed-hybrid-2025-fixed-100-test-v1.json"
+  ]
+}
