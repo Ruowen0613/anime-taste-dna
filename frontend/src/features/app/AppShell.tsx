@@ -11,12 +11,14 @@ const TasteDnaPage = lazy(() => import('../tasteDna/TasteDnaPage').then((module)
 
 type View = 'ratings' | 'popular' | 'recommendations' | 'taste-dna'
 const TASTE_QUIZ_ENABLED = import.meta.env.VITE_ENABLE_TASTE_QUIZ === 'true'
+const MINIMUM_RECOMMENDATION_RATINGS = 10
 
 export function AppShell() {
   const [view, setView] = useState<View>('popular')
   const [quizOpen, setQuizOpen] = useState(false)
   const ratings = useRatings()
   const quiz = usePreferenceQuiz()
+  const recommendationsUnlocked = ratings.ratings.length >= MINIMUM_RECOMMENDATION_RATINGS
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0 })
@@ -34,16 +36,17 @@ export function AppShell() {
             <button aria-current={view === 'ratings' ? 'page' : undefined} className={`rounded-full border px-4 py-2 text-sm transition ${view === 'ratings' ? 'border-violet bg-violet/20 text-white' : 'border-white/15 bg-white/5 text-slate-300 hover:border-violet/50 hover:text-white'}`} type="button" onClick={() => setView('ratings')}>My Ratings</button>
             <button aria-current={view === 'taste-dna' ? 'page' : undefined} className={`rounded-full border px-4 py-2 text-sm transition ${view === 'taste-dna' ? 'border-violet bg-violet/20 text-white' : 'border-white/15 bg-white/5 text-slate-300 hover:border-violet/50 hover:text-white'}`} type="button" onClick={() => setView('taste-dna')}>Taste DNA</button>
             {TASTE_QUIZ_ENABLED && <button className="rounded-full border border-sakura/30 bg-sakura/10 px-4 py-2 text-sm text-sakura transition hover:bg-sakura/20 hover:text-white" type="button" onClick={() => setQuizOpen(true)}>Taste quiz</button>}
-            {ratings.ratings.length >= 10 && (
-              <button
-                aria-current={view === 'recommendations' ? 'page' : undefined}
-                className={`rounded-full border px-4 py-2 text-sm transition ${view === 'recommendations' ? 'border-violet bg-violet/20 text-white' : 'border-violet/40 bg-violet/10 text-violet hover:bg-violet/20 hover:text-white'}`}
-                type="button"
-                onClick={() => setView('recommendations')}
-              >
-                Recommendations
-              </button>
-            )}
+            <button
+              aria-current={view === 'recommendations' ? 'page' : undefined}
+              aria-label={recommendationsUnlocked ? 'Recommendations' : 'Recommendations locked. Rate at least 10 titles to unlock.'}
+              className={`inline-flex flex-col items-start rounded-2xl border px-4 py-2 text-left text-sm transition ${view === 'recommendations' ? 'border-violet bg-violet/20 text-white' : recommendationsUnlocked ? 'border-violet/40 bg-violet/10 text-violet hover:bg-violet/20 hover:text-white' : 'cursor-not-allowed border-white/10 bg-white/[0.03] text-slate-500'}`}
+              type="button"
+              disabled={!recommendationsUnlocked}
+              onClick={() => setView('recommendations')}
+            >
+              <span>{recommendationsUnlocked ? 'Recommendations' : 'Recommendations · Locked'}</span>
+              {!recommendationsUnlocked && <span className="mt-0.5 text-[11px] font-normal text-slate-500">Rate at least 10 titles to unlock</span>}
+            </button>
             <ApiStatus />
           </div>
         </nav>
