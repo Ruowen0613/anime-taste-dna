@@ -1,0 +1,550 @@
+{
+  "experiment": "rating-count-aware-signed-weight-validation-v1",
+  "protocol": {
+    "split": "strict held-out validation users",
+    "test_access": "none",
+    "common_users": 1801,
+    "source_item_model": "weighted-als-hybrid-v1",
+    "selection_metric": "NDCG@10 after recall, popularity-overlap, and coverage gates"
+  },
+  "fixed_model": {
+    "signed_regularization": 100.0,
+    "baseline_signed_weight": 0.05,
+    "popularity_decay_exponent": 1.0,
+    "popularity_decay_pivot": 10
+  },
+  "selected_weights": {
+    "5": 0.05,
+    "10": 0.05,
+    "20": 0.05,
+    "40": 0.04,
+    "80": 0.03
+  },
+  "by_observed_ratings": {
+    "5": {
+      "effective_popularity_blend": 32.0,
+      "baseline": {
+        "signed_weight": 0.05,
+        "eligible_users": 1801,
+        "recall_at_10": 0.02729669,
+        "ndcg_at_10": 0.54444306,
+        "mean_signed_user_factor_norm": 0.0180002,
+        "catalog_coverage_items": 297,
+        "catalog_coverage_fraction": 0.02082749,
+        "popularity_top_10_overlap": 0.63720155
+      },
+      "selected": {
+        "signed_weight": 0.05,
+        "eligible_users": 1801,
+        "recall_at_10": 0.02729669,
+        "ndcg_at_10": 0.54444306,
+        "mean_signed_user_factor_norm": 0.0180002,
+        "catalog_coverage_items": 297,
+        "catalog_coverage_fraction": 0.02082749,
+        "popularity_top_10_overlap": 0.63720155
+      },
+      "trials": [
+        {
+          "signed_weight": 0.03,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02840971,
+          "ndcg_at_10": 0.56700635,
+          "mean_signed_user_factor_norm": 0.0180002,
+          "catalog_coverage_items": 210,
+          "catalog_coverage_fraction": 0.01472651,
+          "popularity_top_10_overlap": 0.6961688
+        },
+        {
+          "signed_weight": 0.04,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02776165,
+          "ndcg_at_10": 0.55452686,
+          "mean_signed_user_factor_norm": 0.0180002,
+          "catalog_coverage_items": 248,
+          "catalog_coverage_fraction": 0.0173913,
+          "popularity_top_10_overlap": 0.66385341
+        },
+        {
+          "signed_weight": 0.05,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02729669,
+          "ndcg_at_10": 0.54444306,
+          "mean_signed_user_factor_norm": 0.0180002,
+          "catalog_coverage_items": 297,
+          "catalog_coverage_fraction": 0.02082749,
+          "popularity_top_10_overlap": 0.63720155
+        },
+        {
+          "signed_weight": 0.06,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02696036,
+          "ndcg_at_10": 0.53665891,
+          "mean_signed_user_factor_norm": 0.0180002,
+          "catalog_coverage_items": 337,
+          "catalog_coverage_fraction": 0.02363254,
+          "popularity_top_10_overlap": 0.61576902
+        },
+        {
+          "signed_weight": 0.075,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02635081,
+          "ndcg_at_10": 0.52561237,
+          "mean_signed_user_factor_norm": 0.0180002,
+          "catalog_coverage_items": 412,
+          "catalog_coverage_fraction": 0.02889201,
+          "popularity_top_10_overlap": 0.58700722
+        },
+        {
+          "signed_weight": 0.1,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02559355,
+          "ndcg_at_10": 0.50871226,
+          "mean_signed_user_factor_norm": 0.0180002,
+          "catalog_coverage_items": 523,
+          "catalog_coverage_fraction": 0.03667602,
+          "popularity_top_10_overlap": 0.54541921
+        },
+        {
+          "signed_weight": 0.15,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02414973,
+          "ndcg_at_10": 0.47944805,
+          "mean_signed_user_factor_norm": 0.0180002,
+          "catalog_coverage_items": 736,
+          "catalog_coverage_fraction": 0.0516129,
+          "popularity_top_10_overlap": 0.47501388
+        },
+        {
+          "signed_weight": 0.2,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02286554,
+          "ndcg_at_10": 0.45272325,
+          "mean_signed_user_factor_norm": 0.0180002,
+          "catalog_coverage_items": 927,
+          "catalog_coverage_fraction": 0.06500701,
+          "popularity_top_10_overlap": 0.41876735
+        }
+      ]
+    },
+    "10": {
+      "effective_popularity_blend": 32.0,
+      "baseline": {
+        "signed_weight": 0.05,
+        "eligible_users": 1801,
+        "recall_at_10": 0.02921453,
+        "ndcg_at_10": 0.58301074,
+        "mean_signed_user_factor_norm": 0.03353289,
+        "catalog_coverage_items": 257,
+        "catalog_coverage_fraction": 0.01802244,
+        "popularity_top_10_overlap": 0.67656857
+      },
+      "selected": {
+        "signed_weight": 0.05,
+        "eligible_users": 1801,
+        "recall_at_10": 0.02921453,
+        "ndcg_at_10": 0.58301074,
+        "mean_signed_user_factor_norm": 0.03353289,
+        "catalog_coverage_items": 257,
+        "catalog_coverage_fraction": 0.01802244,
+        "popularity_top_10_overlap": 0.67656857
+      },
+      "trials": [
+        {
+          "signed_weight": 0.03,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02967448,
+          "ndcg_at_10": 0.59337064,
+          "mean_signed_user_factor_norm": 0.03353289,
+          "catalog_coverage_items": 169,
+          "catalog_coverage_fraction": 0.01185133,
+          "popularity_top_10_overlap": 0.7197668
+        },
+        {
+          "signed_weight": 0.04,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02941154,
+          "ndcg_at_10": 0.58755692,
+          "mean_signed_user_factor_norm": 0.03353289,
+          "catalog_coverage_items": 210,
+          "catalog_coverage_fraction": 0.01472651,
+          "popularity_top_10_overlap": 0.69544697
+        },
+        {
+          "signed_weight": 0.05,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02921453,
+          "ndcg_at_10": 0.58301074,
+          "mean_signed_user_factor_norm": 0.03353289,
+          "catalog_coverage_items": 257,
+          "catalog_coverage_fraction": 0.01802244,
+          "popularity_top_10_overlap": 0.67656857
+        },
+        {
+          "signed_weight": 0.06,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02893395,
+          "ndcg_at_10": 0.57744123,
+          "mean_signed_user_factor_norm": 0.03353289,
+          "catalog_coverage_items": 300,
+          "catalog_coverage_fraction": 0.02103787,
+          "popularity_top_10_overlap": 0.65985564
+        },
+        {
+          "signed_weight": 0.075,
+          "eligible_users": 1801,
+          "recall_at_10": 0.0284924,
+          "ndcg_at_10": 0.56999069,
+          "mean_signed_user_factor_norm": 0.03353289,
+          "catalog_coverage_items": 349,
+          "catalog_coverage_fraction": 0.02447405,
+          "popularity_top_10_overlap": 0.63714603
+        },
+        {
+          "signed_weight": 0.1,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02806871,
+          "ndcg_at_10": 0.56021985,
+          "mean_signed_user_factor_norm": 0.03353289,
+          "catalog_coverage_items": 437,
+          "catalog_coverage_fraction": 0.03064516,
+          "popularity_top_10_overlap": 0.60416435
+        },
+        {
+          "signed_weight": 0.15,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02696089,
+          "ndcg_at_10": 0.53824765,
+          "mean_signed_user_factor_norm": 0.03353289,
+          "catalog_coverage_items": 604,
+          "catalog_coverage_fraction": 0.04235624,
+          "popularity_top_10_overlap": 0.53981122
+        },
+        {
+          "signed_weight": 0.2,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02572076,
+          "ndcg_at_10": 0.51578931,
+          "mean_signed_user_factor_norm": 0.03353289,
+          "catalog_coverage_items": 745,
+          "catalog_coverage_fraction": 0.05224404,
+          "popularity_top_10_overlap": 0.48151027
+        }
+      ]
+    },
+    "20": {
+      "effective_popularity_blend": 16.0,
+      "baseline": {
+        "signed_weight": 0.05,
+        "eligible_users": 1801,
+        "recall_at_10": 0.03082624,
+        "ndcg_at_10": 0.61222057,
+        "mean_signed_user_factor_norm": 0.06090836,
+        "catalog_coverage_items": 248,
+        "catalog_coverage_fraction": 0.0173913,
+        "popularity_top_10_overlap": 0.6570794
+      },
+      "selected": {
+        "signed_weight": 0.05,
+        "eligible_users": 1801,
+        "recall_at_10": 0.03082624,
+        "ndcg_at_10": 0.61222057,
+        "mean_signed_user_factor_norm": 0.06090836,
+        "catalog_coverage_items": 248,
+        "catalog_coverage_fraction": 0.0173913,
+        "popularity_top_10_overlap": 0.6570794
+      },
+      "trials": [
+        {
+          "signed_weight": 0.03,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03121412,
+          "ndcg_at_10": 0.61768969,
+          "mean_signed_user_factor_norm": 0.06090836,
+          "catalog_coverage_items": 187,
+          "catalog_coverage_fraction": 0.0131136,
+          "popularity_top_10_overlap": 0.67762354
+        },
+        {
+          "signed_weight": 0.04,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03098466,
+          "ndcg_at_10": 0.61418718,
+          "mean_signed_user_factor_norm": 0.06090836,
+          "catalog_coverage_items": 218,
+          "catalog_coverage_fraction": 0.01528752,
+          "popularity_top_10_overlap": 0.66735147
+        },
+        {
+          "signed_weight": 0.05,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03082624,
+          "ndcg_at_10": 0.61222057,
+          "mean_signed_user_factor_norm": 0.06090836,
+          "catalog_coverage_items": 248,
+          "catalog_coverage_fraction": 0.0173913,
+          "popularity_top_10_overlap": 0.6570794
+        },
+        {
+          "signed_weight": 0.06,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03062046,
+          "ndcg_at_10": 0.60895714,
+          "mean_signed_user_factor_norm": 0.06090836,
+          "catalog_coverage_items": 273,
+          "catalog_coverage_fraction": 0.01914446,
+          "popularity_top_10_overlap": 0.64758468
+        },
+        {
+          "signed_weight": 0.075,
+          "eligible_users": 1801,
+          "recall_at_10": 0.0304464,
+          "ndcg_at_10": 0.60652391,
+          "mean_signed_user_factor_norm": 0.06090836,
+          "catalog_coverage_items": 307,
+          "catalog_coverage_fraction": 0.02152875,
+          "popularity_top_10_overlap": 0.63287063
+        },
+        {
+          "signed_weight": 0.1,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02999593,
+          "ndcg_at_10": 0.59802384,
+          "mean_signed_user_factor_norm": 0.06090836,
+          "catalog_coverage_items": 367,
+          "catalog_coverage_fraction": 0.02573633,
+          "popularity_top_10_overlap": 0.60544142
+        },
+        {
+          "signed_weight": 0.15,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02909772,
+          "ndcg_at_10": 0.58195297,
+          "mean_signed_user_factor_norm": 0.06090836,
+          "catalog_coverage_items": 495,
+          "catalog_coverage_fraction": 0.03471248,
+          "popularity_top_10_overlap": 0.55813437
+        },
+        {
+          "signed_weight": 0.2,
+          "eligible_users": 1801,
+          "recall_at_10": 0.02816604,
+          "ndcg_at_10": 0.56637054,
+          "mean_signed_user_factor_norm": 0.06090836,
+          "catalog_coverage_items": 604,
+          "catalog_coverage_fraction": 0.04235624,
+          "popularity_top_10_overlap": 0.51315936
+        }
+      ]
+    },
+    "40": {
+      "effective_popularity_blend": 8.0,
+      "baseline": {
+        "signed_weight": 0.05,
+        "eligible_users": 1801,
+        "recall_at_10": 0.03179003,
+        "ndcg_at_10": 0.6325809,
+        "mean_signed_user_factor_norm": 0.10657506,
+        "catalog_coverage_items": 246,
+        "catalog_coverage_fraction": 0.01725105,
+        "popularity_top_10_overlap": 0.61560244
+      },
+      "selected": {
+        "signed_weight": 0.04,
+        "eligible_users": 1801,
+        "recall_at_10": 0.03204673,
+        "ndcg_at_10": 0.63484221,
+        "mean_signed_user_factor_norm": 0.10657506,
+        "catalog_coverage_items": 233,
+        "catalog_coverage_fraction": 0.01633941,
+        "popularity_top_10_overlap": 0.62087729
+      },
+      "trials": [
+        {
+          "signed_weight": 0.03,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03212509,
+          "ndcg_at_10": 0.63560726,
+          "mean_signed_user_factor_norm": 0.10657506,
+          "catalog_coverage_items": 217,
+          "catalog_coverage_fraction": 0.01521739,
+          "popularity_top_10_overlap": 0.62731816
+        },
+        {
+          "signed_weight": 0.04,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03204673,
+          "ndcg_at_10": 0.63484221,
+          "mean_signed_user_factor_norm": 0.10657506,
+          "catalog_coverage_items": 233,
+          "catalog_coverage_fraction": 0.01633941,
+          "popularity_top_10_overlap": 0.62087729
+        },
+        {
+          "signed_weight": 0.05,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03179003,
+          "ndcg_at_10": 0.6325809,
+          "mean_signed_user_factor_norm": 0.10657506,
+          "catalog_coverage_items": 246,
+          "catalog_coverage_fraction": 0.01725105,
+          "popularity_top_10_overlap": 0.61560244
+        },
+        {
+          "signed_weight": 0.06,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03165034,
+          "ndcg_at_10": 0.63150317,
+          "mean_signed_user_factor_norm": 0.10657506,
+          "catalog_coverage_items": 260,
+          "catalog_coverage_fraction": 0.01823282,
+          "popularity_top_10_overlap": 0.6096613
+        },
+        {
+          "signed_weight": 0.075,
+          "eligible_users": 1801,
+          "recall_at_10": 0.031623,
+          "ndcg_at_10": 0.63073493,
+          "mean_signed_user_factor_norm": 0.10657506,
+          "catalog_coverage_items": 293,
+          "catalog_coverage_fraction": 0.02054698,
+          "popularity_top_10_overlap": 0.59883398
+        },
+        {
+          "signed_weight": 0.1,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03140478,
+          "ndcg_at_10": 0.62632565,
+          "mean_signed_user_factor_norm": 0.10657506,
+          "catalog_coverage_items": 331,
+          "catalog_coverage_fraction": 0.02321178,
+          "popularity_top_10_overlap": 0.58239867
+        },
+        {
+          "signed_weight": 0.15,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03074465,
+          "ndcg_at_10": 0.61585945,
+          "mean_signed_user_factor_norm": 0.10657506,
+          "catalog_coverage_items": 412,
+          "catalog_coverage_fraction": 0.02889201,
+          "popularity_top_10_overlap": 0.54936147
+        },
+        {
+          "signed_weight": 0.2,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03016958,
+          "ndcg_at_10": 0.60555486,
+          "mean_signed_user_factor_norm": 0.10657506,
+          "catalog_coverage_items": 493,
+          "catalog_coverage_fraction": 0.03457223,
+          "popularity_top_10_overlap": 0.51915602
+        }
+      ]
+    },
+    "80": {
+      "effective_popularity_blend": 4.0,
+      "baseline": {
+        "signed_weight": 0.05,
+        "eligible_users": 1801,
+        "recall_at_10": 0.03349573,
+        "ndcg_at_10": 0.66220815,
+        "mean_signed_user_factor_norm": 0.17397529,
+        "catalog_coverage_items": 207,
+        "catalog_coverage_fraction": 0.01451613,
+        "popularity_top_10_overlap": 0.52393115
+      },
+      "selected": {
+        "signed_weight": 0.03,
+        "eligible_users": 1801,
+        "recall_at_10": 0.03354462,
+        "ndcg_at_10": 0.66290574,
+        "mean_signed_user_factor_norm": 0.17397529,
+        "catalog_coverage_items": 198,
+        "catalog_coverage_fraction": 0.01388499,
+        "popularity_top_10_overlap": 0.52509717
+      },
+      "trials": [
+        {
+          "signed_weight": 0.03,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03354462,
+          "ndcg_at_10": 0.66290574,
+          "mean_signed_user_factor_norm": 0.17397529,
+          "catalog_coverage_items": 198,
+          "catalog_coverage_fraction": 0.01388499,
+          "popularity_top_10_overlap": 0.52509717
+        },
+        {
+          "signed_weight": 0.04,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03352947,
+          "ndcg_at_10": 0.66261636,
+          "mean_signed_user_factor_norm": 0.17397529,
+          "catalog_coverage_items": 203,
+          "catalog_coverage_fraction": 0.01423562,
+          "popularity_top_10_overlap": 0.52459745
+        },
+        {
+          "signed_weight": 0.05,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03349573,
+          "ndcg_at_10": 0.66220815,
+          "mean_signed_user_factor_norm": 0.17397529,
+          "catalog_coverage_items": 207,
+          "catalog_coverage_fraction": 0.01451613,
+          "popularity_top_10_overlap": 0.52393115
+        },
+        {
+          "signed_weight": 0.06,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03347783,
+          "ndcg_at_10": 0.6616011,
+          "mean_signed_user_factor_norm": 0.17397529,
+          "catalog_coverage_items": 216,
+          "catalog_coverage_fraction": 0.01514727,
+          "popularity_top_10_overlap": 0.52159911
+        },
+        {
+          "signed_weight": 0.075,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03344136,
+          "ndcg_at_10": 0.66057182,
+          "mean_signed_user_factor_norm": 0.17397529,
+          "catalog_coverage_items": 224,
+          "catalog_coverage_fraction": 0.01570827,
+          "popularity_top_10_overlap": 0.52054414
+        },
+        {
+          "signed_weight": 0.1,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03330834,
+          "ndcg_at_10": 0.65799719,
+          "mean_signed_user_factor_norm": 0.17397529,
+          "catalog_coverage_items": 246,
+          "catalog_coverage_fraction": 0.01725105,
+          "popularity_top_10_overlap": 0.51615769
+        },
+        {
+          "signed_weight": 0.15,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03298525,
+          "ndcg_at_10": 0.65285025,
+          "mean_signed_user_factor_norm": 0.17397529,
+          "catalog_coverage_items": 282,
+          "catalog_coverage_fraction": 0.0197756,
+          "popularity_top_10_overlap": 0.50161022
+        },
+        {
+          "signed_weight": 0.2,
+          "eligible_users": 1801,
+          "recall_at_10": 0.03265664,
+          "ndcg_at_10": 0.6456699,
+          "mean_signed_user_factor_norm": 0.17397529,
+          "catalog_coverage_items": 354,
+          "catalog_coverage_fraction": 0.02482468,
+          "popularity_top_10_overlap": 0.48467518
+        }
+      ]
+    }
+  }
+}

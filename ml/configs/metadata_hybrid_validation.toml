@@ -1,0 +1,26 @@
+[paths]
+split_directory = "../data/processed/v2-user-holdout"
+artifact_path = "../data/artifacts/weighted-als-hybrid-v1/weighted_als_hybrid.npz"
+items_path = "../data/processed/v1/items.parquet"
+output_report = "reports/metadata-hybrid-validation-v1.json"
+
+[fixed_model]
+signed_regularization = 100.0
+signed_weight = 0.05
+popularity_decay_exponent = 1.0
+popularity_decay_pivot = 10
+
+[selection]
+metadata_weight_candidates = [0.0, 0.0001, 0.0003, 0.0005, 0.001, 0.002, 0.003, 0.005, 0.01]
+minimum_genre_frequency = 20
+maximum_recall_loss_fraction = 0.01
+maximum_popularity_overlap_increase = 0.01
+minimum_coverage_retention_fraction = 0.9
+
+[evaluation]
+observed_ratings = [5, 10, 20, 40, 80]
+relevance_threshold = 8
+ranking_k = 10
+user_batch_size = 128
+parquet_batch_size = 131072
+seed = 42

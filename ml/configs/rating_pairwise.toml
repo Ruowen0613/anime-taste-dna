@@ -1,0 +1,21 @@
+[paths]
+split_directory = "../data/processed/v2-user-holdout"
+output_report = "reports/rating-pairwise-validation-v1.json"
+
+[training]
+embedding_dimension = 32
+epochs = 4
+batch_size = 131072
+learning_rate = 0.01
+weight_decay = 0.00001
+minimum_rating_gap = 1
+seed = 42
+device = "auto"
+
+[validation]
+regularization_candidates = [0.1, 1.0, 10.0, 100.0, 1000.0]
+observed_ratings = [10, 20, 40, 80]
+relevance_threshold = 8
+ranking_k = 10
+user_batch_size = 128
+fold_in_steps = 8

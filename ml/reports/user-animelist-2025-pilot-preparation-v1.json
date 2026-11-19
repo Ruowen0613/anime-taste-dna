@@ -1,0 +1,33 @@
+{
+  "source": {
+    "ratings_sha256": "2ee00f83262cd4cdb2d4a0f1661545307ccc956b01314df0d5e5232433339e68",
+    "anime_sha256": "5bec78930e6e7633156046338947954c7e619d9615116bec13d9fc4e04221175",
+    "valid_rows_before_deduplication": 148064215
+  },
+  "cleaning": {
+    "duplicate_rows_beyond_first_removed": 3384712,
+    "conflicting_rating_groups_dropped": 57178,
+    "conflict_policy": "drop the entire user-item group when ratings disagree"
+  },
+  "selection": {
+    "selected_users": 108948,
+    "user_groups": {
+      "train": 106222,
+      "validation": 1369,
+      "test": 1357
+    },
+    "rows": {
+      "train": 8688154,
+      "validation_history": 274902,
+      "validation_target": 67375,
+      "test_history": 268235,
+      "test_target": 65806
+    },
+    "items": 20237
+  },
+  "limitations": [
+    "The source lacks timestamps, so held-out targets are deterministic random samples.",
+    "This is a resource-bounded pilot using a deterministic subset of source users.",
+    "Platform provenance is absent, so platform-specific calibration cannot be audited."
+  ]
+}

@@ -41,7 +41,8 @@ export function PopularPicksPage({ ratings, onRate, onRemove, onRecommend }: Pop
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-violet">Build a stronger taste profile</p>
           <h1 id="popular-picks-heading" className="mt-3 text-4xl font-bold sm:text-6xl">Popular Picks</h1>
-          <p className="mt-4 max-w-3xl text-slate-300">Rate any titles you have watched. These are the 100 most-interacted-with anime supported by the current recommendation model.</p>
+          <p className="mt-4 max-w-3xl text-slate-300">Rate titles you have watched from these 100 popular, model-supported picks. More ratings—and a wider mix of favorites and dislikes—help us build a stronger profile and make your recommendations more personal.</p>
+          <p className="mt-2 max-w-3xl text-sm text-slate-400">Only score anime you have watched. If you have not seen a title and do not want it recommended, choose <span className="font-medium text-slate-300">Not interested</span> instead; it will be excluded without counting as a low rating.</p>
         </div>
         <div className="flex items-center gap-4">
           <p className="text-sm text-slate-400"><strong className="text-xl text-white">{ratedPopularCount}</strong> / 100 rated</p>

@@ -141,3 +141,12 @@ this model is an evaluated comparison baseline rather than the intended final re
 - Title strings are never used for runtime joins. MAL IDs remain canonical and AniList mappings must be explicit.
 
 The dataset reference, version, checksum, filters, seeds, row counts, time-split protocol, and fingerprints must be recorded in every exported model artifact.
+
+## 2025 cross-platform pilot
+
+A separate, non-production experiment audited and tested the 2025
+`mramazan/User-Animelist-Dataset` snapshot containing 148 million published rows. It remains
+isolated from the selected MVP snapshot because it combines MAL, AniList, and Kitsu, provides no
+timestamps or platform labels, and contains duplicate user-item rows that require explicit
+cleaning. The executed audit, deterministic pilot split, results, and decision are documented in
+[`USER_ANIMELIST_2025_DATASET_EXPERIMENT.md`](USER_ANIMELIST_2025_DATASET_EXPERIMENT.md).

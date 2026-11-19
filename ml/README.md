@@ -8,6 +8,20 @@ This package holds offline-only recommendation work. No data preparation or trai
 
 Raw data belongs in root `data/`, while generated reports, runs, and checkpoints belong in ignored data/artifact directories.
 
+## 2025 dataset pilot
+
+Audit and prepare the isolated cross-platform pilot:
+
+```bash
+anime-taste-audit-user-animelist-2025 --config configs/user_animelist_2025_audit.toml
+anime-taste-prepare-user-animelist-2025 --config configs/user_animelist_2025_pilot.toml
+```
+
+Then run its popularity baseline, Weighted ALS validation/frozen test, and signed-residual
+validation/frozen test using the corresponding `*_user_animelist_2025_pilot*.toml` configs. The
+pilot is deliberately blocked from production acceptance; its source has no timestamps or platform
+provenance. See `docs/USER_ANIMELIST_2025_DATASET_EXPERIMENT.md` for executed results.
+
 ## Dataset audit
 
 Install the package in an isolated environment and run the chunked audit from `ml/`:
@@ -92,6 +106,16 @@ anime-taste-strict-mf --config configs/strict_mf.toml
 
 The executed validation report is `reports/strict-cold-start-mf-v1.json`. This experiment does not
 export an artifact or access held-out test users.
+
+Test whether additional new-user ratings reduce the need for strong fold-in regularization on one
+common validation cohort:
+
+```bash
+anime-taste-strict-mf --config configs/strict_mf_rating_count.toml
+```
+
+This validation-only experiment compares 10, 20, 40, and 80 observed ratings across regularization
+0.1 through 10,000. Its report is `reports/strict-mf-rating-count-validation-v1.json`.
 
 Train Weighted ALS and select a popularity-aware hybrid ranker on strict validation users:
 
@@ -214,3 +238,17 @@ The first ridge fold-in report is `reports/bpr-validation-v1.json`. The current 
 pairwise logistic fold-in aligned with BPR training and writes
 `reports/bpr-pairwise-fold-in-v1.json`. Both candidates were rejected on validation and never
 accessed test targets.
+
+## Full-rating pairwise MF experiment
+
+Train and validate the observed-only, full-rating pairwise candidate:
+
+```bash
+anime-taste-rating-pairwise --config configs/rating_pairwise.toml
+```
+
+The model compares titles rated by the same user, weights each pair by its exact 1–10 rating gap,
+and never treats an unrated title as disliked. It evaluates 10, 20, 40, and 80-rating cold-start
+profiles on strict validation only. The executed report is
+`reports/rating-pairwise-validation-v1.json`; this candidate was rejected and is not a production
+artifact.

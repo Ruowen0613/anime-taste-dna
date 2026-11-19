@@ -1,0 +1,21 @@
+[paths]
+ratings_csv = "../data/raw/user-animelist-2025/ratings.csv"
+anime_csv = "../data/raw/user-animelist-2025/animes.csv"
+audit_report = "reports/user-animelist-2025-audit-v1.json"
+output_directory = "../data/processed/user-animelist-2025-pilot"
+working_directory = "../data/working/user-animelist-2025-pilot"
+report_json = "reports/user-animelist-2025-pilot-preparation-v1.json"
+
+[preparation]
+chunk_size = 1000000
+partitions = 32
+
+[split]
+seed = 20250718
+train_fraction = 0.06
+validation_fraction = 0.003
+test_fraction = 0.003
+target_fraction = 0.2
+minimum_train_interactions = 5
+minimum_history_interactions = 80
+minimum_target_interactions = 10

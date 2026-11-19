@@ -22,6 +22,8 @@ dev = [
 
 [project.scripts]
 anime-taste-audit = "anime_taste_dna.data.audit:main"
+anime-taste-audit-user-animelist-2025 = "anime_taste_dna.data.audit_user_animelist_2025:main"
+anime-taste-prepare-user-animelist-2025 = "anime_taste_dna.data.prepare_user_animelist_2025_pilot:main"
 anime-taste-preprocess = "anime_taste_dna.data.preprocess:main"
 anime-taste-split = "anime_taste_dna.data.split:main"
 anime-taste-popularity = "anime_taste_dna.models.popularity:main"
@@ -42,6 +44,7 @@ anime-taste-signed-hybrid-test = "anime_taste_dna.evaluation.signed_hybrid_test:
 anime-taste-export-signed-hybrid = "anime_taste_dna.models.export_signed_hybrid:main"
 anime-taste-rating-scale-validation = "anime_taste_dna.evaluation.rating_scale_validation:main"
 anime-taste-rating-scale-test = "anime_taste_dna.evaluation.rating_scale_test:main"
+anime-taste-rating-pairwise = "anime_taste_dna.models.rating_pairwise:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

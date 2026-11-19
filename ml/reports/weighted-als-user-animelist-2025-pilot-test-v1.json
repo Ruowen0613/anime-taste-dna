@@ -1,0 +1,105 @@
+{
+  "protocol": {
+    "split": "strict untouched test users",
+    "test_users": 1354,
+    "parameter_search": "none; all values frozen from validation",
+    "candidate_exclusion": "only exposed ratings"
+  },
+  "fixed_selection": {
+    "iterations": 2,
+    "fold_in_regularization": 100.0,
+    "popularity_blend": 8.0
+  },
+  "interaction_count_baseline": {
+    "mean_recall_at_10": 0.05435157,
+    "mean_ndcg_at_10": 0.11395029,
+    "by_observed_ratings": {
+      "5": {
+        "eligible_users": 1354,
+        "recall_at_10": 0.04764539,
+        "ndcg_at_10": 0.10145569,
+        "catalog_coverage_items": 13,
+        "candidate_exclusion": "only the 5 exposed ratings"
+      },
+      "10": {
+        "eligible_users": 1354,
+        "recall_at_10": 0.04883877,
+        "ndcg_at_10": 0.10314179,
+        "catalog_coverage_items": 14,
+        "candidate_exclusion": "only the 10 exposed ratings"
+      },
+      "20": {
+        "eligible_users": 1354,
+        "recall_at_10": 0.0513194,
+        "ndcg_at_10": 0.10687633,
+        "catalog_coverage_items": 16,
+        "candidate_exclusion": "only the 20 exposed ratings"
+      },
+      "40": {
+        "eligible_users": 1354,
+        "recall_at_10": 0.05556341,
+        "ndcg_at_10": 0.11499742,
+        "catalog_coverage_items": 20,
+        "candidate_exclusion": "only the 40 exposed ratings"
+      },
+      "80": {
+        "eligible_users": 1354,
+        "recall_at_10": 0.06839087,
+        "ndcg_at_10": 0.14328021,
+        "catalog_coverage_items": 36,
+        "candidate_exclusion": "only the 80 exposed ratings"
+      }
+    }
+  },
+  "weighted_als_hybrid": {
+    "mean_recall_at_10": 0.06347489,
+    "mean_ndcg_at_10": 0.13132668,
+    "by_observed_ratings": {
+      "5": {
+        "eligible_users": 1354,
+        "recall_at_10": 0.0545692,
+        "ndcg_at_10": 0.11264334,
+        "mean_user_factor_norm": 0.13131444,
+        "catalog_coverage_items": 205,
+        "catalog_coverage_fraction": 0.01212946
+      },
+      "10": {
+        "eligible_users": 1354,
+        "recall_at_10": 0.05462885,
+        "ndcg_at_10": 0.11341316,
+        "mean_user_factor_norm": 0.22668827,
+        "catalog_coverage_items": 165,
+        "catalog_coverage_fraction": 0.00976274
+      },
+      "20": {
+        "eligible_users": 1354,
+        "recall_at_10": 0.0590388,
+        "ndcg_at_10": 0.12295945,
+        "mean_user_factor_norm": 0.39268813,
+        "catalog_coverage_items": 120,
+        "catalog_coverage_fraction": 0.00710017
+      },
+      "40": {
+        "eligible_users": 1354,
+        "recall_at_10": 0.06521834,
+        "ndcg_at_10": 0.1348008,
+        "mean_user_factor_norm": 0.65796002,
+        "catalog_coverage_items": 83,
+        "catalog_coverage_fraction": 0.00491095
+      },
+      "80": {
+        "eligible_users": 1354,
+        "recall_at_10": 0.08391924,
+        "ndcg_at_10": 0.17281664,
+        "mean_user_factor_norm": 1.05553127,
+        "catalog_coverage_items": 73,
+        "catalog_coverage_fraction": 0.00431927
+      }
+    }
+  },
+  "passed_both_metrics": true,
+  "artifact": {
+    "path": "/Users/wangruowen/Downloads/anime-taste-dna/data/artifacts/weighted-als-user-animelist-2025-pilot-v1/weighted_als_hybrid.npz",
+    "exported": true
+  }
+}

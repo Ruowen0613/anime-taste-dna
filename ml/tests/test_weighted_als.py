@@ -4,6 +4,7 @@ from anime_taste_dna.models.weighted_als import (
     fold_in_implicit_users,
     fold_in_signed_implicit_users,
     implicit_confidence,
+    positive_rating_mask,
     solve_implicit_factors,
 )
 
@@ -14,6 +15,17 @@ def test_implicit_confidence_increases_with_rating() -> None:
     )
 
     assert confidence.tolist() == [3.0, 5.0, 7.0]
+
+
+def test_confidence_override_adds_weak_seven_without_changing_high_ratings() -> None:
+    ratings = np.asarray([7, 8, 9, 10], dtype=np.uint8)
+    overrides = ((7, 3.0),)
+
+    confidence = implicit_confidence(ratings, 8, 10.0, overrides)
+    positive = positive_rating_mask(ratings, 8, overrides)
+
+    assert confidence.tolist() == [3.0, 11.0, 21.0, 31.0]
+    assert positive.tolist() == [True, True, True, True]
 
 
 def test_implicit_factor_solver_points_toward_observed_factor() -> None:

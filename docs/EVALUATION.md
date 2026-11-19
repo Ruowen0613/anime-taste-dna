@@ -285,6 +285,65 @@ improve Top-N ranking, while practical AdamW weight-decay changes had no meaning
 evidence of objective mismatch rather than a fold-in hyperparameter mistake. Further tuning of the
 same explicit-MSE setup is not justified before testing a ranking-aware objective.
 
+### Explicit-MF rating-count experiment
+
+A validation-only follow-up tested whether ten observed ratings had forced excessive new-user
+fold-in regularization. One common cohort of 1,801 strict validation users supplied 10, 20, 40,
+and 80 observed ratings. Every count was evaluated against the full train-supported catalog at
+regularization 0.1, 1, 10, 100, 1,000, and 10,000; test users remained untouched.
+
+Selecting by NDCG@10 independently at each rating count chose epoch 1 and regularization 10,000 in
+all four conditions:
+
+| Observed ratings | Recall@10 | NDCG@10 | User-factor norm | Coverage | Bias-only NDCG@10 |
+|---:|---:|---:|---:|---:|---:|
+| 10 | 0.01611452 | 0.34872646 | 0.00110891 | 12 | 0.34858951 |
+| 20 | 0.01638187 | 0.35246322 | 0.00178632 | 13 | 0.35196425 |
+| 40 | 0.01672847 | 0.35761410 | 0.00288768 | 14 | 0.35727681 |
+| 80 | 0.01759949 | 0.36619471 | 0.00480046 | 18 | 0.36626131 |
+
+More ratings improve the selected model's absolute metrics, but they do not make weaker
+regularization accurate. At regularization 10, NDCG@10 falls from 0.19745691 with ten ratings to
+0.06906680 with eighty; at regularization 100 it falls from 0.33738393 to 0.30331881. The selected
+user vector remains tiny and its NDCG is effectively identical to item-bias-only, including a small
+loss to bias-only at eighty ratings. Regularization 1,000 raises eighty-rating Recall@10 to
+0.01881637 and coverage to 33 items, but lowers NDCG@10 to 0.35670232.
+
+The hypothesis that ten ratings alone caused the high selected regularization is therefore not
+supported. Additional observations expose the same objective/geometry mismatch: weakening the
+penalty increases personalization but degrades ranking quality. Full executed results are recorded
+in `strict-mf-rating-count-validation-v1.json`.
+
+## Full-rating pairwise MF validation
+
+The rating-aware pairwise experiment uses all distinct 1–10 rating differences without score
+bins. Training pairs contain only two titles rated by the same historical user: the higher-rated
+title must rank above the lower-rated title, and the logistic-loss weight is the rating gap divided
+by nine. Unrated titles are never treated as negative feedback. Cold-start fold-in optimizes the
+same objective over the new user's exposed ratings.
+
+The strict validation cohort contains 1,801 users eligible at all four observation counts. Epoch 1
+with fold-in regularization 10 was best; later epochs lowered training loss while also lowering
+validation ranking quality, so they were rejected as overfit.
+
+| Observed ratings | Recall@10 | NDCG@10 | User-factor norm | Coverage |
+|---:|---:|---:|---:|---:|
+| 10 | 0.00725099 | 0.13503207 | 0.30785912 | 814 |
+| 20 | 0.00809438 | 0.15851318 | 0.72443685 | 1,375 |
+| 40 | 0.00785217 | 0.15778314 | 1.46721475 | 1,811 |
+| 80 | 0.00746007 | 0.15345235 | 2.53847336 | 2,063 |
+
+This model is genuinely personalized: its mean NDCG@10 is 0.15119518 versus 0.03882225 for its
+item-bias-only ablation, and coverage grows with more observations. It is nevertheless not accurate
+enough to ship. The frozen signed hybrid reaches mean Recall@10 0.03052464 and mean NDCG@10
+0.60689233 on the same 10/20/40/80 slices, compared with 0.00766440 and 0.15119518 for pairwise
+MF. This candidate therefore stops at validation: no test access, artifact export, backend
+integration, or deployment.
+
+The executed report is `rating-pairwise-validation-v1.json`. It records every epoch and
+regularization trial, the bias-only ablation, the observed-only pair definition, and confirmation
+that test data was not read.
+
 ## BPR Model C validation experiment
 
 The first ranking-aware candidate trained 32-dimensional Bayesian Personalized Ranking matrix
